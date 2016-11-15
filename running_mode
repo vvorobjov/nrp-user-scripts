@@ -1,0 +1,123 @@
+#!/bin/bash
+# A script to enable or disable oidc
+
+mode=$1
+if [[ -z $mode ]]; then
+  echo "1. EPFL mode -- Enable OIDC and use dev. servers as backends"
+  echo "2. Offline mode -- Disable OIDC and use your local machine as backend"
+  echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
+  read mode
+fi
+
+function enableFrontendOIDC {
+  echo "Editing Frontend config.json"
+  cd $HBP/ExDFrontend/app
+  sed -e '/ensureToken/ s/false/true/' -i config.json
+  sed -e '/forceuser/ s/true/false/' -i config.json
+}
+
+function enableBackendOIDC {
+  echo "Editing Backend config.json"
+  cd $HBP/ExDBackend/platform_venv/local/lib/python2.7/site-packages/flask_restful_swagger/static
+  sed -e '/deactivate/ s/true/false/' -i config.json
+}
+
+function enableNginxOIDC {
+  echo "Editing nginx conf files"
+  cd ~/.local/etc/nginx/conf.d
+  sed -e '/access_by_lua_file/ s/^#*//#/' -i nrp-services.conf
+  sed -e '/_access_token/, +2 s/^#*//#/' -i nrp-services.conf
+  sed -e '/_userinfo/, +2 s/^#*//#/' -i nrp-services.conf
+  sed -e '/access_by_lua_file/ s/^#*//#/' -i nrp-services-websockets.conf
+  sed -e '/_access_token/, +2 s/^#*//#/' -i nrp-services-websockets.conf
+  sed -e '/_userinfo/, +2 s/^#*//#/' -i nrp-services-websockets.conf
+}
+
+function proxyUseDevServers {
+  echo "Using the proxy config file containing the dev. servers as backends"
+  cd $HBP/nrpBackendProxy
+  rm config.json
+  cp config.json.sample config.json
+}
+
+function disableFrontendOIDC {
+  echo "Editing Frontend config.json"
+  cd $HBP/ExDFrontend/app
+  sed -e '/ensureToken/ s/true/false/' -i config.json
+  sed -e '/forceuser/ s/false/true/' -i config.json
+}
+
+function disableBackendOIDC {
+  echo "Editing Backend config.json"
+  cd $HBP/ExDBackend/platform_venv/local/lib/python2.7/site-packages/flask_restful_swagger/static
+  sed -e '/deactivate/ s/false/true/' -i config.json
+}
+
+function disableNginxOIDC {
+  echo "Editing nginx conf files"
+  cd ~/.local/etc/nginx/conf.d
+  sed -e '/access_by_lua_file/ s/^#*/#/' -i nrp-services.conf
+  sed -e '/_access_token/, +2 s/^#*/#/' -i nrp-services.conf
+  sed -e '/_userinfo/, +2 s/^#*/#/' -i nrp-services.conf
+  sed -e '/access_by_lua_file/ s/^#*/#/' -i nrp-services-websockets.conf
+  sed -e '/_access_token/, +2 s/^#*/#/' -i nrp-services-websockets.conf
+  sed -e '/_userinfo/, +2 s/^#*/#/' -i nrp-services-websockets.conf
+}
+
+function proxyUseLocalhost {
+  echo "Using the proxy config file containing your localhost as backend"
+  cd $HBP/nrpBackendProxy
+  rm config.json
+  cp config.json.sample.local config.json
+}
+
+function enableCollabSupport {
+  echo "Editing the APP_SETTINGS variable"
+  if grep -q APP_SETTINGS "$HOME/.bashrc"; then
+    sed -e '/export APP_SETTINGS/ s/NoDBConfig/LocalConfig/' -i $HOME/.bashrc
+  else
+    sed -e "\$aexport APP_SETTINGS=config.LocalConfig" -i $HOME/.bashrc
+  fi
+  echo "Sourcing the .bashrc"
+  source ~/.bashrc
+  echo "Enabling authentication in local proxy config for collab support"
+  cd $HBP/nrpBackendProxy
+  sed -e '/deactivate/ s/true/false/' -i config.json
+}
+
+function disableCollabSupport {
+  echo "Editing the APP_SETTINGS variable and sourcing the .bashrc"
+  cd $HOME
+  if grep -q APP_SETTINGS "$HOME/.bashrc"; then
+    sed -e '/export APP_SETTINGS/ s/LocalConfig/NoDBConfig/' -i $HOME/.bashrc
+  else
+    sed -e "\$aexport APP_SETTINGS=config.NoDBConfig" -i $HOME/.bashrc
+  fi
+  echo "Sourcing the .bashrc"
+  source ~/.bashrc
+  echo "Disabling authentication in local proxy config file"
+  cd $HBP/nrpBackendProxy
+  sed -e '/deactivate/ s/false/true/' -i config.json
+}
+
+if [ $mode -eq 1 ]; then
+  enableFrontendOIDC
+  proxyUseDevServers
+
+elif [ $mode -eq 2 ]; then
+  disableFrontendOIDC
+  disableNginxOIDC
+  disableCollabSupport
+  proxyUseLocalhost
+
+elif [ $mode -eq 3 ]; then
+  enableFrontendOIDC
+  enableBackendOIDC
+  enableNginxOIDC
+  enableCollabSupport
+  proxyUseLocalhost
+
+fi
+
+echo "Done"
+$HOME/.local/etc/init.d/nginx restart

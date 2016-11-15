@@ -1,0 +1,9 @@
+#!/bin/bash
+# Remove already existing config files that will be set-up using the configure_nrp script
+echo "Removing existing config files for nginx, ExDFrontend, CLE, nrpBackendProxy and the gzserver/gzbridge scripts. This can be remedied by runnning configure_nrp"
+$HOME/.local/etc/init.d/nginx stop
+rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
+rm $HBP/ExDFrontend/app/config.json $HBP/ExDFrontend/app/config.json.local
+rm $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
+rm $HBP/nrpBackendProxy/config.json $HBP/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample.local
+echo "DONE"

@@ -1,0 +1,85 @@
+{
+  "refreshInterval": 5000,
+  "auth": {
+    "renewInternal": 600000,
+    "clientId": "0dcfb392-32c7-480c-ae18-cbaf29e8a6b1",
+    "clientSecret": "WfjTCn30aTlcmbL-wWVhmsAUgobaX9o5xR-6WQ9jQEDFAodNVozzjy283qaOjUYkl28DfG-L6vVnQGwlBvzikA",
+    "url": "https://services.humanbrainproject.eu/oidc",
+    "deactivate": false
+  },
+  "port": 8000,
+  "servers": {
+    "geneva1": {
+      "gzweb": {
+        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/1/assets",
+        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/1/api",
+        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/1/api/webstream/",
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/1/ws/gzbridge"
+      },
+      "rosbridge": {
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/1/ws"
+      },
+      "serverJobLocation": "lugano"
+    },
+    "geneva2": {
+      "gzweb": {
+        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/2/assets",
+        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/2/api",
+        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/2/api/webstream/",
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/2/ws/gzbridge"
+      },
+      "rosbridge": {
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/2/ws"
+      },
+      "serverJobLocation": "lugano"
+    },
+    "geneva3": {
+      "gzweb": {
+        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/3/assets",
+        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/3/api",
+        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/3/api/webstream/",
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/3/ws/gzbridge"
+      },
+      "rosbridge": {
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/3/ws"
+      },
+      "serverJobLocation": "lugano"
+    },
+    "lugano4": {
+      "gzweb": {
+        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/4/assets",
+        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/4/api",
+        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/4/api/webstream/",
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/4/ws/gzbridge"
+      },
+      "rosbridge": {
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/4/ws"
+      },
+      "serverJobLocation": "lugano"
+    },
+    "lugano5": {
+      "gzweb": {
+        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/5/assets",
+        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/5/api",
+        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/5/api/webstream/",
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/5/ws/gzbridge"
+      },
+      "rosbridge": {
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/5/ws"
+      },
+      "serverJobLocation": "lugano"
+    },
+    "lugano6": {
+      "gzweb": {
+        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/6/assets",
+        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/6/api",
+        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/6/api/webstream/",
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/6/ws/gzbridge"
+      },
+      "rosbridge": {
+        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/6/ws"
+      },
+      "serverJobLocation": "lugano"
+    }
+  }
+}

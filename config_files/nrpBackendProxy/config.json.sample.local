@@ -1,0 +1,25 @@
+{
+  "refreshInterval": 5000,
+  "auth": {
+    "renewInternal": 600000,
+    "clientId": "0dcfb392-32c7-480c-ae18-cbaf29e8a6b1",
+    "clientSecret": "WfjTCn30aTlcmbL-wWVhmsAUgobaX9o5xR-6WQ9jQEDFAodNVozzjy283qaOjUYkl28DfG-L6vVnQGwlBvzikA",
+    "url": "https://services.humanbrainproject.eu/oidc",
+    "deactivate": true
+  },
+  "port": 8000,
+  "servers": {
+    "localhost": {
+      "gzweb": {
+        "assets": "http://localhost:8040",
+        "nrp-services": "http://localhost:8080",
+        "videoStreaming": "http://localhost:8080/webstream/",
+        "websocket": "ws://localhost:9091/gzbridge"
+      },
+      "rosbridge": {
+        "websocket": "ws://localhost:9091"
+      },
+      "serverJobLocation": "local"
+    }
+  }
+}

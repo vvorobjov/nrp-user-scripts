@@ -1,0 +1,39 @@
+#!/bin/bash
+# A script to clone all necessary repos when installing from scratch. the $HBP need to be set-up for this script to work successfully
+
+if [[ -z $HBP ]] ; then
+  echo "Please set the \$HBP variable to your desired installation path first."
+  exit
+else
+  if [[ -d $HBP ]] ; then
+    echo "The NRP repos will be cloned to the already-existing directory" $HBP
+  elif [[ -f $HBP ]] ; then
+    echo "Invalid destination." $HBP "is a file."
+    exit 1
+  else
+    echo "The NRP repos will be cloned to the newly created directory" $HBP
+    mkdir -p -v $HBP
+  fi
+fi
+
+# Get EPFL username to clone repos
+echo "Enter your EPFL username:"
+read user
+
+# cloning all repos
+cd $HBP
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/sdformat && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg sdformat/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/bulletphysics && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg bulletphysics/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/gazebo && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg gazebo/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/MUSIC && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg MUSIC/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/nest-simulator && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg nest-simulator/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/BrainSimulation && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg BrainSimulation/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/ExDBackend && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg ExDBackend/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/CLE && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg CLE/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/ExperimentControl && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg ExperimentControl/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/GazeboRosPackages && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg GazeboRosPackages/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/Models && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg Models/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/gzweb && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg gzweb/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/ExDFrontend && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg ExDFrontend/.git/hooks/
+git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/nrpBackendProxy
+git clone ssh://bbpcode.epfl.ch/neurorobotics/retina && scp -p bbpcode.epfl.ch:hooks/commit-msg retina/.git/hooks/

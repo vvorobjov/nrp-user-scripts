@@ -1,0 +1,38 @@
+alias cle-backend='PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/platform_venv/lib/python2.7/site-packages:$HBP/CLE/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_backend/hbp_nrp_backend/runserver.py'
+alias cle-factory='PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/platform_venv/lib/python2.7/site-packages:$HBP/CLE/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py'
+alias cle-rosbridge='rosrun rosbridge_server rosbridge_websocket'
+alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
+alias cle-nginx='$HOME/.local/etc/init.d/nginx restart'
+alias cle-proxy='cd $HBP/nrpBackendProxy && node app.js'
+alias cle-rosvideo='rosrun web_video_server web_video_server _port:=8081'
+
+kill_hbp_cle()
+{
+    killlist="python.*roscore
+python\s.*rosmaster
+python\s.*rosbridge
+lib/rosout/rosout
+${GZSERVER_BIN_DIR}/gzserver
+python\s.*runserver\.py
+python\s.*ROSCLESimulationFactory\.py
+python\s.*StateMachineRunner\.py
+[0-9]+\snode\sapp\.js$
+node\s.*ws_server\.js
+web_video_server"
+
+    for killit in $killlist; do
+        ps -eo pid,cmd|grep -E $killit|grep -v grep|while read cmd
+        do
+            echo KILL $cmd
+            cmd_pid=$(echo $cmd|grep -Eo "^[0-9]+")
+            kill -INT $cmd_pid
+            kill -TERM $cmd_pid
+            kill -KILL $cmd_pid
+        done
+    done
+    rm -f $HOME/.gazebo/gzserver.lock
+}
+
+alias cle-start='roscore & sleep 2;cle-rosvideo & sleep 2;cle-rosbridge & sleep 2;cle-factory & sleep 2;cle-backend & sleep 2; cle-proxy & sleep 2'
+alias cle-kill='kill_hbp_cle'
+alias cle-postgres='pg_ctl -D $HOME/.local/postgres/data/ -l logfile restart'

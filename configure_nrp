@@ -1,0 +1,40 @@
+#!/bin/bash
+# A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE
+
+mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.opt/bbp
+
+echo "Copying Frontend config.json file"
+ln -s $HBP/user-scripts/config_files/ExDFrontend/config.json.local $HBP/ExDFrontend/app/config.json.local
+cp $HBP/ExDFrontend/app/config.json.local $HBP/ExDFrontend/app/config.json
+sed -e 's/<username>/'"$USER"'/' -i $HBP/ExDFrontend/app/config.json
+
+echo "Copying start/stop scripts for gzserver and gzbridge"
+cp -r $HBP/user-scripts/nrp-services $HOME/.opt/bbp
+chmod u+x $HOME/.opt/bbp/nrp-services/gzbridge
+chmod u+x $HOME/.opt/bbp/nrp-services/gzserver
+
+echo "Copying CLE config.ini file"
+ln -s $HBP/user-scripts/config_files/CLE/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
+cp $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini
+
+echo "Copying Proxy config files."
+ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample
+ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample.local $HBP/nrpBackendProxy/config.json.sample.local
+
+echo "Copying Nginx config files"
+cp -r /etc/nginx/* $HOME/.local/etc/nginx/
+cp /etc/init.d/nginx $HOME/.local/etc/init.d/nginx
+sed -e 's/ \/etc\// \/home\/'"$USER"'\/.local\/etc\//' -i /home/$USER/.local/etc/init.d/nginx
+echo 'DAEMON_OPTS="-c $HOME/.local/etc/nginx/nginx.conf -p $HOME/.local/etc/nginx"' >  $HOME/.local/etc/default/nginx
+cp $HBP/user-scripts/config_files/nginx/nginx.conf $HOME/.local/etc/nginx/nginx.conf
+sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/nginx.conf
+cp $HBP/user-scripts/config_files/nginx/conf.d/* $HOME/.local/etc/nginx/conf.d
+sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
+sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services-websockets.conf
+sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/gzweb.conf
+sed -e 's/80/8040/' -i $HOME/.local/etc/nginx/conf.d/gzweb.conf
+cp -r $HBP/user-scripts/config_files/nginx/lua/* $HOME/.local/etc/nginx/lua
+
+echo "Setting configuration files to default mode (offline mode)"
+$HBP/user-scripts/running_mode "2"
+echo "DONE"
