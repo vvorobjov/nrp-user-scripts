@@ -107,15 +107,15 @@ if [ $mode -eq 1 ]; then
 elif [ $mode -eq 2 ]; then
   disableFrontendOIDC
   disableNginxOIDC
-  disableCollabSupport
   proxyUseLocalhost
+  disableCollabSupport
 
 elif [ $mode -eq 3 ]; then
   enableFrontendOIDC
   enableBackendOIDC
   enableNginxOIDC
-  enableCollabSupport
   proxyUseLocalhost
+  enableCollabSupport
 
 fi
 
