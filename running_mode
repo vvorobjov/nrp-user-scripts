@@ -36,7 +36,9 @@ function enableNginxOIDC {
 function proxyUseDevServers {
   echo "Using the proxy config file containing the dev. servers as backends"
   cd $HBP/nrpBackendProxy
-  rm config.json
+  if [ -f config.json ]; then
+    rm config.json
+  fi
   cp config.json.sample config.json
 }
 
@@ -67,7 +69,9 @@ function disableNginxOIDC {
 function proxyUseLocalhost {
   echo "Using the proxy config file containing your localhost as backend"
   cd $HBP/nrpBackendProxy
-  rm config.json
+  if [ -f config.json ]; then
+    rm config.json
+  fi
   cp config.json.sample.local config.json
 }
 
