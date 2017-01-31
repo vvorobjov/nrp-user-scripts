@@ -1,0 +1,55 @@
+#!/bin/bash
+# This script is useful for integration testers to reset the whole NRP code to up-to-date master branch
+# and create a local IT branch to cleanly cherry-pick on
+
+cd $HBP
+
+echo
+echo =========================
+echo Updating repos
+echo =========================
+for i in ExperimentControl BrainSimulation CLE ExDBackend gzweb Models GazeboRosPackages nrpBackendProxy ExDFrontend user-scripts
+do
+  echo
+  echo -------------------------
+  echo $i
+  echo -------------------------
+  sleep 2
+  cd $i
+  git checkout master && git pull --rebase && { git branch | grep "^ *IT$" && git branch -D IT || true; } && git checkout -b IT || { echo ERROR;exit 1; }
+  cd ..
+done
+
+echo
+echo =========================
+echo Building
+echo =========================
+for i in ExperimentControl BrainSimulation CLE ExDBackend
+do
+  echo
+  echo -------------------------
+  echo $i
+  echo -------------------------
+  sleep 2
+  cd $i
+  make devinstall || { echo ERROR;exit 1; }
+  cd ..
+done
+
+echo
+echo -------------------------
+echo gzweb
+echo -------------------------
+sleep 2
+cd gzweb
+./deploy.sh || { echo ERROR;exit 1; }
+cd ..
+
+echo
+echo -------------------------
+echo GazeboRosPackages
+echo -------------------------
+sleep 2
+cd GazeboRosPackages
+catkin_make || { echo ERROR;exit 1; }
+cd ..
