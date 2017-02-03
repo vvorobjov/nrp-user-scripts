@@ -1,7 +1,8 @@
 # These variables can be included in the .bashrc before starting the installation process
 
-# ROS indigo
-source /opt/ros/indigo/setup.bash
+# ROS variables
+{ lsb_release -r | grep 14 >>/dev/null; } && source /opt/ros/indigo/setup.bash || source /opt/ros/kinetic/setup.bash
+
 export ROS_PARALLEL_JOBS=-j4
 export ROS_IP=127.0.0.1
 
@@ -21,6 +22,10 @@ export PKG_CONFIG_PATH=$HOME/.local/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_P
 
 # sdformat
 export CMAKE_PREFIX_PATH=$HOME/.local/lib/x86_64-linux-gnu/cmake/sdformat:$CMAKE_PREFIX_PATH
+
+# HBP opensim
+export OPENSIM_INSTALL_DIR=$HOME/.local
+export OPENSIM_HOME=$HOME/.local
 
 # local install including HBP plugins
 source $HBP/GazeboRosPackages/devel/setup.bash
@@ -64,7 +69,10 @@ export APP_SETTINGS=config.NoDBConfig
 # General NRP
 export NRP_USER=$USER
 
-# Permissions
+# User scripts
+export PATH=$HBP/user-scripts:$PATH
+
+# General paths
 export PATH=$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$HOME/.local/lib/pkgconfig:$PKG_CONFIG_PATH
@@ -72,3 +80,7 @@ export MANPATH=$HOME/.local/share/man:$MANPATH
 export C_INCLUDE_PATH=$HOME/.local/include:$C_INCLUDE_PATH
 export CPLUS_INCLUDE_PATH=$HOME/.local/include:$CPLUS_INCLUDE_PATH
 export CPATH=$HOME/.local/include:$CPATH
+
+# This loads nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
