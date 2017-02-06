@@ -1,0 +1,23 @@
+nrp_repos=(
+    BrainSimulation
+    ExperimentControl
+    VirtualCoach
+    GazeboRosPackages
+    CLE
+    ExDBackend
+    gzweb
+    Models
+    nrpBackendProxy
+    brainvisualizer
+    ExDFrontend
+)
+nrp_3rd_party=(
+    sdformat
+    bulletphysics
+    simbody
+    opensim
+    gazebo
+    MUSIC
+    nest-simulator
+    retina
+)

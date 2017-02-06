@@ -1,0 +1,138 @@
+#!/bin/bash
+# This script holds common functions
+
+function nrp_rebase {
+  rebase_all=$1
+
+  cd $HBP || { echo ERROR;exit 1; }
+  source $HBP/user-scripts/repos.txt || { echo ERROR;exit 1; }
+
+  echo
+  echo =========================
+  echo Rebasing repos
+  echo =========================
+  if [ "$rebase_all" = "all" ]
+  then
+    repos=(
+    ${nrp_3rd_party[*]}
+    ${nrp_repos[*]}
+    user-scripts
+  )
+  else
+    repos=(
+      ${nrp_repos[*]}
+      user-scripts
+    )
+  fi
+  for i in ${repos[@]}
+  do
+    echo
+    echo -------------------------
+    echo $i
+    echo -------------------------
+    sleep 2
+    cd $i || { echo ERROR;exit 1; }
+    git checkout master && git pull --rebase || { echo ERROR;exit 1; }
+    cd ..
+  done
+}
+
+function nrp_build {
+  cd $HBP || { echo ERROR;exit 1; }
+
+  echo
+  echo =========================
+  echo Building
+  echo =========================
+  isvpn=`ip tuntap show`
+  test -n "$isvpn" || { echo ERROR you should be on the EPFL vpn;exit 1; }
+  for i in ExperimentControl BrainSimulation CLE ExDBackend
+  do
+    echo
+    echo -------------------------
+    echo $i
+    echo -------------------------
+    sleep 2
+    cd $i || { echo ERROR;exit 1; }
+    make devinstall || { echo ERROR;exit 1; }
+    cd ..
+  done
+
+  echo
+  echo -------------------------
+  echo gzweb
+  echo -------------------------
+  sleep 2
+  cd gzweb || { echo ERROR;exit 1; }
+  ./deploy.sh || { echo ERROR;exit 1; }
+  cd ..
+
+  echo
+  echo -------------------------
+  echo GazeboRosPackages
+  echo -------------------------
+  sleep 2
+  cd GazeboRosPackages || { echo ERROR;exit 1; }
+  catkin_make || { echo ERROR;exit 1; }
+  cd ..
+}
+
+function clean_branches {
+  clean_all=$1
+
+  cd $HBP || { echo ERROR;exit 1; }
+  source $HBP/user-scripts/repos.txt || { echo ERROR;exit 1; }
+
+  echo
+  echo =========================
+  echo Cleaning up branches
+  echo =========================
+  if [ "$clean_all" = "all" ]
+  then
+    repos=(
+    ${nrp_3rd_party[*]}
+    ${nrp_repos[*]}
+    user-scripts
+  )
+  else
+    repos=(
+      ${nrp_repos[*]}
+      user-scripts
+    )
+  fi
+  for i in ${repos[@]}
+  do
+    echo
+    echo -------------------------
+    echo $i
+    echo -------------------------
+    sleep 2
+    cd $i || { echo ERROR;exit 1; }
+    git branch | grep -v "master" | xargs git branch -D 2>/dev/null
+    cd ..
+  done
+}
+
+function it_branch {
+  cd $HBP || { echo ERROR;exit 1; }
+
+  echo
+  echo =========================
+  echo Creating clean IT branch
+  echo =========================
+  repos=(
+    ${nrp_repos[*]}
+    user-scripts
+  )
+  for i in ${repos[@]}
+  do
+    echo
+    echo -------------------------
+    echo $i
+    echo -------------------------
+    sleep 2
+    cd $i || { echo ERROR;exit 1; }
+    { git branch | grep "^ *IT$" && git branch -D IT || true; } && git checkout -b IT || { echo ERROR;exit 1; }
+    cd ..
+  done
+}

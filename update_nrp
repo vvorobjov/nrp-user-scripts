@@ -1,0 +1,45 @@
+#!/bin/bash
+# This script gives many NRP updating options to users
+
+source $HBP/user-scripts/nrp_functions || { echo ERROR;exit 1; }
+
+function help {
+  echo "Usage: "`basename $0`" <command> [<arg>]"
+  echo "  command can be:"
+  echo "    help    : print this message"
+  echo "    rebase  : switch repos to master and rebase"
+  echo "              If argument 'all' is provided, include 3rd party repos"
+  echo "    build   : build all buildable repos (except 3rd party)"
+  echo "    update  : run rebase followed by build. Should update your NRP all-in-one"
+  echo "    itmaster: updates your NRP and create a clean IT branch in each repo"
+  echo "    gitclean: removes all local branches except master"
+  echo "              If argument 'all' is provided, include 3rd party repos"
+}
+
+if [ $# -lt 1 ]; then help;exit 1; fi
+command="$1"
+arg="$2"
+
+case "$command" in
+"rebase")
+  nrp_rebase $arg
+  ;;
+"build")
+  nrp_build
+  ;;
+"update")
+  nrp_rebase ""
+  nrp_build
+  ;;
+"itmaster")
+  nrp_rebase ""
+  nrp_build
+  it_branch
+  ;;
+"gitclean")
+  clean_branches $arg
+  ;;
+*)
+  help
+  ;;
+esac

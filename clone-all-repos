@@ -39,23 +39,10 @@ function clone_repo {
 }
 
 # cloning all repos
+source $HBP/user-scripts/repos.txt
 repos=(
-    BrainSimulation
-    bulletphysics
-    CLE
-    ExDBackend
-    ExDFrontend
-    ExperimentControl
-    GazeboRosPackages
-    gazebo
-    gzweb
-    Models
-    MUSIC
-    nest-simulator
-    nrpBackendProxy
-    retina
-    sdformat
-    VirtualCoach
+  ${nrp_3rd_party[*]}
+  ${nrp_repos[*]}
 )
 echo "Cloning all repos:"
 pushd $HBP > /dev/null
