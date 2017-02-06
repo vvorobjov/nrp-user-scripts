@@ -3,7 +3,8 @@
 echo "Removing existing config files for nginx, ExDFrontend, CLE, nrpBackendProxy and the gzserver/gzbridge scripts. This can be remedied by runnning configure_nrp"
 $HOME/.local/etc/init.d/nginx stop
 rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
-rm $HBP/ExDFrontend/app/config.json $HBP/ExDFrontend/app/config.json.local
-rm $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
-rm $HBP/nrpBackendProxy/config.json $HBP/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample.local
+rm -f $HBP/ExDFrontend/app/config.json $HBP/ExDFrontend/app/config.json.local
+rm -f $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
+rm -f $HBP/nrpBackendProxy/config.json $HBP/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample.local
+rm -f $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
 echo "DONE"

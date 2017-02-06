@@ -5,6 +5,7 @@ alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
 alias cle-nginx='$HOME/.local/etc/init.d/nginx restart'
 alias cle-proxy='cd $HBP/nrpBackendProxy && node app.js'
 alias cle-rosvideo='rosrun web_video_server web_video_server _port:=8081'
+alias cle-virtual-coach='PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/platform_venv/lib/python2.7/site-packages:$HBP/VirtualCoach/hbp_nrp_virtual_coach && python'
 
 kill_hbp_cle()
 {

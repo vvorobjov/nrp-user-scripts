@@ -1,5 +1,5 @@
 #!/bin/bash
-# A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE
+# A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE, VirtualCoach
 
 mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.opt/bbp
 
@@ -34,6 +34,9 @@ sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services-w
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/gzweb.conf
 sed -e 's/80/8040/' -i $HOME/.local/etc/nginx/conf.d/gzweb.conf
 cp -r $HBP/user-scripts/config_files/nginx/lua/* $HOME/.local/etc/nginx/lua
+
+echo "Copying VirtualCoach config.json file"
+cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
 
 echo "Setting configuration files to default mode (offline mode)"
 $HBP/user-scripts/running_mode "2"

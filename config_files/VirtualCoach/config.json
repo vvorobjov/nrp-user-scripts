@@ -1,0 +1,21 @@
+{
+  "oidc": {
+    "user": "https://services.humanbrainproject.eu/idm/v1/api/user"
+  },
+
+  "proxy": {
+    "staging": "https://neurorobotics-staging.humanbrainproject.eu/proxyserver",
+    "dev"    : "https://neurorobotics-dev.humanbrainproject.eu/proxyserver",
+    "local"  : "http://localhost:8000"
+  },
+
+  "proxy-services": {
+    "experiment-list": "experiments",
+    "server-info"    : "server"
+  },
+
+  "simulation-services": {
+    "create": "simulation",
+    "state" : "state"
+  }
+}
