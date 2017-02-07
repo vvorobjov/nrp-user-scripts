@@ -7,6 +7,7 @@ nrp_repos=(
     ExDBackend
     gzweb
     Models
+    server-scripts
     nrpBackendProxy
     brainvisualizer
     ExDFrontend
