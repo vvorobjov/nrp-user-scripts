@@ -46,7 +46,15 @@ function nrp_build {
   echo =========================
   isvpn=$(curl https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/pip 2>/dev/null | grep 1.4.1);
   test -n "$isvpn" || { echo ERROR you should be on the EPFL vpn;exit 1; }
-  for i in ExperimentControl BrainSimulation CLE ExDBackend
+  echo
+  echo -------------------------
+  echo GazeboRosPackages
+  echo -------------------------
+  sleep 2
+  cd GazeboRosPackages || { echo ERROR;exit 1; }
+  catkin_make || { echo ERROR;exit 1; }
+  cd ..
+  for i in ExperimentControl BrainSimulation VirtualCoach CLE ExDBackend
   do
     echo
     echo -------------------------
@@ -65,15 +73,6 @@ function nrp_build {
   sleep 2
   cd gzweb || { echo ERROR;exit 1; }
   ./deploy.sh || { echo ERROR;exit 1; }
-  cd ..
-
-  echo
-  echo -------------------------
-  echo GazeboRosPackages
-  echo -------------------------
-  sleep 2
-  cd GazeboRosPackages || { echo ERROR;exit 1; }
-  catkin_make || { echo ERROR;exit 1; }
   cd ..
 }
 

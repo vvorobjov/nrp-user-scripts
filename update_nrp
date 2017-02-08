@@ -11,7 +11,7 @@ function help {
   echo "              If argument 'all' is provided, include 3rd party repos"
   echo "    build   : build all buildable repos (except 3rd party)"
   echo "    update  : run rebase followed by build. Should update your NRP all-in-one"
-  echo "    itmaster: updates your NRP and create a clean IT branch in each repo"
+  echo "    itmaster: rebases your NRP and create a clean IT branch in each repo"
   echo "    gitclean: removes all local branches except master"
   echo "              If argument 'all' is provided, include 3rd party repos"
 }
@@ -33,7 +33,6 @@ case "$command" in
   ;;
 "itmaster")
   nrp_rebase ""
-  nrp_build
   it_branch
   ;;
 "gitclean")
