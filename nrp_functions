@@ -1,6 +1,39 @@
 #!/bin/bash
 # This script holds common functions
 
+function checkssh {
+    echo "Checking $1"
+    touch "$touchfilebase""$1"
+    ssh -o 'BatchMode yes' -o 'StrictHostKeyChecking no' -K root@$1 2>"$touchfilebase""$1" 1>/dev/null /bin/uname
+    offends=`grep "Offending" "$touchfilebase""$1"`
+    if [ -n "$offends" ]
+    then
+      echo "yes" > $2
+      echo
+      echo ------------------------------------------------------------
+      echo $1
+      echo "$offends"
+#      cat "$touchfilebase""$1"
+      echo ------------------------------------------------------------
+    fi
+    rm "$touchfilebase""$1"
+}
+
+function waitforall {
+  finished="NOT"
+  while [ -n "$finished" ]
+  do
+    sleep 5
+    finished=`ls "$touchfilebase"* 2>/dev/null`
+    touchbase=`basename $touchfilebase`
+    replacelist=`echo "$finished" | sed 's/^.*'$touchbase'\(.*\)/\1/' | xargs`
+    if [ -n "$replacelist" ]
+    then
+      echo "Still "$1": "$replacelist
+    fi
+  done
+}
+
 function nrp_rebase {
   rebase_all=$1
 
