@@ -1,7 +1,7 @@
 #!/bin/bash
 # A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE, VirtualCoach
 
-$HBP/purge
+$HBP/user-scripts/purge
 
 mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.opt/bbp
 
