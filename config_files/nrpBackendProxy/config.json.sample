@@ -8,6 +8,7 @@
     "deactivate": false
   },
   "port": 8000,
+  "modelsPath": "$HBP/Models",
   "servers": {
     "geneva1": {
       "gzweb": {

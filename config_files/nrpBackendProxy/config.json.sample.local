@@ -8,6 +8,7 @@
     "deactivate": true
   },
   "port": 8000,
+  "modelsPath": "$HBP/Models",
   "servers": {
     "localhost": {
       "gzweb": {
