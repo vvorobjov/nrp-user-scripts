@@ -52,7 +52,7 @@ export PYTHONPATH=$PYTHONPATH:$HBP/CLE/hbp_nrp_cle
 export PYTHONPATH=$PYTHONPATH:$HBP/ExperimentControl/hbp_nrp_excontrol:$HBP/ExperimentControl/hbp_nrp_scxml
 
 # HBP ExDBackend
-export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp_nrp_backend:$HBP/ExDBackend/hbp_nrp_cleserver:$HBP/ExDBackend/hbp_nrp_commons
+export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp_nrp_backend:$HBP/ExDBackend/hbp_nrp_cleserver:$HBP/ExDBackend/hbp_nrp_commons:$HBP/ExDBackend/hbp_nrp_watchdog
 
 # HBP MUSIC pyNN/NEST Support
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_music_xml:$HBP/BrainSimulation/hbp_nrp_music_interface
