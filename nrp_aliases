@@ -30,6 +30,8 @@ ${GZSERVER_BIN_DIR}/gzserver
 python\s.*runserver\.py
 python\s.*ROSCLESimulationFactory\.py
 python\s.*StateMachineRunner\.py
+python\s.*MUSICBrainProcess
+python\s.*CLELauncher
 [0-9]+\snode\sapp\.js$
 node\s.*ws_server\.js
 web_video_server"
