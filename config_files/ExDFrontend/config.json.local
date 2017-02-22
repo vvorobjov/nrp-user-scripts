@@ -18,6 +18,9 @@
     },
     "proxy": {
       "url": "http://localhost:8000"
+    },
+    "collab": {
+      "v0": "https://services.humanbrainproject.eu/collab/v0"
     }
   },
   "auth": {
