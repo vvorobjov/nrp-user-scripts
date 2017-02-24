@@ -31,6 +31,7 @@ echo 'DAEMON_OPTS="-c $HOME/.local/etc/nginx/nginx.conf -p $HOME/.local/etc/ngin
 cp $HBP/user-scripts/config_files/nginx/nginx.conf $HOME/.local/etc/nginx/nginx.conf
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/nginx.conf
 cp $HBP/user-scripts/config_files/nginx/conf.d/* $HOME/.local/etc/nginx/conf.d
+sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services-websockets.conf
 sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/gzweb.conf
