@@ -2,6 +2,8 @@
 # A script to enable or disable oidc
 
 mode=$1
+needs_source=0
+
 if [[ -z $mode ]]; then
   echo "1. EPFL mode -- Enable OIDC and use dev. servers as backends"
   echo "2. Offline mode -- Disable OIDC and use your local machine as backend"
@@ -76,32 +78,30 @@ function proxyUseLocalhost {
 }
 
 function enableCollabSupport {
-  echo "Editing the APP_SETTINGS variable"
-  if grep -q APP_SETTINGS "$HOME/.bashrc"; then
-    sed -e '/export APP_SETTINGS/ s/NoDBConfig/LocalConfig/' -i $HOME/.bashrc
-  else
-    sed -e "\$aexport APP_SETTINGS=config.LocalConfig" -i $HOME/.bashrc
+  if ! grep -q APP_SETTINGS=config.LocalConfig "$HOME/.bashrc"; then
+    echo "Editing the APP_SETTINGS variable"
+    needs_source=1
+    if grep -q APP_SETTINGS "$HOME/.bashrc"; then
+      sed -e '/export APP_SETTINGS/ s/NoDBConfig/LocalConfig/' -i $HOME/.bashrc
+    else
+      sed -e "\$aexport APP_SETTINGS=config.LocalConfig" -i $HOME/.bashrc
+    fi
   fi
-  echo "Sourcing the .bashrc"
-  source ~/.bashrc
   echo "Enabling authentication in local proxy config for collab support"
   cd $HBP/nrpBackendProxy
   sed -e '/deactivate/ s/true/false/' -i config.json
 }
 
 function disableCollabSupport {
-  echo "Editing the APP_SETTINGS variable and sourcing the .bashrc"
-  cd $HOME
-  if grep -q APP_SETTINGS "$HOME/.bashrc"; then
-    sed -e '/export APP_SETTINGS/ s/LocalConfig/NoDBConfig/' -i $HOME/.bashrc
-  else
-    sed -e "\$aexport APP_SETTINGS=config.NoDBConfig" -i $HOME/.bashrc
+  if ! grep -q APP_SETTINGS=config.NoDBConfig "$HOME/.bashrc"; then
+    echo "Editing the APP_SETTINGS variable"
+    needs_source=1
+    if grep -q APP_SETTINGS "$HOME/.bashrc"; then
+      sed -e '/export APP_SETTINGS/ s/LocalConfig/NoDBConfig/' -i $HOME/.bashrc
+    else
+      sed -e "\$aexport APP_SETTINGS=config.NoDBConfig" -i $HOME/.bashrc
+    fi
   fi
-  echo "Sourcing the .bashrc"
-  source ~/.bashrc
-  echo "Disabling authentication in local proxy config file"
-  cd $HBP/nrpBackendProxy
-  sed -e '/deactivate/ s/false/true/' -i config.json
 }
 
 if [ $mode -eq 1 ]; then
@@ -123,5 +123,10 @@ elif [ $mode -eq 3 ]; then
 
 fi
 
-echo "Done"
 $HOME/.local/etc/init.d/nginx restart
+if [ $needs_source -eq 1 ]; then
+  echo "===================== IMPORTANT ====================="
+  echo "======= Remember to source your .bashrc file! ======="
+  echo "====================================================="
+fi
+echo "Done"
