@@ -76,7 +76,7 @@ function nrp_build {
     echo -----------------------
     sleep 2
     cd $i || { echo ERROR;exit 1; }
-    npm install
+    npm install || { echo ERROR;exit 1; }
     cd ..
   done
 
@@ -87,7 +87,7 @@ function nrp_build {
   sleep 2
   cd gzweb || { echo ERROR;exit 1; }
   ./deploy.sh || { echo ERROR;exit 1; }
-  npm install
+  npm install || { echo ERROR;exit 1; }
   cd ..
 }
 
