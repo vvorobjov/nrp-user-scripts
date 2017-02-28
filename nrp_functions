@@ -124,6 +124,16 @@ function nrp_build {
   cd ..
 }
 
+function nrp_configure {
+  echo
+  echo "Would you like to run configure_nrp right away to update the config files?"
+  read -p "Note that this will overwrite local changes in your config sample files. [Y/n] " -n 1 -r REPLY 
+  echo
+  if [[ $REPLY =~ ^[Yy] ]]; then
+    $HBP/user-scripts/configure_nrp || { echo ERROR;exit 1; }
+  fi
+}
+
 function clean_branches {
   clean_all=$1
 

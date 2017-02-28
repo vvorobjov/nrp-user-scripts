@@ -1,18 +1,20 @@
 #!/bin/bash
 # This script gives many NRP updating options to users
-
 source $HBP/user-scripts/nrp_functions || { echo ERROR;exit 1; }
 
 function help {
   echo "Usage: "`basename $0`" <command> [<arg>]"
   echo "  command can be:"
-  echo "    help    : print this message"
-  echo "    rebase  : switch repos to master and rebase"
+  echo "    help    : Print this message"
+  echo "    rebase  : Switch repos to master and rebase"
   echo "              If argument 'all' is provided, include 3rd party repos"
-  echo "    build   : build all buildable repos (except 3rd party)"
-  echo "    update  : run rebase followed by build. Should update your NRP all-in-one"
-  echo "    itmaster: rebases your NRP and create a clean IT branch in each repo"
-  echo "    gitclean: removes all local branches except master"
+  echo "    build   : Build all buildable repos (except 3rd party)"
+  echo "              Requires VPN connection"
+  echo "    update  : Run rebase followed by build"
+  echo "              You will be prompted for running configure_nrp"
+  echo "              Requires connection to the EPFL VPN"
+  echo "    itmaster: Rebases your NRP and create a clean IT branch in each repo"
+  echo "    gitclean: Removes all local branches except master"
   echo "              If argument 'all' is provided, include 3rd party repos"
 }
 
@@ -30,6 +32,7 @@ case "$command" in
 "update")
   nrp_rebase ""
   nrp_build
+  nrp_configure
   ;;
 "itmaster")
   nrp_rebase ""

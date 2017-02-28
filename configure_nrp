@@ -43,3 +43,6 @@ cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp
 echo "Setting configuration files to default mode (offline mode)"
 $HBP/user-scripts/running_mode "2"
 echo "DONE"
+echo
+echo "Warning: your running mode has been switched to full local (2)."
+echo "         you might want to run running_mode to change it."
