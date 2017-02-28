@@ -10,42 +10,6 @@
   "port": 8000,
   "modelsPath": "$HBP/Models",
   "servers": {
-    "geneva1": {
-      "gzweb": {
-        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/1/assets",
-        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/1/api",
-        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/1/api/webstream/",
-        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/1/ws/gzbridge"
-      },
-      "rosbridge": {
-        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/1/ws"
-      },
-      "serverJobLocation": "lugano"
-    },
-    "geneva2": {
-      "gzweb": {
-        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/2/assets",
-        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/2/api",
-        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/2/api/webstream/",
-        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/2/ws/gzbridge"
-      },
-      "rosbridge": {
-        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/2/ws"
-      },
-      "serverJobLocation": "lugano"
-    },
-    "geneva3": {
-      "gzweb": {
-        "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/3/assets",
-        "nrp-services": "https://neurorobotics-dev.humanbrainproject.eu/cle/3/api",
-        "videoStreaming": "https://neurorobotics-dev.humanbrainproject.eu/cle/3/api/webstream/",
-        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/3/ws/gzbridge"
-      },
-      "rosbridge": {
-        "websocket": "wss://neurorobotics-dev.humanbrainproject.eu/cle/3/ws"
-      },
-      "serverJobLocation": "lugano"
-    },
     "lugano4": {
       "gzweb": {
         "assets": "https://neurorobotics-dev.humanbrainproject.eu/cle/4/assets",
