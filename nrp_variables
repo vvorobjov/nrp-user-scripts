@@ -1,7 +1,9 @@
 # These variables can be included in the .bashrc before starting the installation process
 
+CURR_SHELL=$(basename `ps -p $$ --no-headers -o cmd`)
+
 # ROS variables
-{ lsb_release -r | grep 14 >>/dev/null; } && source /opt/ros/indigo/setup.bash || source /opt/ros/kinetic/setup.bash
+{ lsb_release -r | grep 14 >>/dev/null; } && source /opt/ros/indigo/setup.$CURR_SHELL || source /opt/ros/kinetic/setup.$CURR_SHELL
 
 export ROS_PARALLEL_JOBS=-j4
 export ROS_IP=127.0.0.1
@@ -28,7 +30,7 @@ export OPENSIM_INSTALL_DIR=$HOME/.local
 export OPENSIM_HOME=$HOME/.local
 
 # local install including HBP plugins
-source $HBP/GazeboRosPackages/devel/setup.bash
+source $HBP/GazeboRosPackages/devel/setup.$CURR_SHELL
 
 # use HBP version of gazebo in scripts
 export GZSERVER_BIN_DIR=$HOME/.local/bin
