@@ -16,6 +16,7 @@
 
   "simulation-services": {
     "create": "simulation",
-    "state" : "state"
+    "state" : "state",
+    "transfer-functions": "transfer-functions"
   }
 }
