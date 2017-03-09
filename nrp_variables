@@ -62,6 +62,7 @@ export PYTHONPATH=$HBP/retina/build/lib:$PYTHONPATH
 
 # HBP models directory
 export NRP_MODELS_DIRECTORY=$HBP/Models
+export NRP_EXPERIMENTS_DIRECTORY=$HBP/Models/experiments
 
 # NRP App database
 export APP_SETTINGS=config.NoDBConfig
