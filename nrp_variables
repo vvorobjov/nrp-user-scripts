@@ -42,9 +42,6 @@ export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python2.7/site-packages
 # GazeboRosPackages
 export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python2.7/site-packages:$HBP/GazeboRosPackages/devel/lib/python2.7/dist-packages
 
-# HBP BIBI (for the python transfer functions in Models/BIBI)
-export PYTHONPATH=$PYTHONPATH:$HBP/Models/BIBI
-
 # HBP CLE
 export PYTHONPATH=$PYTHONPATH:$HBP/CLE/hbp_nrp_cle
 
@@ -62,7 +59,7 @@ export PYTHONPATH=$HBP/retina/build/lib:$PYTHONPATH
 
 # HBP models directory
 export NRP_MODELS_DIRECTORY=$HBP/Models
-export NRP_EXPERIMENTS_DIRECTORY=$HBP/Models/experiments
+export NRP_EXPERIMENTS_DIRECTORY=$HBP/Experiments
 
 # NRP App database
 export APP_SETTINGS=config.NoDBConfig
