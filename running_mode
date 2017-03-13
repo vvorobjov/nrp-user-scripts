@@ -30,9 +30,6 @@ function enableNginxOIDC {
   sed -e '/access_by_lua_file/ s/^#*//#/' -i nrp-services.conf
   sed -e '/_access_token/, +2 s/^#*//#/' -i nrp-services.conf
   sed -e '/_userinfo/, +2 s/^#*//#/' -i nrp-services.conf
-  sed -e '/access_by_lua_file/ s/^#*//#/' -i nrp-services-websockets.conf
-  sed -e '/_access_token/, +2 s/^#*//#/' -i nrp-services-websockets.conf
-  sed -e '/_userinfo/, +2 s/^#*//#/' -i nrp-services-websockets.conf
 }
 
 function proxyUseDevServers {
@@ -63,9 +60,6 @@ function disableNginxOIDC {
   sed -e '/access_by_lua_file/ s/^#*/#/' -i nrp-services.conf
   sed -e '/_access_token/, +2 s/^#*/#/' -i nrp-services.conf
   sed -e '/_userinfo/, +2 s/^#*/#/' -i nrp-services.conf
-  sed -e '/access_by_lua_file/ s/^#*/#/' -i nrp-services-websockets.conf
-  sed -e '/_access_token/, +2 s/^#*/#/' -i nrp-services-websockets.conf
-  sed -e '/_userinfo/, +2 s/^#*/#/' -i nrp-services-websockets.conf
 }
 
 function proxyUseLocalhost {
