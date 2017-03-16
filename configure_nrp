@@ -2,7 +2,7 @@
 # A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE, VirtualCoach
 
 $HBP/user-scripts/purge
-
+export GROUPNAME=`id -gn`
 mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.opt/bbp
 
 echo "Copying Frontend config.json file"
@@ -18,6 +18,7 @@ chmod u+x $HOME/.opt/bbp/nrp-services/gzserver
 echo "Copying CLE config.ini file"
 ln -s $HBP/user-scripts/config_files/CLE/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
 cp $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini
+cp $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample $HBP/ExDBackend/platform_venv/lib/python2.7/site-packages/hbp_nrp_cle/config.ini
 
 echo "Copying Proxy config files."
 ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample
@@ -30,6 +31,7 @@ sed -e 's/ \/etc\// \/home\/'"$USER"'\/.local\/etc\//' -i /home/$USER/.local/etc
 echo 'DAEMON_OPTS="-c $HOME/.local/etc/nginx/nginx.conf -p $HOME/.local/etc/nginx"' >  $HOME/.local/etc/default/nginx
 cp $HBP/user-scripts/config_files/nginx/nginx.conf $HOME/.local/etc/nginx/nginx.conf
 sed -e 's/<username>/'"$USER"'/g' -i $HOME/.local/etc/nginx/nginx.conf
+sed -e 's/<groupname>/'"$GROUPNAME"'/g' -i $HOME/.local/etc/nginx/nginx.conf
 cp $HBP/user-scripts/config_files/nginx/conf.d/* $HOME/.local/etc/nginx/conf.d
 sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
