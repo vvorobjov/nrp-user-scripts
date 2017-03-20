@@ -19,5 +19,9 @@
     "state" : "state",
     "transfer-functions": "transfer-functions",
     "csv-recorders": "csv-recorders"
+  },
+
+  "ros": {
+    "status": "/ros_cle_simulation/status"
   }
 }
