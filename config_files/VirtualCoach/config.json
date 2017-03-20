@@ -17,6 +17,7 @@
   "simulation-services": {
     "create": "simulation",
     "state" : "state",
-    "transfer-functions": "transfer-functions"
+    "transfer-functions": "transfer-functions",
+    "csv-recorders": "csv-recorders"
   }
 }
