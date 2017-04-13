@@ -1,7 +1,10 @@
 # These variables can be included in the .bashrc before starting the installation process
 
 CURR_SHELL=$(basename `ps -p $$ --no-headers -o cmd`)
-
+if [ -z "$CURR_SHELL" ]
+then
+      CURR_SHELL='sh'
+fi
 # ROS variables
 { lsb_release -r | grep 14 >>/dev/null; } && source /opt/ros/indigo/setup.$CURR_SHELL || source /opt/ros/kinetic/setup.$CURR_SHELL
 
