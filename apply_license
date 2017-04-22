@@ -1,0 +1,81 @@
+#!/bin/bash
+
+function applylicense {
+    if [ $# -lt 4 ]; then echo "applylicense: too few arguments"; return; fi
+    prefix="$4"
+    isupdate=`sed -n '/---LICENSE-BEGIN/,/---LICENSE-END/{//!p}' $1 | cut -c$((${#prefix}+1))- | diff $HBP/user-scripts/LICENSE.header - > /dev/null 2>&1 ; echo $?`
+    if [ $remove = 0 -a "$isupdate" = 0 ]; then return; fi
+    islicense=`grep -e '---LICENSE-BEGIN' $1`
+    if [ -z "$islicense" ]
+    then
+      if [ $remove = 0 ]
+      then
+        echo "$1 -> apply license"
+        cp $1 /tmp/applylicense.src
+      else return; fi
+    else
+      if [ $remove = 0 ]; then echo "$1 -> update license"; else echo "$1 -> remove license"; fi
+      sed '/---LICENSE-BEGIN/,/---LICENSE-END/d' $1 > /tmp/applylicense.src
+    fi
+    if [ $remove = 0 ]
+    then
+      echo "$2""---LICENSE-BEGIN - DO NOT CHANGE OR MOVE THIS HEADER" >> /tmp/applylicense.tmp
+      cat $HBP/user-scripts/LICENSE.header | sed "s/^/$4/" | sed -e 's/[[:space:]]*$//' >> /tmp/applylicense.tmp
+      echo "$4""---LICENSE-END""$3" >> /tmp/applylicense.tmp
+      cat /tmp/applylicense.src >> /tmp/applylicense.tmp
+      mv /tmp/applylicense.tmp $1
+    else
+      mv /tmp/applylicense.src $1
+    fi
+    rm -f /tmp/applylicense.*
+}
+
+if [ "$1" = "--remove" ]
+then
+  remove=1
+  shift
+else
+  remove=0
+fi
+
+if [ $# -lt 1 ]
+then
+  echo "Usage: $1 [--remove] directory1 [directory2 ...]"
+  exit 1
+fi
+
+echo "Search for C++ sources"
+for repo in $*
+do
+  for i in `find $repo -regex '.*\.\(c\|cpp\|h\|hpp\)$' -print`
+  do
+    applylicense $i "/**" "**/" " * "
+  done
+done
+
+echo "Search for Python sources"
+for repo in $*
+do
+  for i in `find $repo -name '*.py' ! -name config.py ! -name __init__.py ! -name version.py ! -name setup.py -print`
+  do
+    applylicense $i "# " "" "# "
+  done
+done
+
+echo "Search for Javascript sources"
+for repo in $*
+do
+  for i in `find $repo -regex '.*\.\(js\|css\|scss\)$' -print`
+  do
+    applylicense $i "/**" "**/" " * "
+  done
+done
+
+#echo "Search for HTML sources"
+#for repo in $*
+#do
+#  for i in `find $repo -regex '.*\.\(htm\|html\)$' -print`
+#  do
+#    applylicense $i "<!--" "-->" ""
+#  done
+#done
