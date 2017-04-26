@@ -36,6 +36,9 @@ sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 cp -r $HBP/user-scripts/config_files/nginx/lua/* $HOME/.local/etc/nginx/lua
 
+echo "Copying uwsgi config file"
+cp $HBP/user-scripts/config_files/nginx/uwsgi-nrp.ini $HOME/.local/etc/nginx/uwsgi-nrp.ini
+
 echo "Copying VirtualCoach config.json file"
 cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
 

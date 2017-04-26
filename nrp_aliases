@@ -1,4 +1,4 @@
-alias cle-backend='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_backend/hbp_nrp_backend/runserver.py'
+alias cle-backend='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && uwsgi --ini  $HOME/.local/etc/nginx/uwsgi-nrp.ini'
 alias cle-factory='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py'
 alias cle-rosbridge='rosrun rosbridge_server rosbridge_websocket'
 alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
@@ -54,7 +54,8 @@ kill_hbp_cle()
               "python\\s.*CLELauncher"
               "[0-9]+\\snode\\sapp\\.js$"
               "node\\s.*ws_server\\.js"
-              "web_video_server")
+              "web_video_server"
+              "uwsgi")
 
     # find the unique process groups for any matches, this will ensure all
     # spawned subprocesses are also cleanly killed
