@@ -2,7 +2,7 @@
 # A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE, VirtualCoach
 
 $HBP/user-scripts/purge
-export GROUPNAME=`id -gn`
+export GROUPNAME=`/usr/bin/id -gn`
 mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.opt/bbp
 
 echo "Copying Frontend config.json file"
@@ -35,8 +35,6 @@ sed -e 's/<groupname>/'"$GROUPNAME"'/g' -i $HOME/.local/etc/nginx/nginx.conf
 cp $HBP/user-scripts/config_files/nginx/conf.d/* $HOME/.local/etc/nginx/conf.d
 sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
-sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services-websockets.conf
-sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/gzweb.conf
 cp -r $HBP/user-scripts/config_files/nginx/lua/* $HOME/.local/etc/nginx/lua
 
 echo "Copying VirtualCoach config.json file"
