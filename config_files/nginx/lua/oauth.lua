@@ -12,6 +12,7 @@ local oauth_cache = ngx.shared.oauth_cache
 local client_id = ngx.var.oidc_client_id
 local client_secret = ngx.var.oidc_client_secret
 local client_scope = ngx.var.oidc_client_scope
+local accept_client_auth = ngx.var.accept_client_auth
 
 --TODO: Remove this once we are using scopes properly
 client_scope = client_scope or 'openid'
@@ -70,7 +71,7 @@ end
 local cached_info = oauth_cache:get(auth_token)
 if cached_info then
    local user_info = cjson.decode(cached_info)
-   if user_info.sub then
+   if user_info.type == 'user_auth' then
       set_user_header(user_info)
    end
    return
@@ -112,8 +113,9 @@ end
 
 -- if client authentication is accepted and json.sub matches the clientid
 -- and not the user id as for user triggered requests
-if json.sub == json.client_id then
-    set_cache('{}')
+if accept_client_auth and json.sub == json.client_id then
+    client_info = cjson.encode({type = "client_auth"})
+    set_cache(client_info)
     return -- we skip getting the user information
 end
 
@@ -137,6 +139,6 @@ if not user_info.sub then
     ngx.say('{"status":401, "message": "Got nil user form userinfo request"}')
     ngx.exit(ngx.HTTP_OK)
 end
-
-set_cache(res.body)
+user_info.type = 'user_auth'
+set_cache(cjson.encode(user_info))
 set_user_header(user_info)

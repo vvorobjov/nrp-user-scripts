@@ -59,7 +59,8 @@ if not user_info.sub then
     ngx.exit(ngx.HTTP_OK)
 end
 
-local succ, err, forcible = oauth_cache:set(auth_token, res.body, cache_time)
+user_info.type = 'user_auth'
+local succ, err, forcible = oauth_cache:set(auth_token, cjson.encode(user_info), cache_time)
 if err ~= nil then
    ngx.log(ngx.DEBUG, "Error Adding to cache: "..err)
 end
