@@ -8,16 +8,36 @@ alias cle-rosvideo='rosrun web_video_server web_video_server _port:=8081'
 
 cle-virtual-coach()
 {
+    # save the original PYTHONPATH and update current to incliude the VirtualCoach
+    OLD_PYTHONPATH=$PYTHONPATH
     PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/platform_venv/lib/python2.7/site-packages:$HBP/VirtualCoach/hbp_nrp_virtual_coach
-    if [ "$#" -eq 0 ] ; then
-        python -ic "from hbp_nrp_virtual_coach.virtual_coach import VirtualCoach"
-    elif [ "$#" -eq 1 ]  && [ "$1" != "-h" ] ; then
-        python $1
-    else
-        echo "Usage: cle-virtual-coach [-h] [file.py]"
+
+    # usage information and examples for no arguments or -h flag
+    if [ "$#" -eq 0 ]  || [ "$1" == "-h" ] ; then
+        echo "Usage: cle-virtual-coach [-h] [args]"
         echo "       [-h] Print this usage information."
-        echo "       [file.py] Optional script to run, otherwise returns an interactive session."
+        echo "       [args] arguments to run in a VirtualCoach configured environment, e.g.:"
+        echo "              cle-virtual-coach foo.py a b c -> launches foo.py with arguments"
+        echo "              cle-virtual-coach jupyter notebook -> launches a jupyter notebook session"
+        echo "              cle-virtual-coach python -> launches a python interpreter session"
+
+    # user specified Python script, convenience to avoid the extra 'python' in arguments
+    elif [[ "$1" == *\.py ]] ; then
+        python $@
+
+    # otherwise just run whatever command as provided
+    else
+        eval $@      # run any user commands with the modified PYTHONPATH
     fi
+
+    # save the exit code for last executed command
+    RES=$?
+
+    # reset the path so we don't continually append to it after multiple runs
+    PYTHONPATH=$OLD_PYTHONPATH
+
+    # propagate the exit codes if needed above
+    return $RES
 }
 
 kill_hbp_cle()
