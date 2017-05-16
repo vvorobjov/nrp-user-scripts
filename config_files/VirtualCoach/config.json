@@ -17,8 +17,16 @@
   "simulation-services": {
     "create": "simulation",
     "state" : "state",
+    "reset": "reset",
     "transfer-functions": "transfer-functions",
     "csv-recorders": "csv-recorders"
+  },
+
+  "reset-services": {
+    "robot_pose": 0,
+    "full": 1,
+    "world": 2,
+    "brain": 3
   },
 
   "ros": {
