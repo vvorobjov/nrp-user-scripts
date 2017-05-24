@@ -18,8 +18,12 @@
     "create": "simulation",
     "state" : "state",
     "reset": "reset",
-    "transfer-functions": "transfer-functions",
     "csv-recorders": "csv-recorders"
+  },
+
+  "simulation-scripts": {
+    "transfer-function": "transfer-functions",
+    "state-machine": "state-machines"
   },
 
   "reset-services": {
