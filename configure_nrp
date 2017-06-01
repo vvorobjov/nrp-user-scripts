@@ -18,7 +18,6 @@ chmod u+x $HOME/.opt/bbp/nrp-services/gzserver
 echo "Copying CLE config.ini file"
 ln -s $HBP/user-scripts/config_files/CLE/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
 cp $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini
-cp $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample $HBP/ExDBackend/platform_venv/lib/python2.7/site-packages/hbp_nrp_cle/config.ini
 
 echo "Copying Proxy config files."
 ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample

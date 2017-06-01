@@ -16,6 +16,9 @@ source $HOME/.local/share/gazebo/setup.sh
 export LD_LIBRARY_PATH=$HOME/.local/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 export CMAKE_PREFIX_PATH=$HOME/.local/lib/x86_64-linux-gnu/cmake/gazebo/:$CMAKE_PREFIX_PATH
 
+# NRP virtual env
+export VIRTUAL_ENV=$HOME/.opt/platform_venv
+
 # gzbridge & gzserver
 export PATH=$HOME/.opt/bbp/nrp-services:$PATH
 
@@ -55,6 +58,12 @@ export PYTHONPATH=$PYTHONPATH:$HBP/ExperimentControl/hbp_nrp_excontrol:$HBP/Expe
 
 # HBP ExDBackend
 export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp_nrp_backend:$HBP/ExDBackend/hbp_nrp_cleserver:$HBP/ExDBackend/hbp_nrp_commons:$HBP/ExDBackend/hbp_nrp_watchdog
+
+# HBP Flask restful Swagger
+export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp-flask-restful-swagger-master
+
+# HBP VirtualCoach
+export PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/hbp_nrp_virtual_coach
 
 # HBP MUSIC pyNN/NEST Support
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_music_xml:$HBP/BrainSimulation/hbp_nrp_music_interface
