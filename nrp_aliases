@@ -42,31 +42,60 @@ cle-virtual-coach()
 
 kill_hbp_cle()
 {
-    killlist="python.*roscore
-python\s.*rosmaster
-python\s.*rosbridge
-lib/rosout/rosout
-${GZSERVER_BIN_DIR}/gzserver
-python\s.*runserver\.py
-python\s.*ROSCLESimulationFactory\.py
-python\s.*StateMachineRunner\.py
-python\s.*MUSICBrainProcess
-python\s.*CLELauncher
-[0-9]+\snode\sapp\.js$
-node\s.*ws_server\.js
-web_video_server"
+    killlist=("python.*roscore"
+              "python\\s.*rosmaster"
+              "python\\s.*rosbridge"
+              "lib/rosout/rosout"
+              "${GZSERVER_BIN_DIR}/gzserver"
+              "python\\s.*runserver\\.py"
+              "python\\s.*ROSCLESimulationFactory\\.py"
+              "python\\s.*StateMachineRunner\\.py"
+              "python\\s.*MUSICBrainProcess"
+              "python\\s.*CLELauncher"
+              "[0-9]+\\snode\\sapp\\.js$"
+              "node\\s.*ws_server\\.js"
+              "web_video_server")
 
-    for killit in $killlist; do
-        ps -eo pid,cmd|grep -E $killit|grep -v grep|while read cmd
+    # find the unique process groups for any matches, this will ensure all
+    # spawned subprocesses are also cleanly killed
+    # tip: use http:/explainshell.com to understand the entire command expansion
+    pgids=($(ps -eo pgid,cmd |
+             grep -E "$(IFS=$'|'; echo "${killlist[*]}")" |
+             grep -v grep |
+             sed -e 's/^\s*//' |
+             cut -d ' ' -f1 |
+             sort -ru |
+             tr '\n' ' '))
+
+    # loop through and try to kill all of the process groups
+    echo "Found ${#pgids[@]} NRP process groups to terminate."
+    for pgid in ${pgids[@]}
+    do
+        # print the remaining processes under this process group
+        echo
+        echo "$(ps -eo pgid,cmd | grep -E "^\\s*$pgid" | grep -vE "bash|grep" | sed 's/^/  /')"
+
+        # kill with escalating signals, allow a short time to terminate between attempts
+        for level in INT TERM KILL
         do
-            echo KILL $cmd
-            cmd_pid=$(echo $cmd|grep -Eo "^[0-9]+")
-            kill -INT $cmd_pid
-            kill -TERM $cmd_pid
-            kill -KILL $cmd_pid
+            ps -eo pgid | grep -qwE "^\\s*$pgid" || break
+            echo "    sending: $level"
+            kill -$level -$pgid
+            sleep 1
         done
     done
+
+    # force clean NRP gzserver and gzbridge lock files (required for next clean start/launch)
     rm -f $HOME/.gazebo/gzserver.lock
+    rm -f $HBP/gzweb/gzbridge.lock
+
+    # double check everything is killed, this is mostly to ensure a cle-kill
+    # during a startup or process spawning is as successful as we can make it
+    if [[ ${#pgids[@]} -gt 0 ]]
+    then
+        echo
+        kill_hbp_cle
+    fi
 }
 
 alias cle-start='roscore & sleep 2;cle-rosvideo & sleep 2;cle-rosbridge & sleep 2;cle-factory & sleep 2;cle-backend & sleep 2; cle-proxy & sleep 2'
