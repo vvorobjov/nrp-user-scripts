@@ -23,7 +23,8 @@
 
   "simulation-scripts": {
     "transfer-function": "transfer-functions",
-    "state-machine": "state-machines"
+    "state-machine": "state-machines",
+    "brain": "brain"
   },
 
   "reset-services": {
