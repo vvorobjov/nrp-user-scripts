@@ -1,5 +1,5 @@
-alias cle-backend='PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/platform_venv/lib/python2.7/site-packages:$HBP/CLE/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_backend/hbp_nrp_backend/runserver.py'
-alias cle-factory='PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/platform_venv/lib/python2.7/site-packages:$HBP/CLE/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py'
+alias cle-backend='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_backend/hbp_nrp_backend/runserver.py'
+alias cle-factory='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py'
 alias cle-rosbridge='rosrun rosbridge_server rosbridge_websocket'
 alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
 alias cle-nginx='$HOME/.local/etc/init.d/nginx restart'
@@ -10,7 +10,7 @@ cle-virtual-coach()
 {
     # save the original PYTHONPATH and update current to incliude the VirtualCoach
     OLD_PYTHONPATH=$PYTHONPATH
-    PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/platform_venv/lib/python2.7/site-packages:$HBP/VirtualCoach/hbp_nrp_virtual_coach
+    PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages
 
     # usage information and examples for no arguments or -h flag
     if [ "$#" -eq 0 ]  || [ "$1" == "-h" ] ; then

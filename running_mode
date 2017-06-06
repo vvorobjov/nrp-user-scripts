@@ -20,7 +20,7 @@ function enableFrontendOIDC {
 
 function enableBackendOIDC {
   echo "Editing Backend config.json"
-  cd $HBP/ExDBackend/platform_venv/local/lib/python2.7/site-packages/flask_restful_swagger/static
+  cd $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static
   sed -e '/deactivate/ s/true/false/' -i config.json
 }
 
@@ -50,7 +50,7 @@ function disableFrontendOIDC {
 
 function disableBackendOIDC {
   echo "Editing Backend config.json"
-  cd $HBP/ExDBackend/platform_venv/local/lib/python2.7/site-packages/flask_restful_swagger/static
+  cd $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static
   sed -e '/deactivate/ s/false/true/' -i config.json
 }
 
