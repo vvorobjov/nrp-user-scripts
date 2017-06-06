@@ -71,7 +71,7 @@ function nrp_rebase {
 }
 
 function nrp_build {
-  cd $HBP || { echo ERROR;exit 1; }
+  build_all=$1
 
   echo
   echo =========================
@@ -79,6 +79,80 @@ function nrp_build {
   echo =========================
   isvpn=$(curl https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/pip 2>/dev/null | grep 1.4.1);
   test -n "$isvpn" || { echo ERROR you should be on the EPFL vpn;exit 1; }
+
+  if [ "$build_all" = "all" ]
+  then
+    for i in simbody opensim sdformat bulletphysics gazebo
+    do
+      echo
+      echo -------------------------
+      echo $i
+      echo -------------------------
+      sleep 2
+      if [ "$i" == "gazebo" ]; then cmake_args="-DENABLE_TESTS_COMPILATION:BOOL=False"; else cmake_args=;fi
+      cd $HBP/$i || { echo ERROR;exit 1; }
+      mkdir -p build
+      cd build
+      cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo ERROR;exit 1; }
+      make -j`nproc` || { echo ERROR;exit 1; }
+      make install || { echo ERROR;exit 1; }
+    done
+
+    echo
+    echo -------------------------
+    echo Mvapich2
+    echo -------------------------
+    sleep 2
+    cd $HBP/mvapich2 || { echo ERROR;exit 1; }
+    ./autogen.sh || { echo ERROR;exit 1; }
+    ./configure --prefix=$HOME/.local --with-device=ch3:nemesis || { echo ERROR;exit 1; }
+    make -j`nproc` || { echo ERROR;exit 1; }
+    make install || { echo ERROR;exit 1; }
+
+    echo
+    echo -------------------------
+    echo MUSIC
+    echo -------------------------
+    sleep 2
+    cd $HBP/MUSIC
+    ln -sf $HOME/.local/bin/mpichversion mpich2version
+    old_path=$PATH
+    export PATH=$PATH:$HBP/MUSIC
+    export LDFLAGS+=" -pthread"
+    virtualenv build_venv || { echo ERROR;exit 1; }
+    source build_venv/bin/activate
+    pip install Cython==0.23.4 mpi4py==2.0.0 || { echo ERROR;exit 1; }
+    deactivate
+    PYTHONPATH=$HBP/MUSIC/build_venv/lib/python2.7/site-packages:$PYTHONPATH
+    ./autogen.sh || { echo ERROR;exit 1; }
+    ./configure --prefix=$HOME/.local MPI_CXX=mpicxx || { echo ERROR;exit 1; }
+    make -j`nproc` || { echo ERROR;exit 1; }
+    make install || { echo ERROR;exit 1; }
+    rm -rf build_venv || { echo ERROR;exit 1; }
+    rm mpich2version || { echo ERROR;exit 1; }
+    export PATH=$old_path
+    old_path=
+    export LDFLAGS=
+
+    echo
+    echo -------------------------
+    echo Nest
+    echo -------------------------
+    sleep 2
+    cd $HBP/nest-simulator || { echo ERROR;exit 1; }
+    virtualenv build_venv || { echo ERROR;exit 1; }
+    source build_venv/bin/activate
+    pip install Cython==0.23.4 mpi4py==2.0.0 || { echo ERROR;exit 1; }
+    deactivate
+    PYTHONPATH=$HBP/nest-simulator/build_venv/lib/python2.7/site-packages:$PYTHONPATH
+    ./bootstrap.sh || { echo ERROR;exit 1; }
+    ./configure --prefix=$HOME/.local --with-gsl --with-mpi --with-music || { echo ERROR;exit 1; }
+    make -j`nproc` || { echo ERROR;exit 1; }
+    make install || { echo ERROR;exit 1; }
+    rm -rf build_venv || { echo ERROR;exit 1; }
+  fi
+
+  cd $HBP || { echo ERROR;exit 1; }
 
   echo
   echo -------------------------
@@ -171,16 +245,27 @@ function clean_branches {
 }
 
 function it_branch {
+  itbranch_all=$1
+
   cd $HBP || { echo ERROR;exit 1; }
 
   echo
   echo =========================
   echo Creating clean IT branch
   echo =========================
-  repos=(
+  if [ "$clean_all" = "all" ]
+  then
+    repos=(
+    ${nrp_3rd_party[*]}
     ${nrp_repos[*]}
     user-scripts
   )
+  else
+    repos=(
+      ${nrp_repos[*]}
+      user-scripts
+    )
+  fi
   for i in ${repos[@]}
   do
     echo

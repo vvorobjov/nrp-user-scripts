@@ -4,10 +4,10 @@ source $HBP/user-scripts/nrp_functions || { echo ERROR;exit 1; }
 
 function help {
   echo "Usage: "`basename $0`" <command> [<arg>]"
-  echo "  command can be:"
+  echo "  If arg='all', include 3rd party repos (gazebo, opensim, nest, ...)"
+  echo "  Command can be:"
   echo "    help    : Print this message"
   echo "    rebase  : Switch repos to master and rebase"
-  echo "              If argument 'all' is provided, include 3rd party repos"
   echo "    build   : Build all buildable repos (except 3rd party)"
   echo "              Requires VPN connection"
   echo "    update  : Run rebase followed by build"
@@ -15,7 +15,6 @@ function help {
   echo "              Requires connection to the EPFL VPN"
   echo "    itmaster: Rebases your NRP and create a clean IT branch in each repo"
   echo "    gitclean: Removes all local branches except master"
-  echo "              If argument 'all' is provided, include 3rd party repos"
 }
 
 if [ $# -lt 1 ]; then help;exit 1; fi
@@ -27,16 +26,16 @@ case "$command" in
   nrp_rebase $arg
   ;;
 "build")
-  nrp_build
+  nrp_build $arg
   ;;
 "update")
-  nrp_rebase ""
-  nrp_build
+  nrp_rebase $arg
+  nrp_build $arg
   nrp_configure
   ;;
 "itmaster")
-  nrp_rebase ""
-  it_branch
+  nrp_rebase $arg
+  it_branch $arg
   ;;
 "gitclean")
   clean_branches $arg
