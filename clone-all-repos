@@ -16,9 +16,14 @@ else
   fi
 fi
 
-# Get EPFL username to clone repos
+# Get EPFL/Bitbucket username to clone repos
 echo
-read -p "Enter your EPFL username: " user
+if [ "$NRP_INSTALL_MODE" == "user" ]
+then
+  read -p "Enter your Bitbucket username: " user
+else
+  read -p "Enter your EPFL username: " user
+fi
 echo
 
 function clone_repo {
@@ -33,7 +38,12 @@ function clone_repo {
   if [ -d "$1" ] ; then
     echo "Skipped, directory already exists."
   else
-    git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/$1 && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg $1/.git/hooks/
+    if [ "$NRP_INSTALL_MODE" == "user" ]
+    then
+      git clone https://$user@bitbucket.org/hbpneurorobotics/$1.git
+    else
+      git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/$1 && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg $1/.git/hooks/
+    fi
   fi
   echo
 }

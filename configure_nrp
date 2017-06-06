@@ -1,9 +1,14 @@
 #!/bin/bash
 # A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE, VirtualCoach
 
+source $HBP/user-scripts/repos.txt
+
 $HBP/user-scripts/purge
 export GROUPNAME=`/usr/bin/id -gn`
 mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.opt/bbp
+
+echo "Copying user_makefile to python repos"
+for i in ${nrp_python[@]} ; do cp -f config_files/user_makefile $HBP/$i; done
 
 echo "Copying Frontend config.json file"
 ln -s $HBP/user-scripts/config_files/ExDFrontend/config.json.local $HBP/ExDFrontend/app/config.json.local
