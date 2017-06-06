@@ -29,8 +29,7 @@ start() {
     fi
 
     echo -n $"Starting $prog: "
-    # if not running, start gzbridge up here
-    $exec -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_api_plugin.so -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_paths_plugin.so &
+    $exec --pause -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_api_plugin.so -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_paths_plugin.so &
     retval=$?
     procid=$!
     if [ $retval -eq 0 ]; then
@@ -44,6 +43,10 @@ start() {
 }
 
 stop() {
+    if [ ! -f $lockfile ] ; then
+        return 0
+    fi
+
     procid=`cat $lockfile`
     echo -n "Stopping $procid: "
     kill $procid

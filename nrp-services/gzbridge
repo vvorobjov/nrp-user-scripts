@@ -54,6 +54,10 @@ start() {
 }
 
 stop() {
+    if [ ! -f $lockfile ] ; then
+        return 0
+    fi
+
     echo -n $"Stopping $prog: "
     kill -9 $(<$lockfile)
     retval=$?
