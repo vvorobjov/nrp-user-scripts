@@ -19,6 +19,10 @@ echo "Copying CLE config.ini file"
 ln -s $HBP/user-scripts/config_files/CLE/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
 cp $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini
 
+echo "Copying hbp-flask-restful config files."
+ln -s $HBP/user-scripts/config_files/hbp-flask-restful-swagger-master/config.json.sample $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample
+cp $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json
+
 echo "Copying Proxy config files."
 ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample
 ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample.local $HBP/nrpBackendProxy/config.json.sample.local
