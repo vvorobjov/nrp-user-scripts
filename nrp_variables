@@ -69,7 +69,8 @@ export PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/hbp_nrp_virtual_coach
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_music_xml:$HBP/BrainSimulation/hbp_nrp_music_interface
 
 # retina
-export PYTHONPATH=$HBP/retina/build/lib:$PYTHONPATH
+export RETINA_INSTALL_DIR=$HBP/retina
+export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
 
 # HBP models directory
 export NRP_MODELS_DIRECTORY=$HBP/Models
