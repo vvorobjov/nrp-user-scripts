@@ -1,0 +1,118 @@
+[
+    {
+        "title": "Shapes",
+        "thumbnail": "shapes.png",
+        "models": [
+            {
+                "modelPath": "box",
+                "modelTitle": "Box",
+                "thumbnail": "img/esv/objects/box.png"
+            },
+            {
+                "modelPath": "sphere",
+                "modelTitle": "Sphere",
+                "thumbnail": "img/esv/objects/sphere.png"
+            },
+            {
+                "modelPath": "cylinder",
+                "modelTitle": "Cylinder",
+                "thumbnail": "img/esv/objects/cylinder.png"
+            }
+        ]
+    },
+    {
+        "title": "Lights",
+        "thumbnail": "lights.png",
+        "models": [
+            {
+                "modelPath": "pointlight",
+                "modelTitle": "Point Light",
+                "thumbnail": "img/esv/objects/pointlight.png"
+            },
+            {
+                "modelPath": "spotlight",
+                "modelTitle": "Spot Light",
+                "thumbnail": "img/esv/objects/spotlight.png"
+            },
+            {
+                "modelPath": "directionallight",
+                "modelTitle": "Directional Light",
+                "thumbnail": "img/esv/objects/directionallight.png"
+            }
+        ]
+    },
+    {
+        "title": "Construction",
+        "thumbnail": "construction.png",
+        "models": [
+            {
+                "modelPath": "concretewall1",
+                "modelTitle": "Concrete Wall 1"
+            }
+        ]
+    },
+    {
+        "title": "Furniture",
+        "thumbnail": "roomObjects.png",
+        "models": [
+            {
+                "modelPath": "vr_lamp",
+                "modelTitle": "Stand Lamp"
+            },
+            {
+                "modelPath": "library_model",
+                "modelTitle": "Library"
+            },
+            {
+                "modelPath": "hosta_potted_plant",
+                "modelTitle": "Hosta Plant"
+            },
+            {
+                "modelPath": "vr_screen",
+                "modelTitle": "Virtual Screen"
+            },
+            {
+                "modelPath": "viz_poster",
+                "modelTitle": "Poster 1"
+            }
+        ]
+    },
+    {
+        "title": "Street",
+        "thumbnail": "street.png",
+        "models": [
+            {
+                "modelPath": "future_lamp",
+                "modelTitle": "Future Lamp"
+            },
+            {
+                "modelPath": "large_concrete_ground",
+                "modelTitle": "Large Concrete Ground"
+            }
+        ]
+    },
+    {
+        "title": "Nature",
+        "thumbnail": "nature.png",
+        "models": [
+            {
+                "modelPath": "mars_ground_model",
+                "modelTitle": "Mars Ground"
+            }
+        ]
+    },
+    {
+        "title": "NRP",
+        "thumbnail": "NRP.png",
+        "models": [
+            {
+                "modelPath": "viz_poster_2",
+                "modelTitle": "HBP/NRP Poster"
+            },
+            {
+                "modelPath": "nrp_panel",
+                "modelTitle": "HBP/NRP Panel"
+            }
+        ]
+    }
+]
