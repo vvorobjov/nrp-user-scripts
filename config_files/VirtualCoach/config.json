@@ -35,6 +35,7 @@
   },
 
   "ros": {
-    "status": "/ros_cle_simulation/status"
+    "status": "/ros_cle_simulation/status",
+    "error": "/ros_cle_simulation/cle_error"
   }
 }
