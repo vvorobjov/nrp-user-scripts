@@ -104,6 +104,7 @@ if [ $mode -eq 1 ]; then
 
 elif [ $mode -eq 2 ]; then
   disableFrontendOIDC
+  disableBackendOIDC
   disableNginxOIDC
   proxyUseLocalhost
   disableCollabSupport
