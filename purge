@@ -1,11 +1,34 @@
 #!/bin/bash
+
+function backup() {
+  targetfile=$1
+  if [ -f $targetfile ]
+  then
+    index=`(ls $targetfile.bak* 2>/dev/null || echo bak) | sed -n "s/^.*bak\([0-9]*\).*$/0\1/p" | sort -n -r | head -1`
+    if [ $index -gt 9 ]
+    then
+      printf "\033[1;33mYou have more than 10 backups of $targetfile. Would you like to purge them? (y/n)\033[0m\n"
+      read -t 5 p
+      if [ "$p" == "y" -o "$p" == "Y" ]; then rm -f $targetfile.bak*; index=0; fi
+    fi
+    mv -f $targetfile $targetfile.bak`expr $index + 1`
+    echo "  Backed up $targetfile.bak"`expr $index + 1`
+  fi
+}
+
+
 # Remove already existing config files that will be set-up using the configure_nrp script
 echo "Removing existing config files for nginx, ExDFrontend, CLE, nrpBackendProxy and the gzserver/gzbridge scripts."
 $HOME/.local/etc/init.d/nginx stop
 rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
-rm -f $HBP/ExDFrontend/app/config.json $HBP/ExDFrontend/app/config.json.local
-rm -f $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
-rm -f $HBP/nrpBackendProxy/config.json $HBP/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample.local
+for i in CLE ExperimentControl BrainSimulation VirtualCoach; do backup $HBP/$i/user_makefile; done
+backup $HBP/ExDFrontend/app/config.json
+rm -f $HBP/ExDFrontend/app/config.json.local
+backup $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini
+rm -f $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
+backup $HBP/nrpBackendProxy/config.json
+rm -f $HBP/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample.local
+backup $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json
 rm -f $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample
-rm -f $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
+backup $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
 echo "DONE"

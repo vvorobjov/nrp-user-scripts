@@ -1,17 +1,26 @@
-nrp_repos=(
+nrp_python=(
     BrainSimulation
     ExperimentControl
     VirtualCoach
-    GazeboRosPackages
     CLE
     ExDBackend
-    gzweb
+)
+nrp_other=(
+    GazeboRosPackages
     Models
     Experiments
     server-scripts
+)
+nrp_js=(
+    gzweb
     nrpBackendProxy
     brainvisualizer
     ExDFrontend
+)
+nrp_repos=(
+    ${nrp_python[*]}
+    ${nrp_other[*]}
+    ${nrp_js[*]}
 )
 nrp_3rd_party=(
     sdformat

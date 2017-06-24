@@ -77,8 +77,11 @@ function nrp_build {
   echo =========================
   echo Building
   echo =========================
-  isvpn=$(curl https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/pip 2>/dev/null | grep 1.4.1);
-  test -n "$isvpn" || { echo ERROR you should be on the EPFL vpn;exit 1; }
+  if [ "$NRP_INSTALL_MODE" != "user" ]
+  then
+    isvpn=$(curl https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/pip 2>/dev/null | grep 1.4.1);
+    test -n "$isvpn" || { echo ERROR you should be on the EPFL vpn;exit 1; }
+  fi
 
   if [ "$build_all" = "all" ]
   then
