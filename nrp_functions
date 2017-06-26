@@ -49,12 +49,10 @@ function nrp_rebase {
     repos=(
     ${nrp_3rd_party[*]}
     ${nrp_repos[*]}
-    user-scripts
   )
   else
     repos=(
       ${nrp_repos[*]}
-      user-scripts
     )
   fi
   for i in ${repos[@]}
@@ -178,7 +176,7 @@ function nrp_build {
     cd ..
   done
 
-  for i in brainvisualizer ExDFrontend nrpBackendProxy
+  for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
   do
     echo
     echo -----------------------
@@ -226,12 +224,10 @@ function clean_branches {
     repos=(
     ${nrp_3rd_party[*]}
     ${nrp_repos[*]}
-    user-scripts
   )
   else
     repos=(
       ${nrp_repos[*]}
-      user-scripts
     )
   fi
   for i in ${repos[@]}
@@ -261,12 +257,10 @@ function it_branch {
     repos=(
     ${nrp_3rd_party[*]}
     ${nrp_repos[*]}
-    user-scripts
   )
   else
     repos=(
       ${nrp_repos[*]}
-      user-scripts
     )
   fi
   for i in ${repos[@]}
