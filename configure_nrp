@@ -51,6 +51,10 @@ cp $HBP/user-scripts/config_files/nginx/uwsgi-nrp.ini $HOME/.local/etc/nginx/uws
 echo "Copying VirtualCoach config.json file"
 cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
 
+echo "Copying Models model_library.json file"
+cp $HBP/user-scripts/config_files/Models/model_library.json $HBP/ExDFrontend/app/model_library.json
+
+
 echo "Setting configuration files to default mode (offline mode)"
 $HBP/user-scripts/running_mode "2"
 echo "DONE"
