@@ -10,9 +10,11 @@ nrp_other=(
     Models
     Experiments
     server-scripts
+    user-scripts
 )
 nrp_js=(
     gzweb
+    SlurmClusterMonitor
     nrpBackendProxy
     brainvisualizer
     ExDFrontend
