@@ -202,9 +202,9 @@ function nrp_build {
 function nrp_configure {
   echo
   echo "Would you like to run configure_nrp right away to update the config files?"
-  read -p "Note that this will overwrite local changes in your config sample files. [y/N] " -n 1 -r REPLY 
+  read -p "Note that this will backup your local config files with then .bak extension. [Y/n] " -n 1 -r REPLY 
   echo
-  if [[ $REPLY =~ ^[Yy] ]]; then
+  if [[ ( -z "$REPLY" ) || ( $REPLY =~ ^[Yy] ) ]]; then
     $HBP/user-scripts/configure_nrp || { echo ERROR;exit 1; }
   fi
 }
@@ -252,7 +252,7 @@ function it_branch {
   echo =========================
   echo Creating clean IT branch
   echo =========================
-  if [ "$clean_all" = "all" ]
+  if [ "$itbranch_all" = "all" ]
   then
     repos=(
     ${nrp_3rd_party[*]}

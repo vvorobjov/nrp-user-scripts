@@ -21,7 +21,6 @@ function backup() {
 echo "Removing existing config files for nginx, ExDFrontend, CLE, nrpBackendProxy and the gzserver/gzbridge scripts."
 $HOME/.local/etc/init.d/nginx stop
 rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
-for i in CLE ExperimentControl BrainSimulation VirtualCoach; do backup $HBP/$i/user_makefile; done
 backup $HBP/ExDFrontend/app/config.json
 rm -f $HBP/ExDFrontend/app/config.json.local
 backup $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini
