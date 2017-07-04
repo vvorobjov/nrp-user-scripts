@@ -14,7 +14,8 @@
       "url": "https://neurorobotics-dev.humanbrainproject.eu/slurmmonitor"
     },
     "document": {
-      "v0": "https://services.humanbrainproject.eu/document/v0/api"
+      "v0": "https://services.humanbrainproject.eu/document/v0/api",
+      "v1": "https://services.humanbrainproject.eu/storage/v1/api"
     },
     "proxy": {
       "url": "http://localhost:8000"
