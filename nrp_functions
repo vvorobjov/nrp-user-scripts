@@ -196,7 +196,9 @@ function nrp_build {
   cd gzweb || { echo ERROR;exit 1; }
   ./deploy.sh || { echo ERROR;exit 1; }
   npm install || { echo ERROR;exit 1; }
-  cd ..
+  cd gz3d/utils || { echo ERROR;exit 1; }
+  npm install || { echo ERROR;exit 1; }
+  cd ../../.. || { echo ERROR;exit 1; }
 }
 
 function nrp_configure {
