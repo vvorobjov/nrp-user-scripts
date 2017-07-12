@@ -47,7 +47,7 @@ fi
 echo "Search for C++ sources"
 for repo in $*
 do
-  for i in `find $repo -regex '.*\.\(c\|cpp\|h\|hpp\)$' -print`
+  for i in `find $repo -regex '.*\.\(c\|cpp\|cc\|h\|hpp\|hh\)$' -print`
   do
     applylicense $i "/**" "**/" " * "
   done
@@ -56,7 +56,7 @@ done
 echo "Search for Python sources"
 for repo in $*
 do
-  for i in `find $repo -name '*.py' ! -name config.py ! -name __init__.py ! -name version.py ! -name setup.py -print`
+  for i in `find $repo -name '*.py' ! -name __init__.py ! -name version.py ! -name setup.py -print`
   do
     applylicense $i "# " "" "# "
   done
