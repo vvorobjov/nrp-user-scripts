@@ -204,7 +204,7 @@ function nrp_build {
 function nrp_configure {
   echo
   echo "Would you like to run configure_nrp right away to update the config files?"
-  read -p "Note that this will backup your local config files with then .bak extension. [Y/n] " -n 1 -r REPLY 
+  read -p "Note that this will backup your local config files with then .bak extension. [Y/n] " -n 1 -r REPLY
   echo
   if [[ ( -z "$REPLY" ) || ( $REPLY =~ ^[Yy] ) ]]; then
     $HBP/user-scripts/configure_nrp || { echo ERROR;exit 1; }
@@ -276,4 +276,47 @@ function it_branch {
     { git branch | grep "^ *IT$" && git branch -D IT || true; } && git checkout -b IT || { echo ERROR;exit 1; }
     cd ..
   done
+}
+
+function set_up_tingoDB {
+  #check if the STORAGE_PATH is set, if not we use the default ~/.opt
+  if [ -z ${STORAGE_PATH+x} ];
+   then echo "STORAGE_PATH is unset. Defaulting to ~/.opt"
+     STORAGE_PATH=~/.opt
+   else echo "STORAGE_PATH is set to '$STORAGE_PATH'"
+  fi
+  #check if the storage path exists
+  if [ ! -d "$STORAGE_PATH" ]; then
+   mkdir $STORAGE_PATH || { echo ERROR;exit 1;}
+  fi
+
+  node $HBP/nrpBackendProxy/utils/createFSUser.js --user nrpuser --password password || { echo ERROR;exit 1; }
+}
+
+function add_new_user_tingoDB {
+  #check if the STORAGE_PATH is set, if not we use the default ~/.opt
+  echo
+  echo "Welcome to the interactive nrp storage database user creation"
+  echo
+  if [ -z ${STORAGE_PATH+x} ];
+   then echo "STORAGE_PATH is unset. Defaulting to ~/.opt"
+     STORAGE_PATH=~/.opt
+   else echo "STORAGE_PATH is set to '$STORAGE_PATH'"
+  fi
+  #check if the storage path exists
+  if [ ! -d "$STORAGE_PATH" ]; then
+   mkdir $STORAGE_PATH || { echo ERROR;exit 1;}
+  fi
+  echo "Type the username and press [ENTER]"
+  read username || { echo ERROR;exit 1; }
+  echo
+  echo "Type the password and press [ENTER]"
+  read -s password || { echo ERROR;exit 1; }
+  echo
+  echo "Are you finished with your input [y] or you would like to abort?"
+  read -p "[Y/n] " -n 1 -r REPLY || { echo ERROR;exit 1; }
+  echo
+  if [[ ( -z "$REPLY" ) || ( $REPLY =~ ^[Yy] ) ]]; then
+    node $HBP/nrpBackendProxy/utils/createFSUser.js --user $username --password $password || { echo ERROR;exit 1; }
+  fi
 }

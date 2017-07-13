@@ -84,5 +84,8 @@
       },
       "serverJobLocation": "lugano"
     }
+  },
+  "storage": {
+    "type": "FS"
   }
 }
