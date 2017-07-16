@@ -29,7 +29,11 @@ start() {
     fi
 
     echo -n $"Starting $prog: "
-    $VGLRUN $exec $GZSERVER_ARGS --pause -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_api_plugin.so -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_paths_plugin.so &
+    $VGLRUN $exec $GZSERVER_ARGS \
+                  --pause \
+                  -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_api_plugin.so \
+                  -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_paths_plugin.so \
+                  -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_recording_plugin.so &
     retval=$?
     procid=$!
     if [ $retval -eq 0 ]; then
