@@ -78,7 +78,7 @@ export NRP_EXPERIMENTS_DIRECTORY=$HBP/Experiments
 
 # NRP App database
 export APP_SETTINGS=config.NoDBConfig #to be removed after the full migration to the storage server
-export STORAGE_PATH=$HOME/.opt
+export STORAGE_PATH=$HOME/.opt/nrpStorage
 
 # General NRP
 export NRP_USER=$USER

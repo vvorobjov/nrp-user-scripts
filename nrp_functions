@@ -283,10 +283,10 @@ function it_branch {
 }
 
 function set_up_tingoDB {
-  #check if the STORAGE_PATH is set, if not we use the default ~/.opt
+  #check if the STORAGE_PATH is set, if not we use the default ~/.opt/nrpStorage
   if [ -z ${STORAGE_PATH+x} ];
-   then echo "STORAGE_PATH is unset. Defaulting to ~/.opt"
-     STORAGE_PATH=~/.opt
+   then echo "STORAGE_PATH is unset. Defaulting to ~/.opt/nrpStorage"
+     STORAGE_PATH=~/.opt/nrpStorage
    else echo "STORAGE_PATH is set to '$STORAGE_PATH'"
   fi
   #check if the storage path exists
@@ -298,13 +298,13 @@ function set_up_tingoDB {
 }
 
 function add_new_user_tingoDB {
-  #check if the STORAGE_PATH is set, if not we use the default ~/.opt
+  #check if the STORAGE_PATH is set, if not we use the default ~/.opt/nrpStorage
   echo
   echo "Welcome to the interactive nrp storage database user creation"
   echo
   if [ -z ${STORAGE_PATH+x} ];
-   then echo "STORAGE_PATH is unset. Defaulting to ~/.opt"
-     STORAGE_PATH=~/.opt
+   then echo "STORAGE_PATH is unset. Defaulting to ~/.opt/nrpStorage"
+     STORAGE_PATH=~/.opt/nrpStorage
    else echo "STORAGE_PATH is set to '$STORAGE_PATH'"
   fi
   #check if the storage path exists
