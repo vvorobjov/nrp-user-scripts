@@ -109,6 +109,7 @@ function nrp_build {
     ./configure --prefix=$HOME/.local --with-device=ch3:nemesis || { echo ERROR;exit 1; }
     make -j`nproc` || { echo ERROR;exit 1; }
     make install || { echo ERROR;exit 1; }
+    git clean -fd || { echo ERROR;exit 1; }
 
     echo
     echo -------------------------
