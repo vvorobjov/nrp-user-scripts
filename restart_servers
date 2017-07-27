@@ -11,9 +11,16 @@ then
   shift
 fi
 
+isgpfs="no"
+if [ "$1" = "gpfs" ]
+then
+  isgpfs="yes"
+  shift
+fi
+
 if [ $# -lt 1 ]
 then
-  echo "Usage: "$0" [puppet] dev|staging|<list of machines>"
+  echo "Usage: "$0" [puppet|gpfs] dev|staging|<list of machines>"
   exit 1
 fi
 
@@ -38,6 +45,15 @@ function puppetagentall() {
         puppet agent --test
         chown bbpnrsoa /etc/krb5.keytab.d/bbpnrsoa.keytab
         echo ------------------------------------------------------------
+EOF
+     rm "$touchfilebase""$1"
+}
+
+function unmount_gpfs() {
+    echo "Unmounting GPFS on $1"
+    touch "$touchfilebase""$1"
+    ssh -o 'BatchMode yes' -K root@$1 /bin/bash << EOF
+        nohup mmshutdown
 EOF
      rm "$touchfilebase""$1"
 }
@@ -85,6 +101,9 @@ then
      if [ $ispuppet = "yes" ]
      then
         puppetagentall $var &
+     elif [ $isgpfs = "yes" ]
+     then
+        unmount_gpfs $var &
      else
         nrprestart $var &
      fi
