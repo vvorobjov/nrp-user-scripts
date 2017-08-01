@@ -1,6 +1,6 @@
 # These variables can be included in the .bashrc before starting the installation process
 
-CURR_SHELL=$(basename `ps -p $$ --no-headers -o cmd`)
+CURR_SHELL=$(basename `ps -p $$ --no-headers -o comm`)
 if [ -z "$CURR_SHELL" ]
 then
       CURR_SHELL='sh'
