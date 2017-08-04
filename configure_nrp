@@ -54,8 +54,9 @@ cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp
 echo "Copying Models model_library.json file"
 cp $HBP/user-scripts/config_files/Models/model_library.json $HBP/ExDFrontend/app/model_library.json
 
-read -r -p "Would you like to setup your local storage database with a default user? [y/N] " response
-if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]
+printf "\033[1;33mWould you like to setup your local storage database with a default user? (y/N)\033[0m\n"
+read -t 5 p
+if [ "$p" == "y" -o "$p" == "Y" ]
 then
   echo "Setting up local storage database"
   chmod +x $HBP/user-scripts/configure_storage_database
