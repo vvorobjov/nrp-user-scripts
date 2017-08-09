@@ -47,7 +47,67 @@
         "models": [
             {
                 "modelPath": "concretewall1",
-                "modelTitle": "Concrete Wall 1"
+                "modelTitle": "Concrete Wall"
+            },
+            {
+                "modelPath": "woodwall",
+                "modelTitle": "Wood Wall"
+            },
+            {
+                "modelPath": "whitepanelwall",
+                "modelTitle": "White Panel Wall"
+            },
+            {
+                "modelPath": "metallicwallangle",
+                "modelTitle": "Wall Metallic Angle"
+            },
+            {
+                "modelPath": "concretewallhigh",
+                "modelTitle": "High Concrete Wall"
+            },
+            {
+                "modelPath": "metallicwallanglehigh",
+                "modelTitle": "High Wall Metallic Angle"
+            },
+            {
+                "modelPath": "squarewindow",
+                "modelTitle": "Square Window"
+            },
+            {
+                "modelPath": "highwindow",
+                "modelTitle": "High Window"
+            },
+            {
+                "modelPath": "topwindow",
+                "modelTitle": "Top Window"
+            },
+            {
+                "modelPath": "bigtopwindow",
+                "modelTitle": "Big Top Window"
+            },
+            {
+                "modelPath": "topmetalbeam",
+                "modelTitle": "Top Metal Beam"
+            },
+            {
+                "modelPath": "glassdoor",
+                "modelTitle": "Glass Door"
+            },
+            {
+                "modelPath": "highpylon",
+                "modelTitle": "High Pylon"
+            },
+            {
+                "modelPath": "concretepylon",
+                "modelTitle": "Concrete Pylon"
+            },
+            {
+                "modelPath": "groundmetalgrid",
+                "modelTitle": "Ground Metal Grid"
+            },
+            {
+                "modelPath": "robotplayground",
+                "modelTitle": "Robot Playground"
             }
         ]
     },
@@ -60,6 +120,10 @@
                 "modelTitle": "Stand Lamp"
             },
             {
+                "modelPath": "top_lamp",
+                "modelTitle": "Top Lamp"
+            },
+            {
                 "modelPath": "library_model",
                 "modelTitle": "Library"
             },
@@ -70,6 +134,26 @@
             {
                 "modelPath": "vr_screen",
                 "modelTitle": "Virtual Screen"
+            },
+            {
+                "modelPath": "bench",
+                "modelTitle": "Bench"
+            },
+            {
+                "modelPath": "sofa",
+                "modelTitle": "Sofa"
+            },
+            {
+                "modelPath": "woodtable",
+                "modelTitle": "Wood Table"
+            },
+            {
+                "modelPath": "officechair",
+                "modelTitle": "Office Chair"
+            },
+            {
+                "modelPath": "computer",
+                "modelTitle": "Computer"
             },
             {
                 "modelPath": "viz_poster",
@@ -98,6 +182,10 @@
             {
                 "modelPath": "mars_ground_model",
                 "modelTitle": "Mars Ground"
+            },
+            {
+                "modelPath": "grasshill",
+                "modelTitle": "Grass Hill"
             }
         ]
     },
