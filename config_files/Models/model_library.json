@@ -108,6 +108,22 @@
             {
                 "modelPath": "robotplayground",
                 "modelTitle": "Robot Playground"
+            },
+            {
+                "modelPath": "ramp",
+                "modelTitle": "Ramps"
+            },
+            {
+                "modelPath": "stairs",
+                "modelTitle": "Stairs"
+            },
+            {
+                "modelPath": "concreteblock",
+                "modelTitle": "Concrete Block"
+            },
+            {
+                "modelPath": "bumpysoil",
+                "modelTitle": "Bumpy Soil"
             }
         ]
     },
@@ -158,6 +174,14 @@
             {
                 "modelPath": "viz_poster",
                 "modelTitle": "Poster 1"
+            },
+            {
+                "modelPath": "pingpongtable",
+                "modelTitle": "Ping Pong Table"
+            },
+            {
+                "modelPath": "pingpongtrainerbot",
+                "modelTitle": "Ping Pong Trainer Robot"
             }
         ]
     },
