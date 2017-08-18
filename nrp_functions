@@ -199,11 +199,21 @@ function nrp_build {
   echo -------------------------
   sleep 2
   cd gzweb || { echo ERROR;exit 1; }
-  ./deploy.sh || { echo ERROR;exit 1; }
+  ./deploy-gzbridge-nrp.sh || { echo ERROR;exit 1; }
   npm install || { echo ERROR;exit 1; }
   cd gz3d/utils || { echo ERROR;exit 1; }
   npm install || { echo ERROR;exit 1; }
   cd ../../.. || { echo ERROR;exit 1; }
+
+  echo
+  echo -------------------------
+  echo Models
+  echo -------------------------
+  sleep 2
+  cd Models || { echo ERROR;exit 1; }
+  ./create-symlinks.sh || { echo ERROR;exit 1; }
+  ../gzweb/deploy-models-nrp.sh || { echo ERROR;exit 1; }
+  cd ..
 }
 
 function nrp_configure {
