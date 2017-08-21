@@ -83,7 +83,7 @@
             },
             {
                 "modelPath": "bigtopwindow",
-                "modelTitle": "Big Top Window"
+                "modelTitle": "3x3 Top Window"
             },
             {
                 "modelPath": "topmetalbeam",
@@ -152,6 +152,10 @@
                 "modelTitle": "Virtual Screen"
             },
             {
+                "modelPath": "screensupport",
+                "modelTitle": "Screen Support"
+            },
+            {
                 "modelPath": "bench",
                 "modelTitle": "Bench"
             },
@@ -182,6 +186,10 @@
             {
                 "modelPath": "pingpongtrainerbot",
                 "modelTitle": "Ping Pong Trainer Robot"
+            },
+            {
+                "modelPath": "carpetground",
+                "modelTitle": "Carpet"
             }
         ]
     },
