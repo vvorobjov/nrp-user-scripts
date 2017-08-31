@@ -68,6 +68,16 @@ function nrp_rebase {
   done
 }
 
+function ubuntu_fix_cv2 {
+
+  # This imports cv2 to the platform_venv on ubuntu. Use this script on local installations only.
+  # You should have installed python-opencv via apt-get
+
+  mkdir ${VIRTUAL_ENV}/lib/python2.7/site-packages/ -p || { echo ERROR;exit 1; }
+  cp /usr/lib/python2.7/dist-packages/cv* ${VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
+
+}
+
 function nrp_build {
   build_all=$1
 
@@ -180,6 +190,8 @@ function nrp_build {
     make devinstall || { echo ERROR;exit 1; }
     cd ..
   done
+
+  ubuntu_fix_cv2
 
   for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
   do
