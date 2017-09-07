@@ -74,7 +74,8 @@ function ubuntu_fix_cv2 {
   # You should have installed python-opencv via apt-get
 
   mkdir ${VIRTUAL_ENV}/lib/python2.7/site-packages/ -p || { echo ERROR;exit 1; }
-  cp /usr/lib/python2.7/dist-packages/cv* ${VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
+  cp /usr/lib/python2.7/dist-packages/cv2*.so ${VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
+  cp /usr/lib/python2.7/dist-packages/cv.py ${VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
 
 }
 
