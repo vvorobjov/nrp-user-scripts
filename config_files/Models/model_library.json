@@ -140,7 +140,7 @@
                 "modelTitle": "Top Lamp"
             },
             {
-                "modelPath": "library_model",
+                "modelPath": "metal_library",
                 "modelTitle": "Library"
             },
             {
@@ -226,6 +226,18 @@
             {
                 "modelPath": "mouseymaze",
                 "modelTitle": "Mouse Y Maze"
+            },
+            {
+                "modelPath": "openglbook",
+                "modelTitle": "OpenGL Book"
+            },
+            {
+                "modelPath": "tatbook",
+                "modelTitle": "TAT Book"
+            },
+            {
+                "modelPath": "impcppbook",
+                "modelTitle": "C++ Book"
             }
         ]
     },
