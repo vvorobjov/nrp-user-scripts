@@ -225,7 +225,7 @@ function nrp_build {
   sleep 2
   cd Models || { echo ERROR;exit 1; }
   ./create-symlinks.sh || { echo ERROR;exit 1; }
-  ../gzweb/deploy-models-nrp.sh || { echo ERROR;exit 1; }
+  ../gzweb/deploy-models-nrp.sh -a || { echo ERROR;exit 1; }
   cd ..
 }
 
