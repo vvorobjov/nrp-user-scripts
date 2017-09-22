@@ -57,6 +57,8 @@ stop() {
     kill $procid
     retval=$?
     if [ $retval -eq 0 ]; then
+        # make sure gzserver is really dead
+        pkill -f $exec
         echo " OK."
     else
         echo " Error $retval. Removing $lockfile"
