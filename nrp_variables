@@ -41,14 +41,11 @@ source $HBP/GazeboRosPackages/devel/setup.$CURR_SHELL
 # use HBP version of gazebo in scripts
 export GZSERVER_BIN_DIR=$HOME/.local/bin
 
-# Py2.7
-export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python2.7/dist-packages
-
 # HBP NEST
 export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python2.7/site-packages
 
 # GazeboRosPackages
-export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python2.7/site-packages:$HBP/GazeboRosPackages/devel/lib/python2.7/dist-packages
+export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python2.7/dist-packages
 
 # HBP CLE
 export PYTHONPATH=$PYTHONPATH:$HBP/CLE/hbp_nrp_cle
