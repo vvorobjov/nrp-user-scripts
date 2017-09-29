@@ -2,12 +2,15 @@
 # A script to enable or disable oidc
 
 mode=$1
+no_restart=$2 # makes sure nginx is not started on *dev servers* when running_mode is used
 needs_source=0
 
 if [[ -z $mode ]]; then
   echo "1. EPFL mode -- Enable OIDC and use dev. servers as backends"
   echo "2. Offline mode -- Disable OIDC and use your local machine as backend"
   echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
+  echo
+  echo "Specify the additional 'no_restart' option if you want nginx not to be restarted"
   read mode
 fi
 
@@ -118,7 +121,10 @@ elif [ $mode -eq 3 ]; then
 
 fi
 
-$HOME/.local/etc/init.d/nginx restart
+if [ -z $no_restart ] || [ "$no_restart" != "no_restart" ]; then
+  $HOME/.local/etc/init.d/nginx restart
+fi
+
 if [ $needs_source -eq 1 ]; then
   echo "===================== IMPORTANT ====================="
   echo "======= Remember to source your .bashrc file! ======="
