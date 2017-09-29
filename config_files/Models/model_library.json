@@ -172,6 +172,18 @@
                 "modelTitle": "Office Chair"
             },
             {
+                "modelPath": "biologylabchair",
+                "modelTitle": "Biology Lab Chair"
+            },
+            {
+                "modelPath": "biologylabsink",
+                "modelTitle": "Biology Lab Sink"
+            },
+            {
+                "modelPath": "biologylabdesk",
+                "modelTitle": "Biology Lab Desk"
+            },
+            {
                 "modelPath": "computer",
                 "modelTitle": "Computer"
             },
@@ -198,6 +210,22 @@
             {
                 "modelPath": "woodcheckerboard",
                 "modelTitle": "Wood Checkerboard"
+            },
+            {
+                "modelPath": "biologylabbottle",
+                "modelTitle": "Biology Lab Bottle"
+            },
+            {
+                "modelPath": "trashcan",
+                "modelTitle": "Trashcan"
+            },
+            {
+                "modelPath": "shelf",
+                "modelTitle": "Shelf"
+            },
+            {
+                "modelPath": "mouseymaze",
+                "modelTitle": "Mouse Y Maze"
             }
         ]
     },
