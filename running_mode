@@ -7,13 +7,13 @@ needs_source=0
 
 if [[ -z $mode ]]; then
   echo "1. EPFL mode -- Enable OIDC and use dev. servers as backends"
-  echo "2. Offline mode -- Disable OIDC and use your local machine as backend"
+  echo "2. Offline mode -- Disable OIDC and use your local machine as backend and storage"
   echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
   echo
   echo "Specify the additional 'no_restart' option if you want nginx not to be restarted"
   read mode
 fi
-
+ 
 function enableFrontendOIDC {
   echo "Editing Frontend config.json"
   cd $HBP/ExDFrontend/app
@@ -65,13 +65,24 @@ function disableNginxOIDC {
   sed -e '/_userinfo/, +2 s/^#*/#/' -i nrp-services.conf
 }
 
-function proxyUseLocalhost {
-  echo "Using the proxy config file containing your localhost as backend"
+function proxyUseLocalhostCollab {
+  echo "Using the proxy config file containing your localhost as backend, and the Collab as storage"
   cd $HBP/nrpBackendProxy
   if [ -f config.json ]; then
     rm config.json
   fi
   cp config.json.sample.local config.json
+  sed -e '/type/ s/FS/Collab/' -i config.json
+}
+
+function proxyUseLocalhostFS {
+  echo "Using the proxy config file containing your localhost as backend, and your FS as storage"
+  cd $HBP/nrpBackendProxy
+  if [ -f config.json ]; then
+    rm config.json
+  fi
+  cp config.json.sample.local config.json
+  sed -e '/type/ s/Collab/FS/' -i config.json
 }
 
 function enableCollabSupport {
@@ -109,14 +120,14 @@ elif [ $mode -eq 2 ]; then
   disableFrontendOIDC
   disableBackendOIDC
   disableNginxOIDC
-  proxyUseLocalhost
+  proxyUseLocalhostFS
   disableCollabSupport
 
 elif [ $mode -eq 3 ]; then
   enableFrontendOIDC
   enableBackendOIDC
   enableNginxOIDC
-  proxyUseLocalhost
+  proxyUseLocalhostCollab
   enableCollabSupport
 
 fi
