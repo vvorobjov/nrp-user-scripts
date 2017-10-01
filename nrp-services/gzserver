@@ -29,6 +29,7 @@ start() {
     fi
 
     echo -n $"Starting $prog: "
+
     $VGLRUN $exec $GZSERVER_ARGS \
                   --pause \
                   -s $HBP/GazeboRosPackages/devel/lib/libgazebo_ros_api_plugin.so \
