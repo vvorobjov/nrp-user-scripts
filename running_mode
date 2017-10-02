@@ -14,13 +14,6 @@ if [[ -z $mode ]]; then
   read mode
 fi
  
-function enableFrontendOIDC {
-  echo "Editing Frontend config.json"
-  cd $HBP/ExDFrontend/app
-  sed -e '/ensureToken/ s/false/true/' -i config.json
-  sed -e '/forceuser/ s/true/false/' -i config.json
-}
-
 function enableBackendOIDC {
   echo "Editing Backend config.json"
   cd $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static
@@ -42,13 +35,6 @@ function proxyUseDevServers {
     rm config.json
   fi
   cp config.json.sample config.json
-}
-
-function disableFrontendOIDC {
-  echo "Editing Frontend config.json"
-  cd $HBP/ExDFrontend/app
-  sed -e '/ensureToken/ s/true/false/' -i config.json
-  sed -e '/forceuser/ s/false/true/' -i config.json
 }
 
 function disableBackendOIDC {
@@ -113,18 +99,15 @@ function disableCollabSupport {
 }
 
 if [ $mode -eq 1 ]; then
-  enableFrontendOIDC
   proxyUseDevServers
 
 elif [ $mode -eq 2 ]; then
-  disableFrontendOIDC
   disableBackendOIDC
   disableNginxOIDC
   proxyUseLocalhostFS
   disableCollabSupport
 
 elif [ $mode -eq 3 ]; then
-  enableFrontendOIDC
   enableBackendOIDC
   enableNginxOIDC
   proxyUseLocalhostCollab

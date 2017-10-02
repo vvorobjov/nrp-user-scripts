@@ -26,11 +26,7 @@
   },
   "auth": {
     "clientId": "neurorobotics-ui",
-    "url": "https://services.humanbrainproject.eu/oidc",
-    "ensureToken": false
-  },
-  "oidc": {
-    "debug": false
+    "url": "https://services.humanbrainproject.eu/oidc"
   },
   "collab" : {
     "features": {
@@ -49,10 +45,6 @@
         "support": 5101
       }
     }
-  },
-  "localmode" : {
-    "forceuser": true,
-    "ownerID": "<username>"
   },
   "ros-topics": {
     "spikes": "/monitor/spike_recorder",
