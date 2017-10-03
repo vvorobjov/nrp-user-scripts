@@ -190,6 +190,14 @@
             {
                 "modelPath": "carpetground",
                 "modelTitle": "Carpet"
+            },
+            {
+                "modelPath": "graycarpetground",
+                "modelTitle": "Small Gray Carpet"
+            },
+            {
+                "modelPath": "woodcheckerboard",
+                "modelTitle": "Wood Checkerboard"
             }
         ]
     },
