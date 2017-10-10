@@ -314,7 +314,7 @@ function set_up_tingoDB {
   fi
   #check if the storage path exists
   if [ ! -d "$STORAGE_PATH" ]; then
-   mkdir $STORAGE_PATH || { echo ERROR;exit 1;}
+   mkdir -p $STORAGE_PATH || { echo ERROR;exit 1;}
   fi
 
   node $HBP/nrpBackendProxy/utils/createFSUser.js --user nrpuser --password password || { echo ERROR;exit 1; }
