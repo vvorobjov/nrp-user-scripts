@@ -60,6 +60,7 @@ stop() {
     if [ $retval -eq 0 ]; then
         # make sure gzserver is really dead
         pkill -f $exec
+        killall Xvfb 2> /dev/null
         echo " OK."
     else
         echo " Error $retval. Removing $lockfile"
