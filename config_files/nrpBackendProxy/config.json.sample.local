@@ -23,7 +23,6 @@
       "serverJobLocation": "local"
     }
   },
-  "storage": {
-    "type": "FS"
-  }
+  "storage": "FS",
+  "authentication": "FS"
 }

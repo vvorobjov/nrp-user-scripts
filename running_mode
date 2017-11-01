@@ -9,6 +9,7 @@ if [[ -z $mode ]]; then
   echo "1. EPFL mode -- Enable OIDC and use dev. servers as backends"
   echo "2. Offline mode -- Disable OIDC and use your local machine as backend and storage"
   echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
+  echo "4. Mixed Collab  mode -- OIDC authentication and local storage"
   echo
   echo "Specify the additional 'no_restart' option if you want nginx not to be restarted"
   read mode
@@ -58,7 +59,19 @@ function proxyUseLocalhostCollab {
     rm config.json
   fi
   cp config.json.sample.local config.json
-  sed -e '/type/ s/FS/Collab/' -i config.json
+  sed -e '/storage/ s/FS/Collab/' -i config.json
+  sed -e '/authentication/ s/FS/Collab/' -i config.json
+}
+
+function proxyUseLocalhostCollabAuthFsStorage {
+  echo "Configuring proxyto use localhost as backend, the Collab as authentication and FS as storage"
+  cd $HBP/nrpBackendProxy
+  if [ -f config.json ]; then
+    rm config.json
+  fi
+  cp config.json.sample.local config.json
+  sed -e '/storage/ s/Collab/FS/' -i config.json
+  sed -e '/authentication/ s/FS/Collab/' -i config.json
 }
 
 function proxyUseLocalhostFS {
@@ -68,7 +81,8 @@ function proxyUseLocalhostFS {
     rm config.json
   fi
   cp config.json.sample.local config.json
-  sed -e '/type/ s/Collab/FS/' -i config.json
+  sed -e '/storage/ s/Collab/FS/' -i config.json
+  sed -e '/authentication/ s/Collab/FS/' -i config.json
 }
 
 function enableCollabSupport {
@@ -106,13 +120,16 @@ elif [ $mode -eq 2 ]; then
   disableNginxOIDC
   proxyUseLocalhostFS
   disableCollabSupport
-
 elif [ $mode -eq 3 ]; then
   enableBackendOIDC
   enableNginxOIDC
   proxyUseLocalhostCollab
   enableCollabSupport
-
+elif [ $mode -eq 4 ]; then
+  enableBackendOIDC
+  enableNginxOIDC
+  proxyUseLocalhostCollabAuthFsStorage
+  enableCollabSupport
 fi
 
 if [ -z $no_restart ] || [ "$no_restart" != "no_restart" ]; then
