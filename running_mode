@@ -86,30 +86,14 @@ function proxyUseLocalhostFS {
 }
 
 function enableCollabSupport {
-  if ! grep -q APP_SETTINGS=config.LocalConfig "$HOME/.bashrc"; then
-    echo "Editing the APP_SETTINGS variable"
-    needs_source=1
-    if grep -q APP_SETTINGS "$HOME/.bashrc"; then
-      sed -e '/export APP_SETTINGS/ s/NoDBConfig/LocalConfig/' -i $HOME/.bashrc
-    else
-      sed -e "\$aexport APP_SETTINGS=config.LocalConfig" -i $HOME/.bashrc
-    fi
-  fi
   echo "Enabling authentication in local proxy config for collab support"
   cd $HBP/nrpBackendProxy
   sed -e '/deactivate/ s/true/false/' -i config.json
 }
 
 function disableCollabSupport {
-  if ! grep -q APP_SETTINGS=config.NoDBConfig "$HOME/.bashrc"; then
-    echo "Editing the APP_SETTINGS variable"
-    needs_source=1
-    if grep -q APP_SETTINGS "$HOME/.bashrc"; then
-      sed -e '/export APP_SETTINGS/ s/LocalConfig/NoDBConfig/' -i $HOME/.bashrc
-    else
-      sed -e "\$aexport APP_SETTINGS=config.NoDBConfig" -i $HOME/.bashrc
-    fi
-  fi
+  cd $HBP/nrpBackendProxy
+  sed -e '/deactivate/ s/false/true/' -i config.json
 }
 
 if [ $mode -eq 1 ]; then
