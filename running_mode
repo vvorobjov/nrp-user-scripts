@@ -9,7 +9,7 @@ if [[ -z $mode ]]; then
   echo "1. EPFL mode -- Enable OIDC and use dev. servers as backends"
   echo "2. Offline mode -- Disable OIDC and use your local machine as backend and storage"
   echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
-  echo "4. Mixed Collab  mode -- OIDC authentication and local storage"
+  echo "4. Mixed Collab mode -- OIDC authentication and local storage"
   echo
   echo "Specify the additional 'no_restart' option if you want nginx not to be restarted"
   read mode
