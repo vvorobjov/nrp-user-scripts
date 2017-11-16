@@ -176,7 +176,8 @@ function nrp_build {
   echo GazeboRosPackages
   echo -------------------------
   sleep 2
-  cd GazeboRosPackages || { echo ERROR;exit 1; }
+  cd $HBP/GazeboRosPackages || { echo ERROR;exit 1; }
+  rm -rf build
   catkin_make || { echo ERROR;exit 1; }
   cd ..
 
