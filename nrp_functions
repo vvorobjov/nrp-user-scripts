@@ -225,6 +225,14 @@ function nrp_build {
   echo Models
   echo -------------------------
   sleep 2
+  echo "Generate low resolution PBR textures"
+  virtualenv lower_res || { echo ERROR;exit 1; }
+  source lower_res/bin/activate || { echo ERROR;exit 1; }
+  pip install pillow==4.3.0 || { echo ERROR;exit 1; }
+  python $HBP/user-scripts/generatelowrespbr.py || { echo ERROR;exit 1; }
+  deactivate
+  rm -rf lower_res || { echo ERROR;exit 1; }
+  echo "Create links"
   cd Models || { echo ERROR;exit 1; }
   ./create-symlinks.sh || { echo ERROR;exit 1; }
   cd ..
