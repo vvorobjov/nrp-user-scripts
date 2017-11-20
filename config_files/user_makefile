@@ -102,7 +102,7 @@ CHECK_PYTHON_PATH:=@[ -n "$$PYTHONPATH" ] && $(call WARN,PYTHONPATH is set: ($${
 $(PLATFORM_VENV)/bin/activate:
 	@echo VIRTUALENV
 	$(CHECK_PYTHON_PATH)
-	virtualenv --no-site-packages $(PLATFORM_VENV)
+	virtualenv  -p python2.7 --no-site-packages $(PLATFORM_VENV)
 	touch $(PLATFORM_VENV)/bin/activate
 
 #need new version of pip for our setup.py methods
