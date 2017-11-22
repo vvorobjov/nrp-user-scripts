@@ -2,5 +2,5 @@
 host=bbpcode.epfl.ch
 port=22
 project=neurorobotics/user-scripts
-defaultbranch=master
+defaultbranch=development
 defaultremote=origin
