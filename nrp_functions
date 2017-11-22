@@ -36,6 +36,7 @@ function waitforall {
 
 function nrp_rebase {
   rebase_all=$1
+  rebase_branch=$2
 
   cd $HBP || { echo ERROR;exit 1; }
   source $HBP/user-scripts/repos.txt || { echo ERROR;exit 1; }
@@ -63,7 +64,7 @@ function nrp_rebase {
     echo -------------------------
     sleep 2
     cd $i || { echo ERROR;exit 1; }
-    git checkout master && git pull --rebase || { echo ERROR;exit 1; }
+    git checkout $branch && git pull --rebase || { echo ERROR;exit 1; }
     cd ..
   done
 }
@@ -267,7 +268,7 @@ function clean_branches {
     echo -------------------------
     sleep 2
     cd $i || { echo ERROR;exit 1; }
-    git branch | grep -v "master" | xargs git branch -D 2>/dev/null
+    git branch | grep -v "master" | grep -v "development" | xargs git branch -D 2>/dev/null
     cd ..
   done
 }
