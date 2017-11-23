@@ -9,6 +9,7 @@
   },
   "port": 8000,
   "modelsPath": "$HBP/Models",
+  "experimentsPath": "$HBP/Experiments",
   "servers": {
     "localhost": {
       "gzweb": {
