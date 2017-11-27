@@ -1,0 +1,8 @@
+source ${VIRTUAL_ENV}/bin/activate
+pyxbgen -u $HBP/Experiments/bibi_configuration.xsd -m bibi_api_gen
+pyxbgen -u $HBP/Experiments/ExDConfFile.xsd -m exp_conf_api_gen
+deactivate
+
+mv bibi_api_gen.py $HBP/ExDBackend/hbp_nrp_commons/hbp_nrp_commons/generated
+mv exp_conf_api_gen.py $HBP/ExDBackend/hbp_nrp_commons/hbp_nrp_commons/generated
+mv _sc.py $HBP/ExDBackend/hbp_nrp_commons/hbp_nrp_commons/generated
