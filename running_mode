@@ -6,7 +6,6 @@ no_restart=$2 # makes sure nginx is not started on *dev servers* when running_mo
 needs_source=0
 
 if [[ -z $mode ]]; then
-  echo "1. EPFL mode -- Enable OIDC and use dev. servers as backends"
   echo "2. Offline mode -- Disable OIDC and use your local machine as backend and storage"
   echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
   echo "4. Mixed Collab mode -- OIDC authentication and local storage"
@@ -28,15 +27,6 @@ function enableNginxOIDC {
   sed -e '/access_by_lua_file/ s/^#*//#/' -i nrp-services.conf
   sed -e '/_access_token/, +2 s/^#*//#/' -i nrp-services.conf
   sed -e '/_userinfo/, +2 s/^#*//#/' -i nrp-services.conf
-}
-
-function proxyUseDevServers {
-  echo "Using the proxy config file containing the dev. servers as backends"
-  cd $HBP/nrpBackendProxy
-  if [ -f config.json ]; then
-    rm config.json
-  fi
-  cp config.json.sample config.json
 }
 
 function disableBackendOIDC {
@@ -106,9 +96,6 @@ function replaceLocalhostByIP {
 }
 
 case $mode in
-1)
-  proxyUseDevServers
-  ;;
 2)
   disableBackendOIDC
   disableNginxOIDC

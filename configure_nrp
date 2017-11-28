@@ -29,7 +29,6 @@ ln -s $HBP/user-scripts/config_files/hbp-flask-restful-swagger-master/config.jso
 cp $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json
 
 echo "Copying Proxy config files."
-ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample $HBP/nrpBackendProxy/config.json.sample
 ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample.local $HBP/nrpBackendProxy/config.json.sample.local
 
 echo "Copying Nginx config files"
