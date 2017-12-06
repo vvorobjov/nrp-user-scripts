@@ -17,7 +17,7 @@ export LD_LIBRARY_PATH=$HOME/.local/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 export CMAKE_PREFIX_PATH=$HOME/.local/lib/x86_64-linux-gnu/cmake/gazebo/:$CMAKE_PREFIX_PATH
 
 # NRP virtual env
-export NRP_VIRTUAL_ENV=$HOME/.opt/platform_venv
+export VIRTUAL_ENV=$HOME/.opt/platform_venv
 
 # gzbridge & gzserver
 export PATH=$HOME/.opt/bbp/nrp-services:$PATH

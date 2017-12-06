@@ -99,6 +99,6 @@ kill_hbp_cle()
     fi
 }
 
-alias cle-start='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 2;cle-rosvideo & sleep 2;cle-rosbridge & sleep 2;cle-factory & sleep 2;cle-backend & sleep 2; cle-proxy & sleep 2'
+alias cle-start='roscore & sleep 2;cle-rosvideo & sleep 2;cle-rosbridge & sleep 2;cle-factory & sleep 2;cle-backend & sleep 2; cle-proxy & sleep 2'
 alias cle-kill='kill_hbp_cle'
 alias cle-postgres='pg_ctl -D $HOME/.local/postgres/data/ -l logfile restart'
