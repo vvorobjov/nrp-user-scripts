@@ -65,6 +65,9 @@ export PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/hbp_nrp_virtual_coach
 # HBP MUSIC pyNN/NEST Support
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_music_xml:$HBP/BrainSimulation/hbp_nrp_music_interface
 
+# HBP Distributed NEST Support
+export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_distributed_nest
+
 # retina
 export RETINA_INSTALL_DIR=$HBP/retina
 export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
