@@ -19,6 +19,7 @@ lib/Makefile.in
 libnestutil/Makefile.in
 libnestutil/sliconfig.h
 libnestutil/stamp-h1
+libnestutil/config.h
 librandom/Makefile.in
 ltmain.sh
 missing
