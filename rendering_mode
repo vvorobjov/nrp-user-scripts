@@ -13,7 +13,7 @@ fi
 function enableCPURendering {
   echo "Enabling CPU-only rendering"
   sed -i 's|$VGLRUN|xvfb-run -a --server-args="-screen 0 1280x1024x24"|' ~/.opt/bbp/nrp-services/gzserver
-  sed -i 's|--pause|--pause --software_only_rendering|' ${HOME}/.opt/bbp/nrp-services/gzserver
+  grep -q -- '--software_only_rendering' ${HOME}/.opt/bbp/nrp-services/gzserver || sed -i 's|--pause|--pause --software_only_rendering|' ${HOME}/.opt/bbp/nrp-services/gzserver
 }
 
 function enableGPURendering {
