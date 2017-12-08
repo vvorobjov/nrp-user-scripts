@@ -45,6 +45,7 @@ function nest_version_switch {
     cd $HBP/nest-simulator || { echo ERROR;exit 1; }
     make clean >/dev/null 2>&1
     make distclean >/dev/null 2>&1
+    rm -rf build_venv
   fi
   sleep 2
 }
@@ -177,17 +178,16 @@ function nrp_build {
       virtualenv build_venv || { echo ERROR;exit 1; }
       source build_venv/bin/activate
       pip install Cython==0.23.4 mpi4py==2.0.0 || { echo ERROR;exit 1; }
+      xargs rm -rf < $HBP/user-scripts/nest-delete-filelist.txt || { echo ERROR;exit 1; }
+      if [ ! -d $HBP/nest-simulator/build ]; then
+        mkdir $HBP/nest-simulator/build || { echo ERROR;exit 1;}
+      fi
+      cd $HBP/nest-simulator/build || { echo ERROR;exit 1;}
+      cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-music=ON .. || { echo ERROR;exit 1; }
+      make -j`nproc` || { echo ERROR;exit 1; }
+      make install || { echo ERROR;exit 1; }
       deactivate
     )
-    PYTHONPATH=$HBP/nest-simulator/build_venv/lib/python2.7/site-packages:$PYTHONPATH
-    xargs rm -rf < $HBP/user-scripts/nest-delete-filelist.txt || { echo ERROR;exit 1; }
-    if [ ! -d $HBP/nest-simulator/build ]; then
-      mkdir $HBP/nest-simulator/build || { echo ERROR;exit 1;}
-    fi
-    cd $HBP/nest-simulator/build || { echo ERROR;exit 1;}
-    cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-music=ON .. || { echo ERROR;exit 1; }
-    make -j`nproc` || { echo ERROR;exit 1; }
-    make install || { echo ERROR;exit 1; }
     rm -rf build_venv || { echo ERROR;exit 1; }
   fi
 
