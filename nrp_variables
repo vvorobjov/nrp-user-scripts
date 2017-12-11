@@ -42,7 +42,7 @@ source $HBP/GazeboRosPackages/devel/setup.$CURR_SHELL
 export GZSERVER_BIN_DIR=$HOME/.local/bin
 
 # HBP NEST
-export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python2.7/site-packages
+export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python2.7/site-packages:$HOME/.local/lib/x86_64-linux-gnu/python2.7/site-packages
 
 # GazeboRosPackages
 export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python2.7/dist-packages
