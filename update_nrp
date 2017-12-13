@@ -35,7 +35,7 @@ command="$1"
 arg1="$2"
 arg2="$3"
 if [ "$arg1" == "all" -o "$arg2" == "all" ]; then all="all"; else all="no"; fi
-if [ "$arg1" == "master" -o "$arg2" == "master" ]; then branch="master"; else branch="development"; fi
+if [ "$arg1" == "master" -o "$arg2" == "master" -o "$NRP_INSTALL_MODE" == "user" ]; then branch="master"; else branch="development"; fi
 
 case "$command" in
 "rebase")
