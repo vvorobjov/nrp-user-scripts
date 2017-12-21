@@ -143,8 +143,8 @@ function nrp_build {
       mkdir -p build
       cd build
       cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo ERROR;exit 1; }
-      make -j`nproc` || { echo ERROR;exit 1; }
-      make install || { echo ERROR;exit 1; }
+      make -j`nproc` || { echo $i BUILD ERROR;exit 1; }
+      make install || { echo $i INSTALL ERROR;exit 1; }
     done
 
     echo
@@ -153,10 +153,10 @@ function nrp_build {
     echo -------------------------
     sleep 2
     cd $HBP/mvapich2 || { echo ERROR;exit 1; }
-    ./autogen.sh || { echo ERROR;exit 1; }
-    ./configure --prefix=$HOME/.local --with-device=ch3:nemesis || { echo ERROR;exit 1; }
-    make -j`nproc` || { echo ERROR;exit 1; }
-    make install || { echo ERROR;exit 1; }
+    ./autogen.sh || { echo MVAPICH2 AUTOGEN ERROR;exit 1; }
+    ./configure --prefix=$HOME/.local --with-device=ch3:nemesis || { echo MVAPICH2 CONFIGURE ERROR;exit 1; }
+    make -j`nproc` || { echo MVAPICH2 BUILD ERROR;exit 1; }
+    make install || { echo MVAPICH2 INSTALL ERROR;exit 1; }
     git clean -fd || { echo ERROR;exit 1; }
 
     echo
@@ -172,14 +172,14 @@ function nrp_build {
     ( # use a subshell to avoid "nested" virtualenv issues
       virtualenv build_venv || { echo ERROR;exit 1; }
       source build_venv/bin/activate
-      pip install Cython==0.23.4 mpi4py==2.0.0 || { echo ERROR;exit 1; }
+      pip install Cython==0.23.4 mpi4py==2.0.0 || { echo CYTHON_MI4PY INSTALL ERROR;exit 1; }
       deactivate
     )
     PYTHONPATH=$HBP/MUSIC/build_venv/lib/python2.7/site-packages:$PYTHONPATH
     ./autogen.sh || { echo ERROR;exit 1; }
     ./configure --prefix=$HOME/.local MPI_CXX=mpicxx || { echo ERROR;exit 1; }
-    make -j`nproc` || { echo ERROR;exit 1; }
-    make install || { echo ERROR;exit 1; }
+    make -j`nproc` || { echo MUSIC BUILD ERROR;exit 1; }
+    make install || { echo MUSIC INSTALL ERROR;exit 1; }
     rm -rf build_venv || { echo ERROR;exit 1; }
     rm mpich2version || { echo ERROR;exit 1; }
     export PATH=$old_path
@@ -202,11 +202,11 @@ function nrp_build {
       fi
       cd $HBP/nest-simulator/build || { echo ERROR;exit 1;}
       cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-music=ON .. || { echo ERROR;exit 1; }
-      make -j`nproc` || { echo ERROR;exit 1; }
-      make install || { echo ERROR;exit 1; }
+      make -j`nproc` || { echo NEST BUILD ERROR;exit 1; }
+      make install || { echo NEST INSTALL ERROR;exit 1; }
       deactivate
     )
-    rm -rf build_venv || { echo ERROR;exit 1; }
+    rm -rf build_venv || { echo ERROR; exit 1; }
   fi
 
   cd $HBP || { echo ERROR;exit 1; }
@@ -218,7 +218,7 @@ function nrp_build {
   sleep 2
   cd $HBP/GazeboRosPackages || { echo ERROR;exit 1; }
   rm -rf build
-  catkin_make || { echo ERROR;exit 1; }
+  catkin_make || { echo GAZEBO_ROSPACKAGES BUILD ERROR;exit 1; }
   cd ..
 
   for i in ExperimentControl BrainSimulation VirtualCoach CLE ExDBackend
@@ -229,7 +229,7 @@ function nrp_build {
     echo -------------------------
     sleep 2
     cd $i || { echo ERROR;exit 1; }
-    make devinstall || { echo ERROR;exit 1; }
+    make devinstall || { echo $i BUILD ERROR;exit 1; }
     cd ..
   done
 
@@ -243,7 +243,7 @@ function nrp_build {
     echo -----------------------
     sleep 2
     cd $i || { echo ERROR;exit 1; }
-    npm install || { echo ERROR;exit 1; }
+    npm install || { echo  $i INSTALL ERROR;exit 1; }
     cd ..
   done
 
@@ -253,10 +253,10 @@ function nrp_build {
   echo -------------------------
   sleep 2
   cd gzweb || { echo ERROR;exit 1; }
-  ./deploy-gzbridge-nrp.sh || { echo ERROR;exit 1; }
-  npm install || { echo ERROR;exit 1; }
+  ./deploy-gzbridge-nrp.sh || { echo GZBRIDGE BUILD ERROR;exit 1; }
+  npm install || { echo GZBRIDGE INSTALL ERROR;exit 1; }
   cd gz3d/utils || { echo ERROR;exit 1; }
-  npm install || { echo ERROR;exit 1; }
+  npm install || { echo GZ3D INSTALL ERROR;exit 1; }
   cd ../../.. || { echo ERROR;exit 1; }
 
   echo
