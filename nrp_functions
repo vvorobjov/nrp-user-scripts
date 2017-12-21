@@ -325,6 +325,7 @@ function it_branch {
   itbranch_all=$1
 
   cd $HBP || { echo ERROR;exit 1; }
+  source $HBP/user-scripts/repos.txt || { echo ERROR;exit 1; }
 
   echo
   echo =========================
@@ -350,6 +351,39 @@ function it_branch {
     sleep 2
     cd $i || { echo ERROR;exit 1; }
     { git branch | grep "^ *IT$" && git branch -D IT || true; } && git checkout -b IT || { echo ERROR;exit 1; }
+    cd ..
+  done
+}
+
+function merge_dev {
+
+  cd $HBP || { echo ERROR;exit 1; }
+  source $HBP/user-scripts/repos.txt || { echo ERROR;exit 1; }
+
+  echo
+  echo =========================
+  echo Merging development on master
+  echo =========================
+  repos=(
+  ${nrp_3rd_party[*]}
+  ${nrp_repos[*]}
+  )
+
+  for i in ${repos[@]}
+  do
+    echo
+    echo -------------------------
+    echo $i
+    echo -------------------------
+    sleep 2
+    cd $i || { echo ERROR;exit 1; }
+    git checkout development || { echo ERROR;exit 1; }
+    git pull --rebase || { echo ERROR;exit 1; }
+    git checkout master || { echo ERROR;exit 1; }
+    git pull --rebase || { echo ERROR;exit 1; }
+    git merge development || { echo ERROR;exit 1; }
+    git push || { echo ERROR;exit 1; }
+    gitk
     cd ..
   done
 }
