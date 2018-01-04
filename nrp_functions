@@ -35,13 +35,13 @@ function waitforall {
 }
 
 function nest_version_switch {
-  echo
-  echo =========================
-  echo Cleaning up Nest 2.10
-  echo =========================
   source $HBP/nest-simulator/hbp/version
   if [[ "$BUILD_VERSION" =~ ^2\.10.*hbp.* ]]
   then
+    echo
+    echo =========================
+    echo Cleaning up Nest 2.10
+    echo =========================
     cd $HBP/nest-simulator || { echo ERROR;exit 1; }
     make clean >/dev/null 2>&1
     make distclean >/dev/null 2>&1
@@ -82,7 +82,7 @@ function nrp_rebase {
     echo -------------------------
     sleep 2
     cd $i || { echo ERROR;exit 1; }
-    
+
     # in case there are unstaged changes we prompt the user to stash them
     if ! git diff-files --quiet --ignore-submodules --
     then
@@ -99,7 +99,7 @@ function nrp_rebase {
         echo ERROR;exit 1;
       fi
     fi
-    
+
     git checkout $branch && git pull --rebase || { echo ERROR;exit 1; }
     cd ..
   done
@@ -233,7 +233,7 @@ function nrp_build {
     cd ..
   done
 
-  ubuntu_fix_cv2
+  $HBP/CLE/ubuntu_fix_cv2.sh || { echo ERROR;exit 1; }
 
   for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
   do
