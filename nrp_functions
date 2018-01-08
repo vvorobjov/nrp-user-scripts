@@ -84,14 +84,13 @@ function nrp_rebase {
     cd $i || { echo ERROR;exit 1; }
 
     # in case there are unstaged changes we prompt the user to stash them
-    if ! git diff-files --quiet --ignore-submodules --
-    then
+    if git status --short | grep -v "??" > /dev/null 2>&1
+    then 
       echo >&2 "About to checkout the $branch branch, you have the following unstaged changes:"
-      git diff-files --name-status -r --ignore-submodules -- >&2
+      git status --short | grep -v "??" >&2
       echo "Would you like to stash your changes [y] or you would like to abort?"
       read -p "[Y/n] " -n 1 -r REPLY || { echo ERROR;exit 1; }
       if [[ ( -z "$REPLY" ) || ( $REPLY =~ ^[Yy] ) ]]; then
-        echo
         git stash || { echo ERROR;exit 1; }
       else
         echo
