@@ -1,41 +1,42 @@
 {
-  "oidc": {
-    "user": "https://services.humanbrainproject.eu/idm/v1/api/user"
-  },
+    "oidc": {
+        "user": "https://services.humanbrainproject.eu/idm/v1/api/user"
+    },
 
-  "proxy": {
-    "staging": "https://neurorobotics-staging.humanbrainproject.eu/proxyserver",
-    "dev"    : "https://neurorobotics-dev.humanbrainproject.eu/proxyserver",
-    "local"  : "http://localhost:8000"
-  },
+    "proxy": {
+        "staging": "https://neurorobotics-staging.humanbrainproject.eu/proxyserver",
+        "dev": "https://neurorobotics-dev.humanbrainproject.eu/proxyserver",
+        "local": "http://localhost:8000"
+    },
 
-  "proxy-services": {
-    "experiment-list": "experiments",
-    "server-info"    : "server"
-  },
+    "proxy-services": {
+        "experiment-list": "experiments",
+        "available-servers": "availableServers",
+        "server-info": "server"
+    },
 
-  "simulation-services": {
-    "create": "simulation",
-    "state" : "state",
-    "reset": "reset",
-    "csv-recorders": "csv-recorders"
-  },
+    "simulation-services": {
+        "create": "simulation",
+        "state": "state",
+        "reset": "reset",
+        "csv-recorders": "csv-recorders"
+    },
 
-  "simulation-scripts": {
-    "transfer-function": "transfer-functions",
-    "state-machine": "state-machines",
-    "brain": "brain"
-  },
+    "simulation-scripts": {
+        "transfer-function": "transfer-functions",
+        "state-machine": "state-machines",
+        "brain": "brain"
+    },
 
-  "reset-services": {
-    "robot_pose": 0,
-    "full": 1,
-    "world": 2,
-    "brain": 3
-  },
+    "reset-services": {
+        "robot_pose": 0,
+        "full": 1,
+        "world": 2,
+        "brain": 3
+    },
 
-  "ros": {
-    "status": "/ros_cle_simulation/status",
-    "error": "/ros_cle_simulation/cle_error"
-  }
+    "ros": {
+        "status": "/ros_cle_simulation/status",
+        "error": "/ros_cle_simulation/cle_error"
+    }
 }
