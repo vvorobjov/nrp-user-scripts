@@ -93,6 +93,7 @@ function replaceLocalhostByIP {
   frontend_config=$HBP/ExDFrontend/app/config.json
   proxy_config=$HBP/nrpBackendProxy/config.json
   sed -i "s/http:\/\/localhost/http:\/\/$local_host/g" $frontend_config $proxy_config
+  sed -i "s/ws:\/\/localhost/ws:\/\/$local_host/g" $frontend_config $proxy_config
 }
 
 case $mode in
