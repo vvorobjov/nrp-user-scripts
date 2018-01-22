@@ -85,7 +85,7 @@ function nrp_rebase {
 
     # in case there are unstaged changes we prompt the user to stash them
     if git status --short | grep -v "??" > /dev/null 2>&1
-    then 
+    then
       echo >&2 "About to checkout the $branch branch, you have the following unstaged changes:"
       git status --short | grep -v "??" >&2
       echo "Would you like to stash your changes [y] or you would like to abort?"
@@ -400,6 +400,7 @@ function set_up_tingoDB {
   fi
 
   node $HBP/nrpBackendProxy/utils/createFSUser.js --user nrpuser --password password || { echo ERROR;exit 1; }
+  node $HBP/nrpBackendProxy/utils/createFSUser.js --user admin --password password || { echo ERROR;exit 1; }
 }
 
 function add_new_user_tingoDB {
