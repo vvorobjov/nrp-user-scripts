@@ -8,7 +8,7 @@ alias cle-rosvideo='rosrun web_video_server web_video_server _port:=8081'
 
 cle-virtual-coach()
 {
-    # save the original PYTHONPATH and update current to incliude the VirtualCoach
+    # save the original PYTHONPATH and update current to include the VirtualCoach
     OLD_PYTHONPATH=$PYTHONPATH
     PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages
 
