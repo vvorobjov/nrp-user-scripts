@@ -203,6 +203,16 @@ function nrp_build {
       cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-music=ON .. || { echo ERROR;exit 1; }
       make -j`nproc` || { echo NEST BUILD ERROR;exit 1; }
       make install || { echo NEST INSTALL ERROR;exit 1; }
+
+      # optional: install UGR's Cerebellum model plugin
+      cd ../SpikingCerebellum/src/CerebellumModule
+      mkdir build && cd build && cmake .. && make && make install
+      cd ../../../../build/ && cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local \
+         -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-music=ON -Dexternal-modules=cerebellum \
+         ..
+      make -j8
+      make install
+
       deactivate
     )
     rm -rf build_venv || { echo ERROR; exit 1; }
