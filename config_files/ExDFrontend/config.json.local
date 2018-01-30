@@ -7,9 +7,6 @@
     "account": {
       "v1": "https://services.humanbrainproject.eu/idm/v1/api"
     },
-    "collabContextManagement": {
-      "url": "http://localhost:8080"
-    },
     "slurmmonitor": {
       "url": "https://neurorobotics-dev.humanbrainproject.eu/slurmmonitor"
     },
