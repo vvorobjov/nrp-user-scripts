@@ -31,6 +31,20 @@ cp $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static
 echo "Copying Proxy config files."
 ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample.local $HBP/nrpBackendProxy/config.json.sample.local
 
+if ! node --version | grep  -q v8.
+then
+  source $HOME/.bashrc
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  nvm use 8 >/dev/null
+  if [ $? -ne 0 ]
+  then
+    printf "\033[0;31mYou must use node v8. Please run 'nvm install 8; nvm use 8', reopen your shells and run again './configure_nrp'\033[0m\n"
+    exit 1
+  fi
+  printf "\033[0;31mSwitched to node v8. Please reopen all your shells and restart the server.\033[0m\n"
+  read -t 5
+fi
+
 echo "Copying Nginx config files"
 cp -r /etc/nginx/* $HOME/.local/etc/nginx/
 cp /etc/init.d/nginx $HOME/.local/etc/init.d/nginx
@@ -63,7 +77,7 @@ then
 else
   echo "Setting up local storage database"
   chmod +x $HBP/user-scripts/configure_storage_database
-  $HBP/user-scripts/configure_storage_database  
+  $HBP/user-scripts/configure_storage_database
 fi
 
 echo "Setting configuration files to default mode (offline mode)"
