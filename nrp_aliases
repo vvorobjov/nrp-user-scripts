@@ -40,22 +40,54 @@ cle-virtual-coach()
     return $RES
 }
 
+cle_restart_backend()
+{
+  killlist=("python.*roscore"
+            "python\\s.*rosmaster"
+            "python\\s.*rosbridge"
+            "lib/rosout/rosout"
+            "${GZSERVER_BIN_DIR}/gzserver"
+            "python\\s.*runserver\\.py"
+            "python\\s.*ROSCLESimulationFactory\\.py"
+            "python\\s.*StateMachineRunner\\.py"
+            "python\\s.*BrainProcess"
+            "python\\s.*CLELauncher"
+            "node\\s.*ws_server\\.js"
+            "web_video_server"
+            "uwsgi")
+
+  kill_hbp_processes "${killlist[@]}"
+
+  roscore & sleep 2
+  cle-rosvideo & sleep 2
+  cle-rosbridge & sleep 2
+  cle-factory & sleep 2
+  cle-backend &
+}
+
 kill_hbp_cle()
 {
-    killlist=("python.*roscore"
-              "python\\s.*rosmaster"
-              "python\\s.*rosbridge"
-              "lib/rosout/rosout"
-              "${GZSERVER_BIN_DIR}/gzserver"
-              "python\\s.*runserver\\.py"
-              "python\\s.*ROSCLESimulationFactory\\.py"
-              "python\\s.*StateMachineRunner\\.py"
-              "python\\s.*BrainProcess"
-              "python\\s.*CLELauncher"
-              "[0-9]+\\snode\\sapp\\.js$"
-              "node\\s.*ws_server\\.js"
-              "web_video_server"
-              "uwsgi")
+  killlist=("python.*roscore"
+            "python\\s.*rosmaster"
+            "python\\s.*rosbridge"
+            "lib/rosout/rosout"
+            "${GZSERVER_BIN_DIR}/gzserver"
+            "python\\s.*runserver\\.py"
+            "python\\s.*ROSCLESimulationFactory\\.py"
+            "python\\s.*StateMachineRunner\\.py"
+            "python\\s.*BrainProcess"
+            "python\\s.*CLELauncher"
+            "[0-9]+\\snode\\sapp\\.js$"
+            "node\\s.*ws_server\\.js"
+            "web_video_server"
+            "uwsgi")
+
+  kill_hbp_processes "${killlist[@]}"
+}
+
+kill_hbp_processes()
+{
+    declare -a killlist=("${@}")
 
     # find the unique process groups for any matches, this will ensure all
     # spawned subprocesses are also cleanly killed
@@ -94,8 +126,7 @@ kill_hbp_cle()
     # during a startup or process spawning is as successful as we can make it
     if [[ ${#pgids[@]} -gt 0 ]]
     then
-        echo
-        kill_hbp_cle
+        kill_hbp_processes "${killlist[@]}"
     fi
 }
 
