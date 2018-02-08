@@ -109,9 +109,9 @@ function ubuntu_fix_cv2 {
   # This imports cv2 to the platform_venv on ubuntu. Use this script on local installations only.
   # You should have installed python-opencv via apt-get
 
-  mkdir ${VIRTUAL_ENV}/lib/python2.7/site-packages/ -p || { echo ERROR;exit 1; }
-  cp /usr/lib/python2.7/dist-packages/cv2*.so ${VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
-  cp /usr/lib/python2.7/dist-packages/cv.py ${VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
+  mkdir ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ -p || { echo ERROR;exit 1; }
+  cp /usr/lib/python2.7/dist-packages/cv2*.so ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
+  cp /usr/lib/python2.7/dist-packages/cv.py ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR;exit 1; }
 
 }
 
@@ -284,6 +284,19 @@ function nrp_build {
   cd Models || { echo ERROR;exit 1; }
   ./create-symlinks.sh || { echo ERROR;exit 1; }
   cd ..
+
+  echo
+  echo -------------------------
+  echo Experiments
+  echo -------------------------
+  sleep 2
+  echo "Install Experiments'requirements"
+  source ${NRP_VIRTUAL_ENV}/bin/activate 
+  source ${HBP}/Experiments/requirements.txt || { echo ERROR;exit 1; }
+  for requirement in ${experiments_requirements[@]}; do
+    pip install $requirement || { echo ERROR;exit 1; }
+  done
+  deactivate
 }
 
 function nrp_configure {
