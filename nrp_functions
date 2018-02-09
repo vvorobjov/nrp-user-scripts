@@ -124,6 +124,22 @@ function ubuntu_fix_cv2 {
 
 }
 
+function install_template_experiments_requirements {
+  source ${NRP_VIRTUAL_ENV}/bin/activate # pip installation is done inside ${NRP_VIRTUAL_ENV}
+  requirements=$HBP/Experiments/template_requirements.txt # TODO(Luc) create $HBP/Experiments/templates and use a requirements.txt file per each template experiment
+  pip install -r ${requirements}
+  deactivate
+}
+
+function generate_low_resolution_pbr_textures {
+  virtualenv lower_res
+  source lower_res/bin/activate
+  pip install pillow==4.3.0
+  python $HBP/user-scripts/generatelowrespbr.py
+  deactivate
+  rm -rf lower_res
+}
+
 function nrp_build {
   build_all=$1
 
@@ -286,13 +302,8 @@ function nrp_build {
   echo -------------------------
   sleep 2
   echo "Generate low resolution PBR textures"
-  virtualenv lower_res || { echo ERROR;exit 1; }
-  source lower_res/bin/activate || { echo ERROR;exit 1; }
-  pip install pillow==4.3.0 || { echo ERROR;exit 1; }
-  python $HBP/user-scripts/generatelowrespbr.py || { echo ERROR;exit 1; }
-  deactivate
-  rm -rf lower_res || { echo ERROR;exit 1; }
-  echo "Create links"
+  generate_low_resolution_pbr_textures || { echo ERROR; exit 1; }
+  echo "Create symlinks"
   if [ ! -d "$HOME/.gazebo/models" ]; then
    mkdir -p $HOME/.gazebo/models || { echo ERROR;exit 1;}
   fi
@@ -306,12 +317,8 @@ function nrp_build {
   echo -------------------------
   sleep 2
   echo "Install Experiments'requirements"
-  source ${NRP_VIRTUAL_ENV}/bin/activate
-  source ${HBP}/Experiments/requirements.txt || { echo ERROR;exit 1; }
-  for requirement in ${experiments_requirements[@]}; do
-    pip install $requirement || { echo ERROR;exit 1; }
-  done
-  deactivate
+  install_template_experiments_requirements || { echo ERROR;exit 1; }
+
 }
 
 function nrp_configure {
