@@ -253,6 +253,9 @@ function nrp_build {
     sleep 2
     cd $i || { echo ERROR;exit 1; }
     npm install || { echo  $i INSTALL ERROR;exit 1; }
+    if [ "$i" == "ExDFrontend" ]; then
+        grunt build || { echo GRUNT BUILD FAILED;exit 1; }
+    fi
     cd ..
   done
 

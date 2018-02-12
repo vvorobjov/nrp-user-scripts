@@ -15,7 +15,7 @@
       "v1": "https://services.humanbrainproject.eu/storage/v1/api"
     },
     "proxy": {
-      "url": "http://localhost:8000"
+      "url": "http://localhost:9000/proxy"
     },
     "collab": {
       "v0": "https://services.humanbrainproject.eu/collab/v0"
