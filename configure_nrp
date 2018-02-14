@@ -5,7 +5,7 @@ source $HBP/user-scripts/repos.txt
 
 $HBP/user-scripts/purge
 export GROUPNAME=`/usr/bin/id -gn`
-mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.opt/bbp
+mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.local/etc/nginx/conf.d $HOME/.opt/bbp
 
 echo "Copying user_makefile to python repos"
 for i in ${nrp_python[@]} ; do cp -f $HBP/user-scripts/config_files/user_makefile $HBP/$i; done
