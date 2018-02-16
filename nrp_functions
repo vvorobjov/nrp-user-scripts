@@ -1,6 +1,15 @@
 #!/bin/bash
 # This script holds common functions
 
+if [ -z "$NRP_NUM_MAKE_PROCESSES" ]; then
+printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ---------------------------+\n"
+printf "| Dear Neurorobotics user, your NRP_NUM_MAKE_PROCESSES is not defined.                |\n"
+printf "| This could mean you forgot to source the nrp_variables script before sourcing $0.   |\n"
+printf "| NRP_NUM_MAKE_PROCESSES will be set to the number of cores of your CPU by default.   |\n"
+printf "+-------------------------------------------------------------------------------------+\033[0m\n"
+export NRP_NUM_MAKE_PROCESSES=`nproc`
+fi
+
 function checkssh {
     echo "Checking $1"
     touch "$touchfilebase""$1"
@@ -142,7 +151,7 @@ function nrp_build {
       mkdir -p build
       cd build
       cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo ERROR;exit 1; }
-      make -j`nproc` || { echo $i BUILD ERROR;exit 1; }
+      make -j$NRP_NUM_MAKE_PROCESSES || { echo $i BUILD ERROR;exit 1; }
       make install || { echo $i INSTALL ERROR;exit 1; }
     done
 
@@ -154,7 +163,7 @@ function nrp_build {
     cd $HBP/mvapich2 || { echo ERROR;exit 1; }
     ./autogen.sh || { echo MVAPICH2 AUTOGEN ERROR;exit 1; }
     ./configure --prefix=$HOME/.local --with-device=ch3:nemesis || { echo MVAPICH2 CONFIGURE ERROR;exit 1; }
-    make -j`nproc` || { echo MVAPICH2 BUILD ERROR;exit 1; }
+    make -j$NRP_NUM_MAKE_PROCESSES || { echo MVAPICH2 BUILD ERROR;exit 1; }
     make install || { echo MVAPICH2 INSTALL ERROR;exit 1; }
     git clean -fd || { echo ERROR;exit 1; }
 
@@ -177,7 +186,7 @@ function nrp_build {
     PYTHONPATH=$HBP/MUSIC/build_venv/lib/python2.7/site-packages:$PYTHONPATH
     ./autogen.sh || { echo ERROR;exit 1; }
     ./configure --prefix=$HOME/.local MPI_CXX=mpicxx || { echo ERROR;exit 1; }
-    make -j`nproc` || { echo MUSIC BUILD ERROR;exit 1; }
+    make -j$NRP_NUM_MAKE_PROCESSES || { echo MUSIC BUILD ERROR;exit 1; }
     make install || { echo MUSIC INSTALL ERROR;exit 1; }
     rm -rf build_venv || { echo ERROR;exit 1; }
     rm mpich2version || { echo ERROR;exit 1; }
@@ -201,7 +210,7 @@ function nrp_build {
       fi
       cd $HBP/nest-simulator/build || { echo ERROR;exit 1;}
       cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-music=ON .. || { echo ERROR;exit 1; }
-      make -j`nproc` || { echo NEST BUILD ERROR;exit 1; }
+      make -j$NRP_NUM_MAKE_PROCESSES || { echo NEST BUILD ERROR;exit 1; }
       make install || { echo NEST INSTALL ERROR;exit 1; }
 
       # optional: install UGR's Cerebellum model plugin

@@ -105,6 +105,13 @@ export C_INCLUDE_PATH=$HOME/.local/include:$C_INCLUDE_PATH
 export CPLUS_INCLUDE_PATH=$HOME/.local/include:$CPLUS_INCLUDE_PATH
 export CPATH=$HOME/.local/include:$CPATH
 
+# Make number of make processes user-configurable
+if [ -z "$NRP_NUM_CORES" ]; then
+    export NRP_NUM_MAKE_PROCESSES=`nproc`
+else
+    export NRP_NUM_MAKE_PROCESSES=$NRP_NUM_CORES
+fi
+
 # This loads nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
