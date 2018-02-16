@@ -7,7 +7,7 @@
     "url": "https://services.humanbrainproject.eu/oidc",
     "deactivate": true
   },
-  "port": 8000,
+  "port": 8443,
   "modelsPath": "$HBP/Models",
   "experimentsPath": "$HBP/Experiments",
   "servers": {
