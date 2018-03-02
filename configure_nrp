@@ -74,6 +74,19 @@ if [ "$NRP_INSTALL_MODE" == "user" ]; then
   cp -af $HBP/user-scripts/config_files/VirtualCoach/platform_venv/* $HOME/.opt/platform_venv/lib/python2.7/site-packages/
 fi
 
+echo "Generating schema parsers for ExDBackend"
+source $HOME/.opt/platform_venv/bin/activate
+pyxbgen -u $HBP/Experiments/bibi_configuration.xsd -m bibi_api_gen
+pyxbgen -u $HBP/Experiments/ExDConfFile.xsd -m exp_conf_api_gen
+pyxbgen -u $HBP/Models/environment_model_configuration.xsd -m environment_conf_api_gen
+pyxbgen -u $HBP/Models/robot_model_configuration.xsd -m robot_conf_api_gen
+gen_file_path=$HBP/ExDBackend/hbp_nrp_commons/hbp_nrp_commons/generated
+mv bibi_api_gen.py $gen_file_path
+mv exp_conf_api_gen.py $gen_file_path
+mv _sc.py $gen_file_path
+mv robot_conf_api_gen.py $gen_file_path
+mv environment_conf_api_gen.py $gen_file_path
+deactivate
 
 printf "\033[1;33mWould you like to setup your local storage database with a default user? (Y/n)\033[0m\n"
 read -t 5 p
