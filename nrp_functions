@@ -277,6 +277,9 @@ function nrp_build {
     echo -----------------------
     sleep 2
     cd $i || { echo ERROR;exit 1; }
+    if [ "$i" == "brainvisualizer" ]; then
+        rm -rf node_modules
+    fi
     npm install || { echo  $i INSTALL ERROR;exit 1; }
     if [ "$i" == "ExDFrontend" ]; then
         grunt build || { echo GRUNT BUILD FAILED;exit 1; }
