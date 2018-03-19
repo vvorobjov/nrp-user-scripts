@@ -14,6 +14,7 @@
         "available-servers": "availableServers",
         "server-info": "server",
         "experiment-clone": "storage/clone",
+        "experiment-delete": "storage/",
         "storage-authentication": "authentication/authenticate",
         "storage-experiment-list": "storage/experiments"
     },
