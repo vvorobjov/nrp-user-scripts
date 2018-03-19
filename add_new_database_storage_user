@@ -1,5 +1,12 @@
 #!/bin/bash
 # This script sets up the local storage database
+# options
+# -u: username
+# -p: password
+# -s: silent - will not prompt for user input
+
+
+
 source $HBP/user-scripts/nrp_functions || { echo ERROR;exit 1; }
 
-add_new_user_tingoDB
+add_new_user_tingoDB "$@"
