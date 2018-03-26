@@ -452,6 +452,18 @@ function set_up_tingoDB {
 }
 
 function add_new_user_tingoDB {
+  while getopts ":u:p:s" opt; do
+    case $opt in
+      u) username="$OPTARG"
+      ;;
+      p) password="$OPTARG"
+      ;;
+      s) prompt=false
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+    esac
+  done
   #check if the STORAGE_PATH is set, if not we use the default ~/.opt/nrpStorage
   echo
   echo "Welcome to the interactive nrp storage database user creation"
@@ -465,16 +477,23 @@ function add_new_user_tingoDB {
   if [ ! -d "$STORAGE_PATH" ]; then
    mkdir $STORAGE_PATH || { echo ERROR;exit 1;}
   fi
-  echo "Type the username and press [ENTER]"
-  read username || { echo ERROR;exit 1; }
-  echo
-  echo "Type the password and press [ENTER]"
-  read -s password || { echo ERROR;exit 1; }
-  echo
-  echo "Are you finished with your input [y] or you would like to abort?"
-  read -p "[Y/n] " -n 1 -r REPLY || { echo ERROR;exit 1; }
-  echo
-  if [[ ( -z "$REPLY" ) || ( $REPLY =~ ^[Yy] ) ]]; then
-    node $HBP/nrpBackendProxy/utils/createFSUser.js --user $username --password $password || { echo ERROR;exit 1; }
+  if [ -z "$username" ]; then
+    echo "Type the username and press [ENTER]"
+    read username || { echo ERROR;exit 1; }
+    echo
   fi
+  if [ -z "$password" ]; then
+    echo "Type the password and press [ENTER]"
+    read -s password || { echo ERROR;exit 1; }
+    echo
+  fi
+  if [ "$prompt" = true ]; then
+    echo "Are you finished with your input? (Answering no will abort)"
+    read -p "[Y/n] " -n 1 -r REPLY || { echo ERROR;exit 1; }
+    echo
+    if [[( $REPLY =~ ^[Nn] ) ]]; then
+      exit 0
+    fi
+  fi
+  node $HBP/nrpBackendProxy/utils/createFSUser.js --user $username --password $password || { echo ERROR;exit 1; }
 }
