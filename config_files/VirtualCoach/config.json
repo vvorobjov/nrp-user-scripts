@@ -29,7 +29,8 @@
     "simulation-scripts": {
         "transfer-function": "transfer-functions",
         "state-machine": "state-machines",
-        "brain": "brain"
+        "brain": "brain",
+        "sdf-world": "sdf_world"
     },
 
     "reset-services": {
