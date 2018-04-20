@@ -79,6 +79,9 @@ export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_music_xml:$HBP/BrainS
 # HBP Distributed NEST Support
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_distributed_nest
 
+# HBP Temporary Resources Folder
+export PYTHONPATH=$PYTHONPATH:/tmp/nrpTemp/resources
+
 # retina
 export RETINA_INSTALL_DIR=$HBP/retina
 export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
