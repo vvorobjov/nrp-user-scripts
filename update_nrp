@@ -1,23 +1,32 @@
 #!/bin/bash
 # This script gives many NRP updating options to users
-source $HBP/user-scripts/nrp_functions || { echo ERROR;exit 1; }
+source $HBP/user-scripts/nrp_functions || { echo ERROR; exit 1; }
+
+function contains {
+  # usage: contains <list> <item>
+  local list=$1
+  local item=$2 
+  [[ " $list " =~ " $item " ]] && echo yes || echo no
+}
 
 function help {
   echo
   if [ "$NRP_INSTALL_MODE" != "user" ]; then
-    echo "Usage: "`basename $0`" <command> [all] [master]"
+    echo "Usage: "`basename $0`" <command> [all] [spiking-cerebellum] [master]"
     echo
     echo "  If 'master' is provided, checkout the master branch"
     echo "  If 'master' is NOT provided, checkout the development branch (default)"
   else
-    echo "Usage: "`basename $0`" <command> [all]"
+    echo "Usage: "`basename $0`" <command> [all] [spiking-cerebellum]"
     echo
   fi
   echo "  If 'all' is provided, include 3rd party repos (gazebo, opensim, nest, ...)"
+  echo "  If 'spiking-cerebellum' is provided with the build command, build MUSIC and NEST/SpikingCerebellum"
   echo "  Command can be:"
   echo "    help    : Print this message"
   echo "    rebase  : Switch repos to master and rebase"
   echo "    build   : Build all buildable repos (except 3rd party)"
+
   if [ "$NRP_INSTALL_MODE" != "user" ]; then
     echo "              Requires VPN connection"
   fi
@@ -30,23 +39,36 @@ function help {
   echo "    gitclean: Removes all local branches except master and development"
 }
 
-if [ $# -lt 1 ]; then help;exit 1; fi
+if [ $# -lt 1 ]; then help; exit 1; fi
 command="$1"
-arg1="$2"
-arg2="$3"
-if [ "$arg1" == "all" -o "$arg2" == "all" ]; then all="all"; else all="no"; fi
-if [ "$arg1" == "master" -o "$arg2" == "master" -o "$NRP_INSTALL_MODE" == "user" ]; then branch="master"; else branch="development"; fi
+shift
+args="$@"
+if [[ `contains "${args}" "all"` == "yes" ]]; then
+  all="all"; 
+else 
+  all="no";
+fi
+if [[ `contains "${args}" "master"` == "yes" ]]; then
+  branch="master";
+else 
+  branch="development";
+fi
+if [[ `contains "${args}" "spiking-cerebellum"` == "yes" ]]; then
+  spiking_cerebellum_option="spiking-cerebellum"; 
+else 
+  spiking_cerebellum_option="no-spiking-cerebellum";
+fi
 
 case "$command" in
 "rebase")
   nrp_rebase $all $branch
   ;;
 "build")
-  nrp_build $all
+  nrp_build $all ${spiking_cerebellum_option}
   ;;
 "update")
   nrp_rebase $all $branch
-  nrp_build $all
+  nrp_build $all ${spiking_cerebellum_option}
   nrp_configure
   ;;
 "itmaster")
