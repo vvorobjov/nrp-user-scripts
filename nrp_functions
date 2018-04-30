@@ -367,9 +367,7 @@ function nrp_build {
     echo -----------------------
     sleep 2
     cd $HBP/$i || { echo ERROR; exit 1; }
-    if [ "$i" == "brainvisualizer" ]; then
-        rm -rf node_modules
-    fi    
+
     # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
     # For more information see: https://github.com/zurb/foundation-sites/issues/10826
     npm dedupe || { echo  $i INSTALL ERROR; exit 1; }
