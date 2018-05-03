@@ -33,9 +33,6 @@ export VIRTUAL_ENV=$NRP_VIRTUAL_ENV
 # gzbridge & gzserver
 export PATH=$HOME/.opt/bbp/nrp-services:$PATH
 
-# HPB models for gazebo
-export GAZEBO_MODEL_PATH=$HOME/.gazebo/models:$GAZEBO_MODEL_PATH
-
 # Bullet
 export PKG_CONFIG_PATH=$HOME/.local/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 
@@ -89,6 +86,11 @@ export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
 # HBP models directory
 export NRP_MODELS_DIRECTORY=$HBP/Models
 export NRP_EXPERIMENTS_DIRECTORY=$HBP/Experiments
+export NRP_SIMULATION_DIR=/tmp/nrp-simulation-dir
+export NRP_MODELS_PATHS=${NRP_SIMULATION_DIR}:${NRP_SIMULATION_DIR}/robots:${NRP_MODELS_DIRECTORY}
+
+# HPB models for gazebo
+export GAZEBO_MODEL_PATH=$NRP_SIMULATION_DIR:$NRP_SIMULATION_DIR/assets:$HOME/.gazebo/models:$GAZEBO_MODEL_PATH
 
 # NRP local storage path
 export STORAGE_PATH=$HOME/.opt/nrpStorage
