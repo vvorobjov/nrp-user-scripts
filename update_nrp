@@ -48,7 +48,7 @@ if [[ `contains "${args}" "all"` == "yes" ]]; then
 else 
   all="no";
 fi
-if [[ `contains "${args}" "master"` == "yes" ]]; then
+if [[ `contains "${args}" "master"` == "yes" || "$NRP_INSTALL_MODE" == "user" ]]; then
   branch="master";
 else 
   branch="development";
