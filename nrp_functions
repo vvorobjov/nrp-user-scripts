@@ -369,7 +369,10 @@ function nrp_build {
     cd $HBP/$i || { echo ERROR; exit 1; }
     if [ "$i" == "brainvisualizer" ]; then
         rm -rf node_modules
-    fi
+    fi    
+    # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
+    # For more information see: https://github.com/zurb/foundation-sites/issues/10826
+    npm dedupe || { echo  $i INSTALL ERROR; exit 1; }
     npm install || { echo  $i INSTALL ERROR; exit 1; }
     if [ "$i" == "ExDFrontend" ]; then
         grunt build || { echo GRUNT BUILD FAILED; exit 1; }
