@@ -88,12 +88,31 @@ function disableCollabSupport {
 }
 
 function replaceLocalhostByIP {
-  local_host=`hostname -I`
-  local_host="$(echo -e "${local_host}" | tr -d '[:space:]')"
   frontend_config=$HBP/ExDFrontend/app/config.json
   proxy_config=$HBP/nrpBackendProxy/config.json
   sed -i "s/http:\/\/localhost/http:\/\/$local_host/g" $frontend_config $proxy_config
   sed -i "s/ws:\/\/localhost/ws:\/\/$local_host/g" $frontend_config $proxy_config
+}
+
+function ensureNoVPN {
+  vpn=$(ifconfig | grep 'vpn0');
+  test -n "$vpn" && { echo ERROR you are connected to a VPN; exit 1; }
+}
+
+chosenIP=0
+function testIPs {
+  IFS=' ' read -ra IPs <<< `hostname -I`
+  if [[ ${#IPs[@]} > 1 ]]; then
+    count=0
+    echo "more than one possible IP:"
+    for i in "${IPs[@]}"; do
+      echo "$count) $i"
+      ((count++))
+    done
+    read chosenIP
+  fi
+  local_host=${IPs[chosenIP]}
+  echo "Configuring IP to $local_host"
 }
 
 case $mode in
@@ -116,6 +135,8 @@ case $mode in
   enableCollabSupport
   ;;
 5)
+  ensureNoVPN
+  testIPs
   disableBackendOIDC
   disableNginxOIDC
   proxyUseLocalhostFS
