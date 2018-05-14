@@ -1,6 +1,7 @@
 alias cle-backend='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && uwsgi --ini  $HOME/.local/etc/nginx/uwsgi-nrp.ini'
+alias cle-backend-debug='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && export CLE_DEBUG=1 && uwsgi --ini  $HOME/.local/etc/nginx/uwsgi-nrp.ini'
 alias cle-factory='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py'
-alias cle-factory-debug='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py --pycharm $DEBUG_HOST $DEBUG_PORT'
+alias cle-factory-debug='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py --vsdebug'
 alias cle-rosbridge='rosrun rosbridge_server rosbridge_websocket'
 alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
 alias cle-nginx='$HOME/.local/etc/init.d/nginx restart'
@@ -131,7 +132,7 @@ kill_hbp_processes()
     fi
 }
 
-alias cle-start='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-rosvideo & sleep 1;cle-factory & sleep 1;cle-backend & sleep 1; cle-proxy & cle-rosbridge & sleep 1'
-alias cle-debug='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-rosvideo & sleep 1;cle-factory-debug & sleep 1;cle-backend & sleep 1; cle-proxy & cle-rosbridge & sleep 1'
+alias cle-start='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-rosvideo & sleep 1;cle-factory & sleep 1;cle-backend & sleep 1; cle-proxy & cle-rosbridge'
+alias cle-debug='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-rosvideo & sleep 1;cle-factory-debug & sleep 1;cle-backend-debug & sleep 1; cle-proxy & cle-rosbridge'
 alias cle-kill='kill_hbp_cle'
 alias cle-postgres='pg_ctl -D $HOME/.local/postgres/data/ -l logfile restart'
