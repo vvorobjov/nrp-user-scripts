@@ -116,7 +116,8 @@ if [ -z "$NRP_NUM_CORES" ]; then
 else
     export NRP_NUM_MAKE_PROCESSES=$NRP_NUM_CORES
 fi
-
+# This stops the npm notice processes from being spawned
+export NO_UPDATE_NOTIFIER=1
 # This loads nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
