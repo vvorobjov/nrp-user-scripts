@@ -49,5 +49,6 @@
     "status": "/ros_cle_simulation/status",
     "cleError": "/ros_cle_simulation/cle_error",
     "logs": "/ros_cle_simulation/logs"
-  }
+  },
+  "environment" : "noenvironment"
 }
