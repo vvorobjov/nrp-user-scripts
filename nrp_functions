@@ -179,8 +179,10 @@ function build_gzweb {
   sleep 2
   cd $HBP/gzweb || { echo ERROR: $HBP/gzweb NOT FOUND ; exit 1; }
   ./deploy-gzbridge-nrp.sh || { echo GZBRIDGE BUILD ERROR; exit 1; }
+  git checkout -- package.json
   npm install --no-save || { echo GZBRIDGE INSTALL ERROR; exit 1; }
   cd gz3d/utils || { echo ERROR; exit 1; }
+  git checkout -- package.json
   npm install --no-save || { echo GZ3D INSTALL ERROR; exit 1; }
 }
 
@@ -371,6 +373,7 @@ function nrp_build {
     # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
     # For more information see: https://github.com/zurb/foundation-sites/issues/10826
     npm dedupe || { echo  $i INSTALL ERROR; exit 1; }
+    git checkout -- package.json
     npm install --no-save || { echo  $i INSTALL ERROR; exit 1; }
     if [ "$i" == "ExDFrontend" ]; then
         grunt build || { echo GRUNT BUILD FAILED; exit 1; }
