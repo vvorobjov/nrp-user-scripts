@@ -87,6 +87,18 @@ kill_hbp_cle()
   kill_hbp_processes "${killlist[@]}"
 }
 
+kill_single_hbp_process()
+{
+    pgid=$1
+    for level in INT TERM KILL
+    do
+        ps -eo pgid | grep -qwE "^\\s*$pgid" || break
+        echo "    sending: $level"
+        kill -$level -$pgid
+        sleep 1
+    done
+}
+
 kill_hbp_processes()
 {
     declare -a killlist=("${@}")
@@ -110,15 +122,9 @@ kill_hbp_processes()
         echo
         echo "$(ps -eo pgid,cmd | grep -E "^\\s*$pgid" | grep -vE "bash|grep" | sed 's/^/  /')"
 
-        # kill with escalating signals, allow a short time to terminate between attempts
-        for level in INT TERM KILL
-        do
-            ps -eo pgid | grep -qwE "^\\s*$pgid" || break
-            echo "    sending: $level"
-            kill -$level -$pgid
-            sleep 1
-        done
+        kill_single_hbp_process $pgid &
     done
+    wait
 
     # force clean NRP gzserver and gzbridge lock files (required for next clean start/launch)
     rm -f $HOME/.gazebo/gzserver.lock
