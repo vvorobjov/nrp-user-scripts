@@ -105,6 +105,18 @@ else
   $HBP/user-scripts/configure_storage_database
 fi
 
+
+printf "\033[1;33mWould you like to apply the XML TFs migration script to your local experiments? (Y/n)\033[0m\n"
+read -t 5 p
+if [ "$p" == "N" -o "$p" == "n" ]
+then
+  echo "Skipping.."
+else
+    echo "Applying xml TF migration steps"
+    $HBP/user-scripts/migrate_xmltf/migrate_cloned.sh
+fi
+
+
 echo "Setting configuration files to default mode (offline mode)"
 $HBP/user-scripts/running_mode "2"
 echo "DONE"
