@@ -8,7 +8,7 @@ Usage:
 __author__ = 'Claudio Sousa'
 import sys
 import xml.dom.minidom
-from lib import bibi_api_gen, convert_tf
+from lib import bibi_api_gen, convert_tf, correct_indentation
 import os
 
 bibi_file = sys.argv[1]
@@ -24,6 +24,7 @@ for tf in bibi.transferFunction:
     if isinstance(tf, bibi_api_gen.PythonTransferFunction) and tf.src:
         continue
     tf_src = convert_tf(tf, bibi)
+    tf_src = correct_indentation(tf_src, 0)
     python_tf_node = bibi_api_gen.PythonTransferFunction()
     tfs_to_remove.append(tf)
     python_tf_node.src = tf.name + ".py"
