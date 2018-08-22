@@ -38,7 +38,7 @@ function clone_repo {
   else
     if [ "$NRP_INSTALL_MODE" == "user" ]
     then
-      git clone https://bitbucket.org/hbpneurorobotics/$1.git
+      git clone -b master https://bitbucket.org/hbpneurorobotics/$1.git $1
     else
       git clone ssh://$user@bbpcode.epfl.ch/neurorobotics/$1 && scp -p $user@bbpcode.epfl.ch:hooks/commit-msg $1/.git/hooks/
     fi
