@@ -73,7 +73,7 @@ echo "Copying VirtualCoach config.json file"
 cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
 if [ "$NRP_INSTALL_MODE" == "user" ]; then
   echo "Copying VirtualCoach bbpclient"
-  cp -af $HBP/user-scripts/config_files/VirtualCoach/platform_venv/* $HOME/.opt/platform_venv/lib/python2.7/site-packages/
+  cp -af $HBP/user-scripts/config_files/platform_venv/* $VIRTUAL_ENV/lib/python2.7/site-packages/
 fi
 
 echo "Generating schema parsers for ExDBackend"
