@@ -263,7 +263,11 @@ function ubuntu_fix_cv2 {
 
   # This imports cv2 to the platform_venv on ubuntu. Use this script on local installations only.
   # You should have installed python-opencv via apt-get
-
+  echo
+  echo -------------------------------------
+  echo "Applying patch for OpenCv on Ubuntu"
+  echo -------------------------------------
+  echo
   mkdir ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ -p || { echo ERROR; exit 1; }
   cp /usr/lib/python2.7/dist-packages/cv2*.so ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR; exit 1; }
   cp /usr/lib/python2.7/dist-packages/cv.py ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR; exit 1; }
@@ -362,7 +366,7 @@ function nrp_build {
     make devinstall || { echo $i BUILD ERROR; exit 1; }
   done
 
-  $HBP/CLE/ubuntu_fix_cv2.sh || { echo ERROR; exit 1; }
+  ubuntu_fix_cv2
 
   for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
   do
