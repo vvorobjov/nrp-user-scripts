@@ -28,6 +28,6 @@
   "authentication": "FS",
   "restart-backend-cmd": "$HBP/user-scripts/config_files/nrpBackendProxy/restart-backend.sh",
   "activity-logs": {
-    "simulation_start": "/tmp/simulation_start.log"
+    "localfile": "/tmp/nrp_activity.log"
   }
 }
