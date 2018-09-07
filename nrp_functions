@@ -514,8 +514,7 @@ function set_up_tingoDB {
   if [ ! -d "$STORAGE_PATH" ]; then
    mkdir -p $STORAGE_PATH || { echo ERROR; exit 1;}
   fi
-  node $HBP/nrpBackendProxy/utils/createFSUser.js || { echo ERROR; exit 1; }
-
+  node $HBP/nrpBackendProxy/utils/createFSUser.js --user nrpuser --password password || { echo ERROR; exit 1; }
 }
 
 function add_new_user_tingoDB {
