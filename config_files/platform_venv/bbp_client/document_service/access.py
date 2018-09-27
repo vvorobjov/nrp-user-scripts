@@ -157,7 +157,9 @@ class DocAccess(object):
 
         _get_parent('/foo/bar/bin') would return the entity for '/foo/bar'
         '''
-        parent_path = os.path.dirname(path)
+        parent_path = os.path.dirname(path.rstrip(os.sep))
+        if not parent_path.endswith(os.sep):
+            parent_path += os.sep
         parent = self._get_entity_by_path(parent_path)
         if parent is None:
             raise OSError('Path does not exist: %s' % path)
@@ -209,7 +211,7 @@ class DocAccess(object):
         if self.isfile(parent):
             raise TypeError('file with this name already exists')
 
-        name = os.path.basename(path)
+        name = os.path.basename(path.rstrip(os.sep))
         try:
             if self.isroot(parent):
                 body = sh.swagger_create_type(ProjectPostJson.ProjectPostJson, {'_name': name})

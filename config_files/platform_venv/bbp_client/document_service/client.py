@@ -62,8 +62,13 @@ class Client(object):
     def _norm_path(self, path=None):
         '''returns a normalized path'''
         path = str(path)  # convert from unicode, potentially
+        # preserve trailing slash needed for HPC access convention
+        ends_with_slash = path.rstrip().endswith(os.sep)
         if path:
             ret = os.path.normpath(joinp(self._cwd, path))
+            # if normalization left trailing slash as in case of '/' don't append extra one
+            if ends_with_slash and not ret.endswith(os.sep):
+                ret += os.sep
         else:
             ret = self._cwd
         return ret

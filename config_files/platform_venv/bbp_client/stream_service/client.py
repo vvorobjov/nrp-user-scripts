@@ -48,10 +48,39 @@ class Client(object):
                 'Accept': 'application/json'}
 
     def register_activity(self, activity):
-        '''Post Activity'''
+        '''Post Activity
+
+            Automatically sets time if not present
+            Also updates references with entity indices if entity has name
+        '''
+        def update_references(entity):
+            '''helper to update indices'''
+            name = None
+            if entity in activity:
+                name = activity[entity].pop('name', None)
+            if name and not activity['references'].get(entity):
+                # look for first occurance of name in summary and save indices
+                idx = activity['summary'].index(name)
+                activity['references'].update({entity: {'indices': [idx, idx + len(name)]}})
+
+        if not activity.get('references'):
+            activity['references'] = {}
+
+        # set indices
+        update_references('actor')
+        update_references('object')
+        update_references('target')
+
+        # set time
         if not activity.get('time'):
-            activity['time'] = str(datetime.now())
+            activity['time'] = str(datetime.utcnow())
 
         url = joinp(self._host, 'activity/')
         resp = requests.post(url, json=activity, headers=self._get_headers())
+        resp.raise_for_status()
+
+    def send_notification(self, notification):
+        '''Post Notification'''
+        url = joinp(self._host, 'notification/')
+        resp = requests.post(url, json=notification, headers=self._get_headers())
         resp.raise_for_status()

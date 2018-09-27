@@ -10,7 +10,7 @@ from bbp_client.identity_service.userinfo import UserInfo
 L = logging.getLogger(__name__)
 
 
-HBP_MEMBER_GROUP = 'hbp-member'
+HBP_MEMBER_GROUP = 'hbp-accred-sga1'
 
 
 class Client(object):

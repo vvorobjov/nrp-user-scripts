@@ -50,6 +50,21 @@ class Client(object):
             oauth_client = BBPOIDCClient.implicit_auth(user, password, oauth_url)
         return cls(service_url, oauth_client, collab_id, environment)
 
+    @property
+    def details(self):
+        '''return collab details'''
+        url = joinp(self._host, 'collab/%s/' % self.collab_id)
+        resp = requests.get(url, headers=self._get_headers())
+        resp.raise_for_status()
+        return resp.json()
+
+    def context_details(self, context):
+        '''return collab context details'''
+        url = joinp(self._host, 'collab/context/%s/' % context)
+        resp = requests.get(url, headers=self._get_headers())
+        resp.raise_for_status()
+        return resp.json()
+
     def set_collab_id_by_context(self, context):
         '''lookup collab by context'''
         url = joinp(self._host, 'collab/context/%s/' % context)
@@ -145,7 +160,8 @@ class Client(object):
         '''
         if not self.collab_id:
             return []
-        resp = requests.get(joinp(self._host, 'collab/%s/team/' % self.collab_id))
+        resp = requests.get(joinp(self._host, 'collab/%s/team/' % self.collab_id),
+                            headers=self._get_headers())
         resp.raise_for_status()
         return [str(item['user_id']) for item in resp.json()]
 
