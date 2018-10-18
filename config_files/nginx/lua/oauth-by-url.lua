@@ -3,7 +3,7 @@ local cjson = require "cjson"
 local oauth_url = "/_access_token"
 local openid_url = "/_userinfo"
 -- how long the cache will stay active, in seconds
-local cache_time = 60
+local cache_time = 300
 local oauth_cache = ngx.shared.oauth_cache
 
 -- probably params from ~/.bbp_services.cfg should be used
