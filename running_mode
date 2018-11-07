@@ -14,7 +14,7 @@ if [[ -z $mode ]]; then
   echo "Specify the additional 'no_restart' option if you want nginx not to be restarted"
   read mode
 fi
- 
+
 function enableBackendOIDC {
   echo "Editing Backend config.json"
   cd $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static
@@ -87,6 +87,11 @@ function disableCollabSupport {
   sed -e '/deactivate/ s/false/true/' -i config.json
 }
 
+function disableVersionUpdateCheck {
+  # set "checkEnabled: false" to the versionCheck object in the config
+  sed -e '/"checkEnabled"/ s/true/false/' -i $HBP/ExDFrontend/app/config.json
+}
+
 function replaceLocalhostByIP {
   frontend_config=$HBP/ExDFrontend/app/config.json
   proxy_config=$HBP/nrpBackendProxy/config.json
@@ -127,12 +132,14 @@ case $mode in
   enableNginxOIDC
   proxyUseLocalhostCollab
   enableCollabSupport
+  disableVersionUpdateCheck
   ;;
 4)
   enableBackendOIDC
   enableNginxOIDC
   proxyUseLocalhostCollabAuthFsStorage
   enableCollabSupport
+  disableVersionUpdateCheck
   ;;
 5)
   ensureNoVPN
@@ -142,6 +149,7 @@ case $mode in
   proxyUseLocalhostFS
   disableCollabSupport
   replaceLocalhostByIP
+  disableVersionUpdateCheck
   ;;
 esac
 
