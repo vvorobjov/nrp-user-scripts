@@ -3,7 +3,7 @@
   "auth": {
     "renewInternal": 600000,
     "clientId": "0dcfb392-32c7-480c-ae18-cbaf29e8a6b1",
-    "clientSecret": "WfjTCn30aTlcmbL-wWVhmsAUgobaX9o5xR-6WQ9jQEDFAodNVozzjy283qaOjUYkl28DfG-L6vVnQGwlBvzikA",
+    "clientSecret": "<client_oidc_secret>",
     "url": "https://services.humanbrainproject.eu/oidc",
     "deactivate": true
   },

@@ -1,15 +1,18 @@
+
 #!/bin/bash
 # A script to enable or disable oidc
 
 mode=$1
 no_restart=$2 # makes sure nginx is not started on *dev servers* when running_mode is used
 needs_source=0
-
 if [[ -z $mode ]]; then
   echo "2. Offline mode -- Disable OIDC and use your local machine as backend and storage"
-  echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
-  echo "4. Mixed Collab mode -- OIDC authentication and local storage"
+  if [ "$NRP_INSTALL_MODE" != "user" ]; then
+    echo "3. Local Collab mode -- Enable OIDC and use your local machine as backend with collab-support services"
+    echo "4. Mixed Collab mode -- OIDC authentication and local storage."
+  fi
   echo "5. Offline mode with localhost replaced by local IP -- Disable OIDC and use your local machine as backend and storage"
+
   echo
   echo "Specify the additional 'no_restart' option if you want nginx not to be restarted"
   read mode
@@ -23,10 +26,15 @@ function enableBackendOIDC {
 
 function enableNginxOIDC {
   echo "Editing nginx conf files"
-  cd ~/.local/etc/nginx/conf.d
-  sed -e '/access_by_lua_file/ s/^#*//#/' -i nrp-services.conf
-  sed -e '/_access_token/, +2 s/^#*//#/' -i nrp-services.conf
-  sed -e '/_userinfo/, +2 s/^#*//#/' -i nrp-services.conf
+  cp $HBP/admin-scripts/ansible/roles/run_frontend/files/nginx_frontend.conf $HOME/.local/etc/nginx/conf.d/frontend.conf
+  cp $HBP/admin-scripts/ansible/roles/run_backend/files/nrp-services.conf $HOME/.local/etc/nginx/conf.d/nrp-services.conf
+  sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
+  sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
+  sed -e 's|<NRP_SIMULATION_DIR>|'"$NRP_SIMULATION_DIR"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
+
+  sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/frontend.conf
+
+  cp -r $HBP/admin-scripts/ansible/roles/run_backend/files/lua/* $HOME/.local/etc/nginx/lua
 }
 
 function disableBackendOIDC {
@@ -49,7 +57,7 @@ function proxyUseLocalhostCollab {
   if [ -f config.json ]; then
     rm config.json
   fi
-  cp config.json.sample.local config.json
+  cp $HBP/admin-scripts/config_files/nrpBackendProxy/config.json.sample.local config.json
   sed -e '/storage/ s/FS/Collab/' -i config.json
   sed -e '/authentication/ s/FS/Collab/' -i config.json
 }
@@ -60,7 +68,7 @@ function proxyUseLocalhostCollabAuthFsStorage {
   if [ -f config.json ]; then
     rm config.json
   fi
-  cp config.json.sample.local config.json
+  cp $HBP/admin-scripts/config_files/nrpBackendProxy/config.json.sample.local config.json
   sed -e '/storage/ s/Collab/FS/' -i config.json
   sed -e '/authentication/ s/FS/Collab/' -i config.json
 }
@@ -119,6 +127,15 @@ function testIPs {
   local_host=${IPs[chosenIP]}
   echo "Configuring IP to $local_host"
 }
+
+if [ "$NRP_INSTALL_MODE" == "user" ]; then
+  if [ "$mode" == "3" ] || [ "$mode" == "4" ]; then
+    RED="\033[01;31m"
+    NC="\033[00m"
+    echo -e "${RED}Sorry you need to be in developer mode to run options 3 or 4. ${NC}"
+    exit
+  fi
+fi
 
 case $mode in
 2)

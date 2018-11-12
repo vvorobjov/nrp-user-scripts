@@ -63,8 +63,6 @@ sed -e 's|<NRP_SIMULATION_DIR>|'"$NRP_SIMULATION_DIR"'|' -i $HOME/.local/etc/ngi
 
 sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/frontend.conf
 
-cp -r $HBP/user-scripts/config_files/nginx/lua/* $HOME/.local/etc/nginx/lua
-
 
 echo "Copying uwsgi config file"
 cp $HBP/user-scripts/config_files/nginx/uwsgi-nrp.ini $HOME/.local/etc/nginx/uwsgi-nrp.ini
