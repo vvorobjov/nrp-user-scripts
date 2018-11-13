@@ -69,6 +69,7 @@
   },
   "google-analytics": {
     "tracking-id": "notracking",
+    "virtualPageViews": {},
     "anonymize-ip": true
   }
 }
