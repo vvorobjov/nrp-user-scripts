@@ -104,14 +104,24 @@ else
 fi
 
 
-printf "\033[1;33mWould you like to apply the XML TFs migration script to your local experiments? (Y/n)\033[0m\n"
+printf "\033[1;33mWould you like to apply the XML transfer function migration script to your local experiments? (Y/n)\033[0m\n"
 read -t 5 p
 if [ "$p" == "N" -o "$p" == "n" ]
 then
   echo "Skipping.."
 else
-    echo "Applying xml TF migration steps"
-    $HBP/user-scripts/migrate_xmltf/migrate_cloned.sh
+    if [[ -d  "${NRP_VIRTUAL_ENV}" ]]; then
+        source ${NRP_VIRTUAL_ENV}/bin/activate
+        echo "Generating older bibi scheme parser for XML TF Migration"
+        pyxbgen -u $HBP/user-scripts/migrate_xmltf/xsd/xml-tf-bibi.xsd -m $HBP/user-scripts/migrate_xmltf/lib/bibi_api_gen 2>&1 | grep -v "^WARNING" || { echo ERROR;exit 1; }
+        deactivate
+
+        echo "Applying xml TF migration steps"
+        printf "\033[1;34m[Developer note] If pyxb raises exception, make sure that 'user-scripts/migrate_xmltf/xsd/xml-tf-bibi.xsd' is updated with the changes made in 'Experiments/bibi_configuration.xsd'.\033[0m\n"
+        $HBP/user-scripts/migrate_xmltf/migrate_cloned.sh
+    else
+        echo "NRP_VIRTUAL_ENV not defined. Skipping old XML transfer function migration."
+    fi
 fi
 
 
