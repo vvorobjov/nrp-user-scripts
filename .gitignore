@@ -1,4 +1,4 @@
 *.swp
 *.pyc
 node_modules/*
-
+migrate_xmltf/lib/bibi_api_gen.py
