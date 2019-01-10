@@ -5,7 +5,7 @@ alias cle-factory-debug='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp
 alias cle-rosbridge='rosrun rosbridge_server rosbridge_websocket'
 alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
 alias cle-nginx='$HOME/.local/etc/init.d/nginx restart'
-alias cle-proxy='cd $HBP/nrpBackendProxy && node app.js'
+alias cle-proxy='cd $HBP/nrpBackendProxy && npm start'
 alias cle-rosvideo='rosrun web_video_server web_video_server _port:=8081'
 
 cle-virtual-coach()
@@ -79,7 +79,7 @@ kill_hbp_cle()
             "python\\s.*StateMachineRunner\\.py"
             "python\\s.*BrainProcess"
             "python\\s.*CLELauncher"
-            "[0-9]+\\snode\\sapp\\.js$"
+            "[0-9]+\\snode\\s.*\\sapp\\.ts$"
             "node\\s.*ws_server\\.js"
             "web_video_server"
             "uwsgi")
