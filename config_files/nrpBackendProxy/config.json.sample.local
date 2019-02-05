@@ -26,7 +26,10 @@
   },
   "storage": "FS",
   "authentication": "FS",
-  "restart-backend-cmd": "$HBP/user-scripts/config_files/nrpBackendProxy/restart-backend.sh",
+  "backendScripts": {
+    "restart-backend":
+      "$HBP/user-scripts/config_files/nrpBackendProxy/restart-backend.sh"
+  },
   "activity-logs": {
     "localfile": "/tmp/nrp_activity.log"
   }
