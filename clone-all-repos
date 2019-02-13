@@ -46,13 +46,44 @@ function clone_repo {
   echo
 }
 
-# cloning all repos
+# Cloning repos
+option=$1
 source $HBP/user-scripts/repos.txt
+
+case $option in
+backend)
+  repos=(
+    ${nrp_python[*]}
+    GazeboRosPackages
+    ${nrp_3rd_party[*]}
+    gzweb
+  )
+  ;;
+frontend)
+  repos=(
+    nrpBackendProxy
+    ExDFrontend
+  )
+  ;;
+daint)
+  repos=(
+    ${nrp_python[*]}
+    GazeboRosPackages
+    ${nrp_3rd_party[*]}
+    gzweb
+    Models
+    Experiments
+  )
+  ;;
+*)
 repos=(
   ${nrp_3rd_party[*]}
   ${nrp_repos[*]}
 )
-echo "Cloning all repos:"
+  ;;
+esac
+
+echo "Cloning repos:"
 pushd $HBP > /dev/null
 for repo in ${repos[@]} ; do clone_repo $repo ; done
 popd > /dev/null
