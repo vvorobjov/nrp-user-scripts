@@ -556,5 +556,7 @@ function add_new_user_tingoDB {
       exit 0
     fi
   fi
-  node $HBP/nrpBackendProxy/utils/createFSUser.js --user $username --password $password || { echo ERROR; exit 1; }
+  pushd $HBP/nrpBackendProxy >/dev/null || { echo ERROR; exit 1; } 
+  node_modules/ts-node/dist/bin.js $HBP/nrpBackendProxy/utils/createFSUser.ts --user $username --password $password || { echo ERROR; exit 1; }
+  popd >/dev/null || { echo ERROR; exit 1; }
 }
