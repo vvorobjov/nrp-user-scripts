@@ -30,6 +30,7 @@
         "transfer-function": "transfer-functions",
         "state-machine": "state-machines",
         "brain": "brain",
+        "populations": "populations",
         "sdf-world": "sdf_world"
     },
 
