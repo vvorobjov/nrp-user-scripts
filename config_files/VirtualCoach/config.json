@@ -16,7 +16,9 @@
         "experiment-clone": "storage/clone",
         "experiment-delete": "storage/",
         "storage-authentication": "authentication/authenticate",
-        "storage-experiment-list": "storage/experiments"
+        "storage-experiment-list": "storage/experiments",
+        "csv-files": "experiment/%s/csvfiles",
+        "experiment-file": "storage/%s/%s"
     },
 
     "simulation-services": {
