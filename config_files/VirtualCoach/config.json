@@ -4,8 +4,8 @@
     },
 
     "proxy": {
-        "staging": "https://neurorobotics-staging.humanbrainproject.eu/proxyserver",
-        "dev": "https://neurorobotics-dev.humanbrainproject.eu/proxyserver",
+        "staging": "http://148.187.97.48/proxy",
+        "dev": "http://148.187.96.224/proxy",
         "local": "http://localhost:9000/proxy"
     },
 
