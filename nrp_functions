@@ -57,7 +57,7 @@ function build_nest {
     echo ----------------------------------
   fi
   sleep 2
-  cd $HBP/nest-simulator || { echo ERROR: $HBP/nest-simulator/build NOT FOUND; exit 1; }
+  cd $HBP/nest-simulator || { echo ERROR: $HBP/nest-simulator NOT FOUND; exit 1; }
   ( # use a subshell to avoid "nested" virtualenv issues
     virtualenv build_venv || { echo ERROR; exit 1; }
     source build_venv/bin/activate
@@ -128,18 +128,41 @@ function build_music {
   export LDFLAGS=
 }
 
-function build_mvapich2 {
+function clean_old_mvapich2_installation {
+  if [ -d "$HBP/mvapich2" ]; then
+    echo
+    echo -------------------------
+    echo Removing previous mvapich2 installation
+    echo -------------------------
+    echo
+    cd $HBP/mvapich2 || { echo ERROR; exit 1; }
+    make uninstall || { echo ERROR: Could not uninstall mvapich2 properly, please uninstall manually and rerun this script; exit 1; }
+    #make clean || { echo ERROR: Could not clean the build files. Please clean manually; exit 1; }
+    #make distclean || { echo ERROR: Could not clean the configure files. Please distclean manually; exit 1; }
+    cd .. && mv -f $HBP/mvapich2 $HBP/mvapich2.`date +%Y-%m-%d` || { echo ERROR: Could not rename mvapich2 folder, please remove it manually; exit 1; }
+    ls $HOME/.local/lib/libmpi* 1>/dev/null 2>&1 && { echo ERROR: There seems to be MPI leftovers in your ~/.local. Please remove them manually before rerunning this script; exit 1; }
+    ls $HOME/.local/include/*mpi* 1>/dev/null 2>&1 && { echo ERROR: There seems to be MPI leftovers in your ~/.local. Please remove them manually before rerunning this script; exit 1; }
+    cd $HBP/nest-simulator/build || { echo ERROR: $HBP/nest-simulator/build not found; exit 1; }
+    make clean  # option step, no need to error here
+    cd $HBP/nest-simulator
+    rm -rf build || { echo ERROR: could not remove $HBP/nest-simulator/build. Please do so manually.; exit 1; }
+  fi
+}
+
+function build_mpich {
+  # install standard mpich distribution
   echo
   echo -------------------------
-  echo Mvapich2
+  echo mpich
   echo -------------------------
-  sleep 2
-  cd $HBP/mvapich2 || { echo ERROR; exit 1; }
-  ./autogen.sh || { echo MVAPICH2 AUTOGEN ERROR; exit 1; }
-  ./configure --prefix=$HOME/.local --with-device=ch3:nemesis || { echo MVAPICH2 CONFIGURE ERROR; exit 1; }
-  make -j$NRP_NUM_MAKE_PROCESSES || { echo MVAPICH2 BUILD ERROR; exit 1; }
-  make install || { echo MVAPICH2 INSTALL ERROR; exit 1; }
-  git clean -fd || { echo ERROR; exit 1; }
+  echo
+  cd $HBP
+  wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz || { echo ERROR downloading mpich source; exit 1; }
+  tar xf mpich-3.1.4.tar.gz && cd mpich-3.1.4 || { echo ERROR unzipping mpich source archive; exit 1; }
+  ./configure --enable-fast=all,O3 --prefix=$HOME/.local || { echo ERROR configuring mpich build; exit 1; }
+  make -j$NRP_NUM_MAKE_PROCESSES || { echo MPICH BUILD ERROR; exit 1; }
+  make install || { echo ERROR installing mpich in $HOME/.local; exit 1; }
+  rm ../mpich-3.1.4.tar.gz || { echo ERROR deleting mpich source archive; }
 }
 
 function build_gazebo {
@@ -156,7 +179,6 @@ function build_gazebo {
   make -j$NRP_NUM_MAKE_PROCESSES || { echo GAZEBO BUILD ERROR; exit 1; }
   make install || { echo GAZEBO INSTALL ERROR; exit 1; }
 }
-
 
 function build_gazebo_ros_packages {
   echo
@@ -339,7 +361,8 @@ function nrp_build {
     done
 
     build_gazebo
-    build_mvapich2
+    clean_old_mvapich2_installation
+    build_mpich
     if [[ "${spiking_cerebellum_option}" == "spiking-cerebellum" ]]; then
       # MUSIC is required in order to compile SpikingCerebellum
       build_music

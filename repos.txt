@@ -31,7 +31,6 @@ nrp_3rd_party=(
     opensim
     gazebo
     MUSIC
-    mvapich2
     nest-simulator
     retina
 )
