@@ -30,7 +30,8 @@
         "create": "simulation",
         "state": "state",
         "reset": "reset",
-        "csv-recorders": "csv-recorders"
+        "csv-recorders": "csv-recorders",
+        "recorder": "recorder"
     },
 
     "simulation-scripts": {
