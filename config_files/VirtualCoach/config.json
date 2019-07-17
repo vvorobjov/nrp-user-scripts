@@ -15,6 +15,7 @@
         "server-info": "server",
         "experiment-clone": "storage/clone",
         "experiment-delete": "storage/",
+        "experiment-import": "storage/importExperiment",
         "storage-authentication": "authentication/authenticate",
         "storage-experiment-list": "storage/experiments",
         "csv-files": "experiment/%s/csvfiles",
