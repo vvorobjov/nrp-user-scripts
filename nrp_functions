@@ -157,12 +157,15 @@ function build_mpich {
   echo -------------------------
   echo
   cd $HBP
-  wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz || { echo ERROR downloading mpich source; exit 1; }
-  tar xf mpich-3.1.4.tar.gz && cd mpich-3.1.4 || { echo ERROR unzipping mpich source archive; exit 1; }
+  if [ ! -d "mpich-3.1.4" ]; then
+    wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz || { echo ERROR downloading mpich source; exit 1; }
+    tar xf mpich-3.1.4.tar.gz || { echo ERROR unzipping mpich source archive; exit 1; }
+    rm mpich-3.1.4.tar.gz || { echo ERROR deleting mpich source archive, ignoring; }
+  fi
+  cd mpich-3.1.4 || { echo ERROR accessing mpich-3.1.4 directory; exit 1; }
   ./configure --enable-fast=all,O3 --prefix=$HOME/.local || { echo ERROR configuring mpich build; exit 1; }
   make -j$NRP_NUM_MAKE_PROCESSES || { echo MPICH BUILD ERROR; exit 1; }
   make install || { echo ERROR installing mpich in $HOME/.local; exit 1; }
-  rm ../mpich-3.1.4.tar.gz || { echo ERROR deleting mpich source archive; }
 }
 
 function build_gazebo {
