@@ -30,7 +30,6 @@ function enableNginxOIDC {
   cp $HBP/admin-scripts/ansible/roles/run_backend/files/nrp-services.conf $HOME/.local/etc/nginx/conf.d/nrp-services.conf
   sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
   sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
-  sed -e 's|<NRP_SIMULATION_DIR>|'"$NRP_SIMULATION_DIR"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 
   sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/frontend.conf
 
