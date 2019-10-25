@@ -17,6 +17,10 @@
     "proxy": {
       "url": "http://localhost:9000/proxy"
     },
+    "kg": {
+      "url": "https://nexus-int.humanbrainproject.org/v0/data/sp10",
+      "editor-url": "https://nexus-int.humanbrainproject.org/v0/data/sp10editor"
+    },
     "collab": {
       "v0": "https://services.humanbrainproject.eu/collab/v0"
     },
