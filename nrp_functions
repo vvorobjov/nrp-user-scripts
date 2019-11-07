@@ -10,6 +10,14 @@ printf "+-----------------------------------------------------------------------
 export NRP_NUM_MAKE_PROCESSES=`nproc`
 fi
 
+ubuntu_18_version=`lsb_release -rs | grep 18` >> /dev/null
+if ! echo $ubuntu_18_version; then
+printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ----------------------------------+\n"
+printf "| Dear Neurorobotics user, you are currently on Ubuntu 16 or older                           |\n"
+printf "| We recommend that you upgrade your ubuntu version to 18 which is fully supported in the NRP|\n"
+printf "+--------------------------------------------------------------------------------------------+\033[0m\n"
+fi
+
 function checkssh {
     echo "Checking $1"
     touch "$touchfilebase""$1"
@@ -136,7 +144,7 @@ function clean_old_mvapich2_installation {
     echo -------------------------
     echo
     cd $HBP/mvapich2 || { echo ERROR; exit 1; }
-    make uninstall || { echo ERROR: Could not uninstall mvapich2 properly, please uninstall manually and rerun this script; exit 1; }
+    #make uninstall || { echo ERROR: Could not uninstall mvapich2 properly, please uninstall manually and rerun this script; exit 1; }
     #make clean || { echo ERROR: Could not clean the build files. Please clean manually; exit 1; }
     #make distclean || { echo ERROR: Could not clean the configure files. Please distclean manually; exit 1; }
     cd .. && mv -f $HBP/mvapich2 $HBP/mvapich2.`date +%Y-%m-%d` || { echo ERROR: Could not rename mvapich2 folder, please remove it manually; exit 1; }
@@ -174,11 +182,10 @@ function build_gazebo {
   echo Gazebo
   echo -------------------------
   sleep 2
-  cmake_args="-DENABLE_TESTS_COMPILATION:BOOL=False"
   cd $HBP/gazebo || { echo ERROR: $HBP/gazebo NOT FOUND; exit 1; }
   mkdir -p build
   cd build
-  cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo ERROR; exit 1; }
+  cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo ERROR; exit 1; }
   make -j$NRP_NUM_MAKE_PROCESSES || { echo GAZEBO BUILD ERROR; exit 1; }
   make install || { echo GAZEBO INSTALL ERROR; exit 1; }
 }
@@ -262,6 +269,14 @@ function nrp_rebase {
     echo -------------------------
     sleep 2
     cd $i || { echo ERROR; exit 1; }
+
+    # if users (u16 or u18) dont have the master18 branch, get it
+    if [ "$NRP_INSTALL_MODE" == "user" ]; then
+      if ! [ "`git branch --list master18`" ]; then
+        git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*" || { echo ERROR; exit 1; }
+        git pull || { echo ERROR; exit 1; }
+      fi
+    fi
 
     # in case there are unstaged changes we prompt the user to stash them
     if git status --short | grep -v "??" > /dev/null 2>&1
@@ -348,7 +363,7 @@ function nrp_build {
   echo Building
   echo =========================
   if [ "$build_all" = "all" ]; then
-    for i in simbody opensim sdformat bulletphysics
+    for i in simbody opensim sdformat
     do
       echo
       echo -------------------------
@@ -386,8 +401,11 @@ function nrp_build {
     make devinstall || { echo $i BUILD ERROR; exit 1; }
   done
 
-  ubuntu_fix_cv2
-
+  # Only perform this step for Ubuntu16
+  if echo "$ubuntu_version" | grep 16 >> /dev/null; then
+    ubuntu_fix_cv2
+  fi
+ 
   for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
   do
     echo
@@ -451,7 +469,7 @@ function clean_branches {
     echo -------------------------
     sleep 2
     cd $i || { echo ERROR; exit 1; }
-    git branch | grep -v "master" | grep -v "development" | xargs git branch -D 2>/dev/null
+    git branch | grep -v "master" | grep -v "development" | grep -v "master16" | xargs git branch -D 2>/dev/null
     cd ..
   done
 }

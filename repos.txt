@@ -26,7 +26,6 @@ nrp_repos=(
 )
 nrp_3rd_party=(
     sdformat
-    bulletphysics
     simbody
     opensim
     gazebo

@@ -1,6 +1,7 @@
 #!/bin/bash
 # A script to clone all necessary repos when installing from scratch. the $HBP need to be set-up for this script to work successfully
 
+ubuntu_version=`lsb_release -rs`
 if [[ -z $HBP ]] ; then
   echo "Please set the \$HBP variable to your desired installation path first."
   exit
@@ -39,6 +40,11 @@ function clone_repo {
     if [ "$NRP_INSTALL_MODE" == "user" ]
     then
       git clone -b master --depth 1 https://bitbucket.org/hbpneurorobotics/$1.git $1
+      pushd $1;git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*";git pull
+      if echo "$ubuntu_version" | grep 18 >> /dev/null; then
+        git checkout master18
+      fi
+      popd
     else
       git clone $user@bitbucket.org:hbpneurorobotics/$1.git $1
     fi

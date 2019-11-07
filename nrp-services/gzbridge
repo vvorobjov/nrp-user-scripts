@@ -8,18 +8,7 @@ if [ -z $GZBRIDGE_BIN_DIR ]; then
 fi
 
 source $HOME/.bashrc
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-if ! node --version | grep  -q v0.10
-then
-  nvm use 0.10 2>/dev/null
-  if [ $? -ne 0 ]
-  then
-    printf "\033[0;31mYou must use node v0.10 or use nvm and install v0.10 (ie. nvm install 0.10)\033[0m\n"
-    exit 1
-  fi
-fi
-
-exec="$GZBRIDGE_BIN_DIR/ws_server.js"
+exec="$GZBRIDGE_BIN_DIR/server.js"
 prog="node"
 
 lockfile=$HBP/gzweb/gzbridge.lock

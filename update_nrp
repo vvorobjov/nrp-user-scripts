@@ -2,6 +2,7 @@
 # This script gives many NRP updating options to users
 source $HBP/user-scripts/nrp_functions || { echo ERROR; exit 1; }
 
+ubuntu_version=`lsb_release -rs`
 function contains {
   # usage: contains <list> <item>
   local list=$1
@@ -49,7 +50,11 @@ else
   all="no";
 fi
 if [[ `contains "${args}" "master"` == "yes" || "$NRP_INSTALL_MODE" == "user" ]]; then
-  branch="master";
+  if echo "$ubuntu_version" | grep 16 >> /dev/null; then
+    branch="master"
+  else 
+    branch="master18"
+  fi
 else
   branch="development";
 fi

@@ -16,7 +16,7 @@ then
       CURR_SHELL='sh'
 fi
 # ROS variables
-{ lsb_release -r | grep 14 >>/dev/null; } && source /opt/ros/indigo/setup.$CURR_SHELL || source /opt/ros/kinetic/setup.$CURR_SHELL
+{ lsb_release -r | grep 16 >>/dev/null; } && source /opt/ros/kinetic/setup.$CURR_SHELL || source /opt/ros/melodic/setup.$CURR_SHELL
 
 export ROS_PARALLEL_JOBS=-j4
 export ROS_IP=127.0.0.1
@@ -25,6 +25,7 @@ export ROS_IP=127.0.0.1
 source $HOME/.local/share/gazebo/setup.sh
 export LD_LIBRARY_PATH=$HOME/.local/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 export CMAKE_PREFIX_PATH=$HOME/.local/lib/x86_64-linux-gnu/cmake/gazebo/:$CMAKE_PREFIX_PATH
+export IGN_IP=127.0.0.1
 
 # NRP virtual env
 export NRP_VIRTUAL_ENV=$HOME/.opt/platform_venv
