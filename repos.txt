@@ -29,7 +29,6 @@ nrp_3rd_party=(
     simbody
     opensim
     gazebo
-    MUSIC
     nest-simulator
     retina
 )

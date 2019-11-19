@@ -71,9 +71,6 @@ export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp-flask-restful-swagger-master
 # HBP VirtualCoach
 export PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/hbp_nrp_virtual_coach
 
-# HBP MUSIC pyNN/NEST Support
-export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_music_xml:$HBP/BrainSimulation/hbp_nrp_music_interface
-
 # HBP Distributed NEST Support
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_distributed_nest
 

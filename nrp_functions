@@ -66,12 +66,6 @@ function build_nest {
   echo Nest
   echo -------------------------
   echo
-  # Install MUSIC related code if the option "spiking-cerebellum" is specified
-  if [[ "$option" == "spiking-cerebellum" ]]; then
-    echo
-    echo "* Building NEST with MUSIC support"
-    echo ----------------------------------
-  fi
   sleep 2
   cd $HBP/nest-simulator || { echo ERROR: $HBP/nest-simulator NOT FOUND; exit 1; }
   ( # use a subshell to avoid "nested" virtualenv issues
@@ -84,16 +78,11 @@ function build_nest {
     fi
     cd $HBP/nest-simulator/build || { echo ERROR: $HBP/nest-simulator/build NOT FOUND; exit 1;}
     cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=${HOME}/.local -Dwith-gsl=ON -Dwith-mpi=ON"
-
-    if [[ $option == "spiking-cerebellum" ]]; then
-      cmake_args="${cmake_args} -Dwith-music=ON"
-    fi
     cmake $cmake_args .. || { echo CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
     make -j$NRP_NUM_MAKE_PROCESSES || { echo nest-simulator; print_build_error_message nest-simulator; exit 1; }
     make install || { echo NEST: INSTALL ERROR; exit 1; }
 
-    # Optional: install UGR's Cerebellum model plugin
-    # It requires NEST to be built with MUSIC support
+    # install UGR's Cerebellum model plugin
     if [[ $option == "spiking-cerebellum" ]]; then
       echo
       echo -------------------------
@@ -104,7 +93,7 @@ function build_nest {
       mkdir -p build && cd build && cmake .. && make && make install
       cd ../../../../build/ || { echo ERROR; exit 1; }
       cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local \
-          -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-music=ON -Dexternal-modules=cerebellum \
+          -Dwith-gsl=ON -Dwith-mpi=ON -Dexternal-modules=cerebellum \
           .. || { echo CMAKE spiking-cerebellum; print_build_error_message nest-simulator; exit 1; }
       make -j$NRP_NUM_MAKE_PROCESSES || { echo spiking-cerebellum; print_build_error_message nest-simulator; exit 1; }
       make install || { echo NEST-SPIKING-CEREBELLUM: INSTALL ERROR; exit 1; }
@@ -113,36 +102,6 @@ function build_nest {
     deactivate
   ) || { exit 1; }
   rm -rf build_venv || { echo ERROR; exit 1; }
-}
-
-function build_music {
-  echo
-  echo -------------------------
-  echo MUSIC
-  echo -------------------------
-  sleep 2
-  cd $HBP/MUSIC
-  ln -sf $HOME/.local/bin/mpichversion mpich2version
-  old_path=$PATH
-  export PATH=$PATH:$HBP/MUSIC
-  export LDFLAGS+=" -pthread"
-  ( # use a subshell to avoid "nested" virtualenv issues
-    virtualenv build_venv || { echo ERROR; exit 1; }
-    source build_venv/bin/activate
-    pip install Cython==0.23.4 mpi4py==2.0.0 || { echo CYTHON_MI4PY INSTALL ERROR; exit 1; }
-    deactivate
-  ) || { exit 1; }
-  PYTHONPATH=$HBP/MUSIC/build_venv/lib/python2.7/site-packages:$PYTHONPATH
-  ./autogen.sh || { echo ERROR; exit 1; }
-  autoreconf --force --install
-  ./configure --prefix=$HOME/.local MPI_CXX=mpicxx || { echo ERROR; exit 1; }
-  make -j$NRP_NUM_MAKE_PROCESSES || { echo music; print_build_error_message MUSIC; exit 1; }
-  make install || { echo MUSIC INSTALL ERROR; exit 1; }
-  rm -rf build_venv || { echo ERROR; exit 1; }
-  rm mpich2version || { echo ERROR; exit 1; }
-  export PATH=$old_path
-  old_path=
-  export LDFLAGS=
 }
 
 function clean_old_mvapich2_installation {
@@ -390,10 +349,6 @@ function nrp_build {
     build_gazebo
     clean_old_mvapich2_installation
     build_mpich
-    if [[ "${spiking_cerebellum_option}" == "spiking-cerebellum" ]]; then
-      # MUSIC is required in order to compile SpikingCerebellum
-      build_music
-    fi
     build_nest ${spiking_cerebellum_option}
   fi
 

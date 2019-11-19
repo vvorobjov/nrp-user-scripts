@@ -22,7 +22,7 @@ function help {
     echo
   fi
   echo "  If 'all' is provided, include 3rd party repos (gazebo, opensim, nest, ...)"
-  echo "  If 'spiking-cerebellum' is provided with the build command, build MUSIC and NEST/SpikingCerebellum"
+  echo "  If 'spiking-cerebellum' is provided with the build command, build NEST/SpikingCerebellum"
   echo "  Command can be:"
   echo "    help    : Print this message"
   echo "    rebase  : Switch repos to master and rebase"
