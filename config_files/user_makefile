@@ -16,11 +16,12 @@ endif
 #below the jenkins timeout
 TIMEOUT?=530
 
-PYTHON_PIP_VERSION?=pip==1.4.1
-#setuptools needs to be >= 1.0 because of:
-# https://github.com/pypa/pip/issues/1059
-SETUPTOOLS_VERSION:=setuptools==33.1.0
+PYTHON_PIP_VERSION?='pip>=19'
+SETUPTOOLS_VERSION?=setuptools>=40
 DOC_REQS?=sphinx==1.1.3 sphinxcontrib-napoleon==0.2.7
+
+python_version_full := $(wordlist 2,4,$(subst ., ,$(shell python --version 2>&1)))
+python_version_major := $(word 1,${python_version_full})
 
 PIP=$(shell readlink -f $(PLATFORM_VENV)/bin/pip)
 PYTHON=$(shell readlink -f $(PLATFORM_VENV)/bin/python)
@@ -100,9 +101,12 @@ CHECK_PYTHON_PATH:=@[ -n "$$PYTHONPATH" ] && $(call WARN,PYTHONPATH is set: ($${
 
 #create a virtualenv
 $(PLATFORM_VENV)/bin/activate:
-	@echo VIRTUALENV
 	$(CHECK_PYTHON_PATH)
-	virtualenv  -p python2.7 --no-site-packages $(PLATFORM_VENV)
+	if [ $(python_version_major) -lt 3 ]; then \
+		virtualenv --no-site-packages $(PLATFORM_VENV); \
+	else \
+		python -m venv $(PLATFORM_VENV); \
+	fi
 	touch $(PLATFORM_VENV)/bin/activate
 
 #need new version of pip for our setup.py methods

@@ -1,5 +1,14 @@
-alias cle-backend='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && uwsgi --ini  $HOME/.local/etc/nginx/uwsgi-nrp.ini'
-alias cle-backend-debug='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages && export CLE_DEBUG=1 && uwsgi --ini  $HOME/.local/etc/nginx/uwsgi-nrp.ini'
+PYTHON_VERSION_MAJOR_MINOR=$(python -c "from sys import version_info as v_i; print('{}.{}'.format(v_i.major, v_i.minor))")
+PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.major)")
+
+if [[ $PYTHON_VERSION_MAJOR -lt 3 ]]; then
+    UWSGI_PLUGIN="python"
+else
+    UWSGI_PLUGIN="python3" 
+fi
+
+alias cle-backend='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages && uwsgi --ini $HOME/.local/etc/nginx/uwsgi-nrp.ini --plugin $UWSGI_PLUGIN'
+alias cle-backend-debug='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages && export CLE_DEBUG=1 && uwsgi --ini $HOME/.local/etc/nginx/uwsgi-nrp.ini --plugin $UWSGI_PLUGIN'
 alias cle-factory='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py'
 alias cle-factory-debug='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py --vsdebug'
 alias cle-rosbridge='rosrun rosbridge_server rosbridge_websocket'
@@ -12,7 +21,7 @@ cle-virtual-coach()
 {
     # save the original PYTHONPATH and update current to include the VirtualCoach
     OLD_PYTHONPATH=$PYTHONPATH
-    PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python2.7/site-packages
+    PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages
 
     # usage information and examples for no arguments or -h flag
     if [ "$#" -eq 0 ]  || [ "$1" == "-h" ] ; then
@@ -116,7 +125,7 @@ kill_hbp_processes()
 
     # loop through and try to kill all of the process groups
     echo "Found ${#pgids[@]} NRP process groups to terminate."
-    for pgid in ${pgids[@]}
+    for pgid in "${pgids[@]}"
     do
         # print the remaining processes under this process group
         echo

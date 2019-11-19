@@ -10,13 +10,25 @@ printf "| to your ~/.bashrc                                                     
 printf "+-------------------------------------------------------------------------------------+\033[0m\n"
 fi
 
-CURR_SHELL=$(basename `ps -p $$ --no-headers -o comm`)
+CURR_SHELL=$(basename $(ps -p $$ --no-headers -o comm))
 if [ -z "$CURR_SHELL" ]
 then
       CURR_SHELL='sh'
 fi
+
+export PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.major)")
+export PYTHON_VERSION_MAJOR_MINOR=$(python -c "import sys; print('{}.{}'.format(sys.version_info.major, sys.version_info.minor))")
+
 # ROS variables
-{ lsb_release -r | grep 16 >>/dev/null; } && source /opt/ros/kinetic/setup.$CURR_SHELL || source /opt/ros/melodic/setup.$CURR_SHELL
+if [ "$PYTHON_VERSION_MAJOR" -ge 3 ]
+then
+  source $HOME/ros_catkin_ws/install/setup.bash # TODO let the user specify ros_catkin_ws
+elif $(lsb_release -r | grep 16 >>/dev/null)
+  then
+    source /opt/ros/kinetic/setup.$CURR_SHELL
+  else
+    source /opt/ros/melodic/setup.$CURR_SHELL
+fi
 
 export ROS_PARALLEL_JOBS=-j4
 export ROS_IP=127.0.0.1
@@ -50,11 +62,8 @@ source $HBP/GazeboRosPackages/devel/setup.$CURR_SHELL
 # use HBP version of gazebo in scripts
 export GZSERVER_BIN_DIR=$HOME/.local/bin
 
-# HBP NEST
-export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python2.7/site-packages:$HOME/.local/lib/x86_64-linux-gnu/python2.7/site-packages
-
 # GazeboRosPackages
-export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python2.7/dist-packages
+export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python$PYTHON_VERSION_MAJOR_MINOR/dist-packages
 
 # HBP CLE
 export PYTHONPATH=$PYTHONPATH:$HBP/CLE/hbp_nrp_cle
@@ -77,6 +86,9 @@ export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_distributed_nest
 # retina
 export RETINA_INSTALL_DIR=$HBP/retina
 export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
+
+# HBP NEST. will conflict with the virtual environment when preceding $VIRTUAL_ENV/lib/python*/site-packages
+export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages:$HOME/.local/lib/x86_64-linux-gnu/python$PYTHON_VERSION_MAJOR_MINOR/site-packages
 
 # HBP models directory
 export NRP_MODELS_DIRECTORY=$HBP/Models
@@ -106,7 +118,7 @@ export CPATH=$HOME/.local/include:$CPATH
 
 # Make number of make processes user-configurable
 if [ -z "$NRP_NUM_CORES" ]; then
-    export NRP_NUM_MAKE_PROCESSES=`nproc`
+    export NRP_NUM_MAKE_PROCESSES=$(nproc)
 else
     export NRP_NUM_MAKE_PROCESSES=$NRP_NUM_CORES
 fi

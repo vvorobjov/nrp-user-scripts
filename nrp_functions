@@ -1,16 +1,44 @@
 #!/bin/bash
 # This script holds common functions
 
+if [ -z ${PYTHON_VERSION_MAJOR+x} ]; then
+	PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.major)")
+fi
+
+if [ -z ${PYTHON_VERSION_MINOR+x} ]; then
+	PYTHON_VERSION_MINOR=$(python -c "import sys; print(sys.version_info.minor)")
+fi
+
+if [ -z ${PYTHON_VERSION_MAJOR_MINOR+x} ]; then
+	PYTHON_VERSION_MAJOR_MINOR=$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR
+fi
+
+if [[ $PYTHON_VERSION_MAJOR -lt 3 ]]; then
+  VIRTUALENV_CMD="virtualenv"
+else
+  VIRTUALENV_CMD="python -m venv"
+fi
+
+PIP_CMD="python -m pip"
+
+if [[ $PYTHON_VERSION_MAJOR -lt 3 ]]; then
+	PYTHON_PATHNAME="python3"
+else
+	PYTHON_PATHNAME="python2.7"
+fi
+
 if [ -z "$NRP_NUM_MAKE_PROCESSES" ]; then
 printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ---------------------------+\n"
 printf "| Dear Neurorobotics user, your NRP_NUM_MAKE_PROCESSES is not defined.                |\n"
-printf "| This could mean you forgot to source the nrp_variables script before sourcing $0.   |\n"
+printf "| This could mean you forgot to source the nrp_variables script before sourcing %s.   |\n", "$0"
 printf "| NRP_NUM_MAKE_PROCESSES will be set to the number of cores of your CPU by default.   |\n"
 printf "+-------------------------------------------------------------------------------------+\033[0m\n"
-export NRP_NUM_MAKE_PROCESSES=`nproc`
+NRP_NUM_MAKE_PROCESSES=$(nproc)
+export NRP_NUM_MAKE_PROCESSES
 fi
 
-ubuntu_version=`lsb_release -rs`
+ubuntu_version=$(lsb_release -rs)
+
 if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
 printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ----------------------------+\n"
 printf "| Dear Neurorobotics user, you are currently on Ubuntu 16 or older                     |\n"
@@ -18,12 +46,12 @@ printf "| We recommend that you upgrade your ubuntu version to 18 which is fully
 printf "| the NRP.                                                                             |\n"
 printf "+--------------------------------------------------------------------------------------+\033[0m\n"
 printf "Hit Enter to continue\n"
-read
+read -r
 fi
 
 function print_build_error_message {
-printf "\033[1;31m+-------------------------- $1 build FAILED -------------------------------------+\n"
-printf "| If you are upgrading from Ubuntu 16 to 18, try removing the $1/build folder      |\n"
+printf "\033[1;31m+-------------------------- %s build FAILED -------------------------------------+\n", "$1"
+printf "| If you are upgrading from Ubuntu 16 to 18, try removing the %s/build folder      |\n", "$1"
 printf "| and relaunch this script.                                                            |\n"
 printf "+-------------------------------------------------------------------------------------+\033[0m\n"
 }
@@ -32,13 +60,13 @@ function checkssh {
     echo "Checking $1"
     touch "$touchfilebase""$1"
     ssh -o 'BatchMode yes' -o 'StrictHostKeyChecking no' -K root@$1 2>"$touchfilebase""$1" 1>/dev/null /bin/uname
-    offends=`grep "Offending" "$touchfilebase""$1"`
+    offends=$(grep "Offending" "$touchfilebase""$1")
     if [ -n "$offends" ]
     then
-      echo "yes" > $2
+      echo "yes" > "$2"
       echo
       echo ------------------------------------------------------------
-      echo $1
+      echo "$1"
       echo "$offends"
 #      cat "$touchfilebase""$1"
       echo ------------------------------------------------------------
@@ -51,12 +79,12 @@ function waitforall {
   while [ -n "$finished" ]
   do
     sleep 5
-    finished=`ls "$touchfilebase"* 2>/dev/null`
-    touchbase=`basename $touchfilebase`
-    replacelist=`echo "$finished" | sed 's/^.*'$touchbase'\(.*\)/\1/' | xargs`
+    finished=$(ls "$touchfilebase"* 2>/dev/null)
+    touchbase=$(basename "$touchfilebase")
+    replacelist=$(echo "$finished" | sed 's/^.*'"$touchbase"'\(.*\)/\1/' | xargs)
     if [ -n "$replacelist" ]
     then
-      echo "Still "$1": "$replacelist
+      printf "Still %s: %s\n", "$1", "$replacelist"
     fi
   done
 }
@@ -69,19 +97,21 @@ function build_nest {
   echo -------------------------
   echo
   sleep 2
-  cd $HBP/nest-simulator || { echo ERROR: $HBP/nest-simulator NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  cd "$HBP"/nest-simulator || { echo ERROR: "$HBP"/nest-simulator NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   ( # use a subshell to avoid "nested" virtualenv issues
-    virtualenv build_venv || { echo ERROR; exit 1; }
+	$VIRTUALENV_CMD build_venv || { echo ERROR; exit 1; }
     source build_venv/bin/activate
-    pip install Cython==0.23.4 mpi4py==2.0.0 || { echo ERROR; exit 1; }
-    xargs rm -rf < $HBP/user-scripts/nest-delete-filelist.txt || { echo ERROR; exit 1; }
-    if [ ! -d $HBP/nest-simulator/build ]; then
-      mkdir $HBP/nest-simulator/build || { echo ERROR; exit 1;}
+    $PIP_CMD install Cython==0.26.1 mpi4py==2.0.0 || { echo ERROR; exit 1; }
+    xargs rm -rf < "$HBP"/user-scripts/nest-delete-filelist.txt || { echo ERROR; exit 1; }
+    # shellcheck disable=SC2086
+    if [ ! -d "$HBP"/nest-simulator/build ]; then
+      mkdir "$HBP"/nest-simulator/build || { echo ERROR; exit 1;}
     fi
-    cd $HBP/nest-simulator/build || { echo ERROR: $HBP/nest-simulator/build NOT FOUND; exit 1;}
-    cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=${HOME}/.local -Dwith-gsl=ON -Dwith-mpi=ON"
-    cmake $cmake_args .. || { echo CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
-    make -j$NRP_NUM_MAKE_PROCESSES || { echo nest-simulator; print_build_error_message nest-simulator; exit 1; }
+    cd "$HBP"/nest-simulator/build || { echo ERROR: "$HBP"/nest-simulator/build NOT FOUND; exit 1;}
+    cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=${HOME}/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-python=${PYTHON_VERSION_MAJOR}"
+
+    cmake "$cmake_args" .. || { echo CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
+    make -j"$NRP_NUM_MAKE_PROCESSES" || { echo nest-simulator; print_build_error_message nest-simulator; exit 1; }
     make install || { echo NEST: INSTALL ERROR; exit 1; }
 
     # Optional: install UGR's Cerebellum model plugin
@@ -91,7 +121,7 @@ function build_nest {
       echo Nest: SpikingCerebellum
       echo -------------------------
       echo
-      cd $HBP/nest-simulator/SpikingCerebellum/src/CerebellumModule
+      cd "$HBP"/nest-simulator/SpikingCerebellum/src/CerebellumModule
       mkdir -p build && cd build && cmake .. && make && make install
       cd ../../../../build/ || { echo ERROR; exit 1; }
       cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local \
@@ -113,16 +143,16 @@ function clean_old_mvapich2_installation {
     echo Removing previous mvapich2 installation
     echo -------------------------
     echo
-    cd $HBP/mvapich2 || { echo ERROR; exit 1; }
+    cd "$HBP"/mvapich2 || { echo ERROR; exit 1; }
     #make uninstall || { echo ERROR: Could not uninstall mvapich2 properly, please uninstall manually and rerun this script; exit 1; }
     #make clean || { echo ERROR: Could not clean the build files. Please clean manually; exit 1; }
     #make distclean || { echo ERROR: Could not clean the configure files. Please distclean manually; exit 1; }
-    cd .. && mv -f $HBP/mvapich2 $HBP/mvapich2.`date +%Y-%m-%d` || { echo ERROR: Could not rename mvapich2 folder, please remove it manually; exit 1; }
+    cd .. && mv -f $HBP/mvapich2 $HBP/mvapich2.$(date +%Y-%m-%d) || { echo ERROR: Could not rename mvapich2 folder, please remove it manually; exit 1; }
     ls $HOME/.local/lib/libmpi* 1>/dev/null 2>&1 && { echo ERROR: There seems to be MPI leftovers in your ~/.local. Please remove them manually before rerunning this script; exit 1; }
     ls $HOME/.local/include/*mpi* 1>/dev/null 2>&1 && { echo ERROR: There seems to be MPI leftovers in your ~/.local. Please remove them manually before rerunning this script; exit 1; }
-    cd $HBP/nest-simulator/build || { echo ERROR: $HBP/nest-simulator/build not found; exit 1; }
+    cd "$HBP"/nest-simulator/build || { echo ERROR: $HBP/nest-simulator/build not found; exit 1; }
     make clean  # option step, no need to error here
-    cd $HBP/nest-simulator
+    cd "$HBP"/nest-simulator || { echo ERROR; exit 1; }
     rm -rf build || { echo ERROR: could not remove $HBP/nest-simulator/build. Please do so manually.; exit 1; }
   fi
 }
@@ -134,7 +164,7 @@ function build_mpich {
   echo mpich
   echo -------------------------
   echo
-  cd $HBP
+  cd "$HBP"
   if [ ! -d "mpich-3.1.4" ]; then
     wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz || { echo ERROR downloading mpich source; exit 1; }
     tar xf mpich-3.1.4.tar.gz || { echo ERROR unzipping mpich source archive; exit 1; }
@@ -142,7 +172,7 @@ function build_mpich {
   fi
   cd mpich-3.1.4 || { echo ERROR accessing mpich-3.1.4 directory; exit 1; }
   ./configure --enable-fast=all,O3 --prefix=$HOME/.local || { echo ERROR configuring mpich build; exit 1; }
-  make -j$NRP_NUM_MAKE_PROCESSES || { echo mpich; print_build_error_message mpich; exit 1; }
+  make -j"$NRP_NUM_MAKE_PROCESSES" || { echo mpich; print_build_error_message mpich; exit 1; }
   make install || { echo ERROR installing mpich in $HOME/.local; exit 1; }
 }
 
@@ -155,7 +185,7 @@ function build_gazebo {
   if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
     cmake_args="-DENABLE_TESTS_COMPILATION:BOOL=False"
   fi
-  cd $HBP/gazebo || { echo ERROR: $HBP/gazebo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  cd "$HBP"/gazebo || { echo ERROR: "$HBP"/gazebo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   mkdir -p build
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo gazebo; print_build_error_message gazebo; exit 1; }
@@ -169,10 +199,10 @@ function build_gazebo_ros_packages {
   echo GazeboRosPackages
   echo -------------------------
   sleep 2
-  cd $HBP/GazeboRosPackages || { echo ERROR: $HBP/GazeboRosPackages NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  cd "$HBP"/GazeboRosPackages || { echo ERROR: "$HBP"/GazeboRosPackages NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   rm -rf build devel
   catkin_make || { echo GAZEBO_ROSPACKAGES BUILD ERROR; exit 1; }
-  cd $HBP
+  cd "$HBP"
 }
 
 function build_gzweb {
@@ -181,7 +211,7 @@ function build_gzweb {
   echo gzweb
   echo -------------------------
   sleep 2
-  cd $HBP/gzweb || { echo ERROR: $HBP/gzweb NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  cd "$HBP"/gzweb || { echo ERROR: "$HBP"/gzweb NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   ./deploy-gzbridge-nrp.sh || { echo GZBRIDGE BUILD ERROR; exit 1; }
   # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
   # For more information see: https://github.com/zurb/foundation-sites/issues/10826
@@ -214,7 +244,7 @@ function nest_version_switch {
     echo =========================
     echo Cleaning up Nest 2.10
     echo =========================
-    cd $HBP/nest-simulator || { echo ERROR; exit 1; }
+    cd "$HBP"/nest-simulator || { echo ERROR; exit 1; }
     make clean >/dev/null 2>&1
     make distclean >/dev/null 2>&1
     rm -rf build_venv
@@ -228,8 +258,8 @@ function nrp_rebase {
 
   if [ "$rebase_all" == "all" ];then nest_version_switch;fi
 
-  cd $HBP || { echo ERROR; exit 1; }
-  source $HBP/user-scripts/repos.txt || { echo ERROR; exit 1; }
+  cd "$HBP" || { echo ERROR; exit 1; }
+  source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
 
   echo
   echo =========================
@@ -246,19 +276,19 @@ function nrp_rebase {
       ${nrp_repos[*]}
     )
   fi
-  for i in ${repos[@]}
+  for i in "${repos[@]}"
   do
     echo
     echo -------------------------
     echo $i
     echo -------------------------
     sleep 2
-    cd $i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+    cd "$i"|| { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
 
     # if users (u16 or u18) dont have the master18 branch, get it
     if [ "$NRP_INSTALL_MODE" == "user" ]; then
       if ! [ "$(git branch --list master18)" ]; then
-          git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*" || { echo ERROR; exit 1; }
+        git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*" || { echo ERROR; exit 1; }
         git pull || { echo ERROR; exit 1; }
       fi
     fi
@@ -293,9 +323,10 @@ function ubuntu_fix_cv2 {
   echo "Applying patch for OpenCv on Ubuntu"
   echo -------------------------------------
   echo
-  mkdir ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ -p || { echo ERROR; exit 1; }
-  cp /usr/lib/python2.7/dist-packages/cv2*.so ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR; exit 1; }
-  cp /usr/lib/python2.7/dist-packages/cv.py ${NRP_VIRTUAL_ENV}/lib/python2.7/site-packages/ || { echo ERROR; exit 1; }
+
+  mkdir "${NRP_VIRTUAL_ENV}"/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages/ -p || { echo ERROR; exit 1; }
+  cp /usr/lib/$PYTHON_PATHNAME/dist-packages/cv2*.so "${NRP_VIRTUAL_ENV}"/lib/$PYTHON_PATHNAME/site-packages/ || { echo ERROR; exit 1; }
+  cp /usr/lib/$PYTHON_PATHNAME/dist-packages/cv.py "${NRP_VIRTUAL_ENV}"/lib/$PYTHON_PATHNAME/site-packages/ || { echo ERROR; exit 1; }
 
 }
 
@@ -306,18 +337,19 @@ function install_template_experiments_requirements {
   echo -------------------------
   sleep 2
   echo "Install Experiments'requirements"
-  source ${NRP_VIRTUAL_ENV}/bin/activate || { echo ERROR; exit 1; } # pip installation is done inside ${NRP_VIRTUAL_ENV}
+  source "${NRP_VIRTUAL_ENV}"/bin/activate || { echo ERROR; exit 1; } # pip installation is done inside ${NRP_VIRTUAL_ENV}
   requirements=$HBP/Experiments/template_requirements.txt # TODO(Luc) create $HBP/Experiments/templates and use a requirements.txt file per each template experiment
-  pip install -r ${requirements} || { echo EXPERIMENTS: PIP INSTALL ERROR; exit 1; }
+  $PIP_CMD install -r "${requirements}" || { echo EXPERIMENTS: PIP INSTALL ERROR; exit 1; }
   deactivate
 }
 
 function generate_low_resolution_pbr_textures {
-  cd $HBP
-  virtualenv lower_res
+  cd "$HBP"
+  $VIRTUALENV_CMD lower_res || { echo ERROR; exit 1; }
   source lower_res/bin/activate
-  pip install pillow==4.3.0
-  python $HBP/user-scripts/generatelowrespbr.py
+  $PIP_CMD install 'pip>=19' wheel --upgrade
+  $PIP_CMD install pillow==4.3.0 future
+  python "$HBP"/user-scripts/generatelowrespbr.py
   deactivate
   rm -rf lower_res
 }
@@ -332,9 +364,10 @@ function process_models {
   generate_low_resolution_pbr_textures || { echo ERROR; exit 1; }
   echo "Create symlinks"
   if [ ! -d "$HOME/.gazebo/models" ]; then
-   mkdir -p $HOME/.gazebo/models || { echo ERROR; exit 1;}
+   mkdir -p "$HOME"/.gazebo/models || { echo ERROR; exit 1;}
   fi
-  cd $HBP/Models || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  cd "$HBP"/Models || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+
   ./create-symlinks.sh || { echo ERROR; exit 1; }
 }
 
@@ -354,11 +387,12 @@ function nrp_build {
       echo $i
       echo -------------------------
       sleep 2
-      cd $HBP/$i || { echo ERROR: $HBP/$i NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+      cd "$HBP"/$i || { echo ERROR: "$HBP"/$i NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+
       mkdir -p build
       cd build
       cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo $i: CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
-      make -j$NRP_NUM_MAKE_PROCESSES || { echo $i; print_build_error_message $i; exit 1; }
+      make -j"$NRP_NUM_MAKE_PROCESSES" || { echo $i; print_build_error_message $i; exit 1; }
       make install || { echo $i: INSTALL ERROR; exit 1; }
     done
 
@@ -377,7 +411,8 @@ function nrp_build {
     echo $i
     echo -------------------------
     sleep 2
-    cd $HBP/$i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+    cd "$HBP"/$i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+
     make devinstall || { echo $i BUILD ERROR; exit 1; }
   done
 
@@ -390,10 +425,36 @@ function nrp_build {
   # There is a bug in PyNN 0.9.4, which is fixed with the following patch.
   # This Bugfix is needed to run cerebellum.
   # Remove this Bugfix after upgrading to PyNN 0.9.5
-  sed -i "792s/label=self.id)/label=str(self.id))/" $NRP_VIRTUAL_ENV/lib/python2.7/site-packages/pyNN/serialization/sonata.py
-  sed -i "792s/label=self.id)/label=str(self.id))/" $NRP_VIRTUAL_ENV/local/lib/python2.7/site-packages/pyNN/serialization/sonata.py
-  rm $NRP_VIRTUAL_ENV/lib/python2.7/site-packages/pyNN/serialization/sonata.pyc
-  rm $NRP_VIRTUAL_ENV/local/lib/python2.7/site-packages/pyNN/serialization/sonata.pyc
+  sed -i "792s/label=self.id)/label=str(self.id))/" "$NRP_VIRTUAL_ENV"/lib/python2.7/site-packages/pyNN/serialization/sonata.py
+  sed -i "792s/label=self.id)/label=str(self.id))/" "$NRP_VIRTUAL_ENV"/local/lib/python2.7/site-packages/pyNN/serialization/sonata.py
+  rm "$NRP_VIRTUAL_ENV"/lib/python2.7/site-packages/pyNN/serialization/sonata.pyc
+  rm "$NRP_VIRTUAL_ENV"/local/lib/python2.7/site-packages/pyNN/serialization/sonata.pyc
+
+  # sPynnaker8 requires enum34, which is problematic in python > 3.4
+  # TODO remove as soon as sPyNNaker8 is updated
+  if [[ ($PYTHON_VERSION_MAJOR -ge 3) && ($PYTHON_VERSION_MINOR -ge 4) ]]; then
+     echo
+     echo ---------------------------------------------------------------------
+     echo "Uninstalling enum34 (requirement of sPyNNaker8) from NRP_VIRTUAL_ENV"
+     echo ---------------------------------------------------------------------
+     source ${NRP_VIRTUAL_ENV}/bin/activate
+     $PIP_CMD uninstall -y enum34
+     deactivate
+  fi
+
+  echo
+  echo -------------------------
+  echo "Fixing Issue with PyNN 0.9.4"
+  echo -------------------------
+  sleep 2
+  # As of 2019-12-21 spynnaker doesn't work with PyNN 0.9.5
+  # There is a bug in PyNN 0.9.4, which is fixed with the following patch.
+  # This Bugfix is needed to run cerebellum.
+  # Remove this Bugfix after upgrading to PyNN 0.9.5
+  VENV_LOCAL_LIB=$NRP_VIRTUAL_ENV/local/lib/python$PYTHON_VERSION_MAJOR_MINOR
+  VENV_LIB=$NRP_VIRTUAL_ENV/lib/python$PYTHON_VERSION_MAJOR_MINOR
+  sed -i "792s/label=self.id)/label=str(self.id))/" {"$VENV_LIB","$VENV_LOCAL_LIB"}/site-packages/pyNN/serialization/sonata.py
+  rm {"$VENV_LIB","$VENV_LOCAL_LIB"}/site-packages/pyNN/serialization/sonata.pyc
 
   # Only perform this step for Ubuntu16
   if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
@@ -407,16 +468,20 @@ function nrp_build {
     echo $i
     echo -----------------------
     sleep 2
-    cd $HBP/$i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+    cd "$HBP"/$i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
 
     # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
     # For more information see: https://github.com/zurb/foundation-sites/issues/10826
     npm dedupe || { echo  $i INSTALL ERROR; exit 1; }
+    rm package-lock.json
     git checkout -- package.json
+    VENV_CMD=$VIRTUALENV_CMD
+    export VENV_CMD  # used by nrpBackendProxy's install
     npm install --no-save || { echo  $i INSTALL ERROR; exit 1; }
     if [ "$i" == "ExDFrontend" ]; then
         grunt build || { echo GRUNT BUILD FAILED; exit 1; }
     fi
+    unset VENV_CMD
   done
 
   build_gzweb
@@ -438,8 +503,8 @@ function nrp_configure {
 function clean_branches {
   clean_all=$1
 
-  cd $HBP || { echo ERROR: $HBP NOT FOUND; exit 1; }
-  source $HBP/user-scripts/repos.txt || { echo ERROR; exit 1; }
+  cd "$HBP" || { echo ERROR: $HBP NOT FOUND; exit 1; }
+  source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
 
   echo
   echo =========================
@@ -456,14 +521,14 @@ function clean_branches {
       ${nrp_repos[*]}
     )
   fi
-  for i in ${repos[@]}
+  for i in "${repos[@]}"
   do
     echo
     echo -------------------------
-    echo $i
+    echo "$i"
     echo -------------------------
     sleep 2
-    cd $i || { echo ERROR; exit 1; }
+    cd "$i" || { echo ERROR; exit 1; }
     git branch | grep -v "master" | grep -v "development" | grep -v "master16" | xargs git branch -D 2>/dev/null
     cd ..
   done
@@ -472,8 +537,8 @@ function clean_branches {
 function it_branch {
   itbranch_all=$1
 
-  cd $HBP || { echo ERROR; exit 1; }
-  source $HBP/user-scripts/repos.txt || { echo ERROR; exit 1; }
+  cd "$HBP" || { echo ERROR; exit 1; }
+  source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
 
   echo
   echo =========================
@@ -490,14 +555,14 @@ function it_branch {
       ${nrp_repos[*]}
     )
   fi
-  for i in ${repos[@]}
+  for i in "${repos[@]}"
   do
     echo
     echo -------------------------
     echo $i
     echo -------------------------
     sleep 2
-    cd $i || { echo ERROR; exit 1; }
+    cd "$i" || { echo ERROR; exit 1; }
     { git branch | grep "^ *IT$" && git branch -D IT || true; } && git checkout -b IT || { echo ERROR; exit 1; }
     cd ..
   done
@@ -505,7 +570,7 @@ function it_branch {
 
 function merge_dev {
 
-  cd $HBP || { echo ERROR; exit 1; }
+  cd "$HBP" || { echo ERROR; exit 1; }
   source $HBP/user-scripts/repos.txt || { echo ERROR; exit 1; }
 
   echo
@@ -517,7 +582,7 @@ function merge_dev {
   ${nrp_repos[*]}
   )
 
-  for i in ${repos[@]}
+  for i in "${repos[@]}"
   do
     echo
     echo -------------------------
@@ -547,8 +612,8 @@ function set_up_tingoDB {
   if [ ! -d "$STORAGE_PATH" ]; then
    mkdir -p $STORAGE_PATH || { echo ERROR; exit 1;}
   fi
-  cd $HBP/nrpBackendProxy || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-  node_modules/ts-node/dist/bin.js $HBP/nrpBackendProxy/utils/createFSUser.ts --user nrpuser --password password || { echo ERROR; exit 1; }
+  cd "$HBP"/nrpBackendProxy || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  node_modules/ts-node/dist/bin.js "$HBP"/nrpBackendProxy/utils/createFSUser.ts --user nrpuser --password password || { echo ERROR; exit 1; }
 }
 
 function add_new_user_tingoDB {
@@ -579,7 +644,7 @@ function add_new_user_tingoDB {
   fi
   if [ -z "$username" ]; then
     echo "Type the username and press [ENTER]"
-    read username || { echo ERROR; exit 1; }
+    read -r username || { echo ERROR; exit 1; }
     echo
   fi
   if [ -z "$password" ]; then
@@ -595,7 +660,7 @@ function add_new_user_tingoDB {
       exit 0
     fi
   fi
-  pushd $HBP/nrpBackendProxy >/dev/null || { echo ERROR; exit 1; }
-  node_modules/ts-node/dist/bin.js $HBP/nrpBackendProxy/utils/createFSUser.ts --user $username --password $password || { echo ERROR; exit 1; }
+  pushd "$HBP"/nrpBackendProxy >/dev/null || { echo ERROR; exit 1; }
+  node_modules/ts-node/dist/bin.js "$HBP"/nrpBackendProxy/utils/createFSUser.ts --user "$username" --password "$password" || { echo ERROR; exit 1; }
   popd >/dev/null || { echo ERROR; exit 1; }
 }

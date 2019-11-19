@@ -25,13 +25,13 @@ if [ "$p" == "y" -o "$p" == "Y" ]; then NOBACKUP=1;fi
 
 if [ -f $HOME/.local/etc/init.d/nginx ]; then $HOME/.local/etc/init.d/nginx stop; fi
 rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d/nginx $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
-if [ $NOBACKUP ]; then rm -f $HBP/ExDFrontend/app/config.json.bak*; else backup $HBP/ExDFrontend/app/config.json; fi
-rm -f $HBP/ExDFrontend/app/config.json.local
-if [ $NOBACKUP ]; then rm -f $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.bak*; else backup $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini; fi
-rm -f $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
-if [ $NOBACKUP ]; then rm -f $HBP/nrpBackendProxy/config.json.bak*; else backup $HBP/nrpBackendProxy/config.json; fi
-rm -f $HBP/nrpBackendProxy/config.json.sample.local
-if [ $NOBACKUP ]; then rm -f $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.bak*; else backup $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json; fi
-rm -f $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample
-if [ $NOBACKUP ]; then rm -f $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json.bak*; else backup $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json; fi
+if [ $NOBACKUP ]; then rm -f "$HBP"/ExDFrontend/app/config.json.bak*; else backup "$HBP"/ExDFrontend/app/config.json; fi
+rm -f "$HBP"/ExDFrontend/app/config.json.local
+if [ $NOBACKUP ]; then rm -f "$HBP"/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.bak*; else backup "$HBP"/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini; fi
+rm -f "$HBP"/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
+if [ $NOBACKUP ]; then rm -f "$HBP"/nrpBackendProxy/config.json.bak*; else backup "$HBP"/nrpBackendProxy/config.json; fi
+rm -f "$HBP"/nrpBackendProxy/config.json.sample.local
+if [ $NOBACKUP ]; then rm -f "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.bak*; else backup "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json; fi
+rm -f "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample
+if [ $NOBACKUP ]; then rm -f "$HBP"/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json.bak*; else backup "$HBP"/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json; fi
 echo "DONE"

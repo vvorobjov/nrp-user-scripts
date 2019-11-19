@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+from past.utils import old_div
 import sys
 from os import listdir, remove, rename
 from os.path import isfile, join,expandvars
@@ -12,7 +15,7 @@ root = os.path.expandvars('$HBP/Models')
 
 # First remove all low res versions
 
-print "Clean low resolution textures"
+print("Clean low resolution textures")
 
 for path, subdirs, files in os.walk(root):
     for filename in files:
@@ -24,7 +27,7 @@ for path, subdirs, files in os.walk(root):
 
 # Generate low resolution versions of PBR
 
-print "Generate low resolution textures"
+print("Generate low resolution textures")
 
 for path, subdirs, files in os.walk(root):
     for filename in files:
@@ -37,8 +40,8 @@ for path, subdirs, files in os.walk(root):
                         filter = PIL.Image.NEAREST
                     else:
                         filter = PIL.Image.LANCZOS
-                    neww = im.size[0]/2
-                    newh = im.size[1]/2
+                    neww = old_div(im.size[0],2)
+                    newh = old_div(im.size[1],2)
 
                     maxsize = neww
 
@@ -61,7 +64,7 @@ for path, subdirs, files in os.walk(root):
 
 # Generate low resolution versions of sky env. map
 
-print "Generate low resolution of sky textures"
+print("Generate low resolution of sky textures")
 
 root = os.path.expandvars('$HBP/Models/sky')
 for path, subdirs, files in os.walk(root):
@@ -72,8 +75,8 @@ for path, subdirs, files in os.walk(root):
                 im = Image.open(os.path.join(path, filename))
                 filter = PIL.Image.LANCZOS
 
-                neww = im.size[0]/2
-                newh = im.size[1]/2
+                neww = old_div(im.size[0],2)
+                newh = old_div(im.size[1],2)
 
                 im = im.resize((neww,newh),filter)
                 im.save(os.path.join(path,'LOWSKY_')+filename, quality=95)

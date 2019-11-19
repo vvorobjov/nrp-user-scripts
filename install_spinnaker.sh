@@ -11,7 +11,7 @@ then
   # TODO: Instead we should modify the python dependencies for the NRP project
   # Activate the platform virtual env and install the Python dependencies
   source $NRP_VIRTUAL_ENV/bin/activate
-  pip install "appdirs>=1.4.2,<2.0.0" future "numpy>=1.12,<1.9999"  "scipy>=0.16.0" "six>=1.8.0" "pylru>=1" enum34 future lxml jsonschema sortedcollections
+  pip install "appdirs>=1.4.2,<2.0.0" future "numpy>=1.12,<1.9999"  "scipy>=0.16.0" "six>=1.8.0" "pylru>=1" "enum34; python_version<'3.4'" future lxml jsonschema sortedcollections
   pip install  "rig>=2.0.0,<3.0.0" futures enum-compat pytz tzlocal "requests>=2.4.1" matplotlib
   pip install  csa "quantities>=0.12.1" "pynn>=0.9.2,<0.10" "lazyarray>=0.2.9,<=0.4.0" "neo>=0.5.2,< 0.7.0"
   deactivate
