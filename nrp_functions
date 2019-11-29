@@ -11,7 +11,7 @@ export NRP_NUM_MAKE_PROCESSES=`nproc`
 fi
 
 ubuntu_18_version=`lsb_release -rs | grep 18` >> /dev/null
-if ! echo $ubuntu_18_version; then
+if ! echo $ubuntu_18_version >> /dev/null; then
 printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ----------------------------+\n"
 printf "| Dear Neurorobotics user, you are currently on Ubuntu 16 or older                     |\n"
 printf "| We recommend that you upgrade your ubuntu version to 18 which is fully supported in  |\n"
@@ -150,10 +150,13 @@ function build_gazebo {
   echo Gazebo
   echo -------------------------
   sleep 2
+  if ! echo $ubuntu_18_version >> /dev/null; then
+    cmake_args="-DENABLE_TESTS_COMPILATION:BOOL=False"
+  fi
   cd $HBP/gazebo || { echo ERROR: $HBP/gazebo NOT FOUND; exit 1; }
   mkdir -p build
   cd build
-  cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo gazebo; print_build_error_message gazebo; exit 1; }
+  cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo gazebo; print_build_error_message gazebo; exit 1; }
   make -j$NRP_NUM_MAKE_PROCESSES || { echo gazebo; print_build_error_message gazebo; exit 1; }
   make install || { echo GAZEBO INSTALL ERROR; exit 1; }
 }
@@ -366,7 +369,7 @@ function nrp_build {
   done
 
   # Only perform this step for Ubuntu16
-  if echo "$ubuntu_version" | grep 16 >> /dev/null; then
+  if ! echo $ubuntu_18_version >> /dev/null; then
     ubuntu_fix_cv2
   fi
  
