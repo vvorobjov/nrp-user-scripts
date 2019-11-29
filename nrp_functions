@@ -159,7 +159,7 @@ function build_gazebo {
   mkdir -p build
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo gazebo; print_build_error_message gazebo; exit 1; }
-  make -j$NRP_NUM_MAKE_PROCESSES || { echo gazebo; print_build_error_message gazebo; exit 1; }
+  make -j"$NRP_NUM_MAKE_PROCESSES" || { echo gazebo; print_build_error_message gazebo; exit 1; }
   make install || { echo GAZEBO INSTALL ERROR; exit 1; }
 }
 
@@ -257,8 +257,8 @@ function nrp_rebase {
 
     # if users (u16 or u18) dont have the master18 branch, get it
     if [ "$NRP_INSTALL_MODE" == "user" ]; then
-      if ! [ "`git branch --list master18`" ]; then
-        git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*" || { echo ERROR; exit 1; }
+      if ! [ "$(git branch --list master18)" ]; then
+          git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*" || { echo ERROR; exit 1; }
         git pull || { echo ERROR; exit 1; }
       fi
     fi
