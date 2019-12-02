@@ -10,7 +10,7 @@ printf "+-----------------------------------------------------------------------
 export NRP_NUM_MAKE_PROCESSES=`nproc`
 fi
 
-ubuntu_18_version=`lsb_release -rs`
+ubuntu_version=`lsb_release -rs`
 if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
 printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ----------------------------+\n"
 printf "| Dear Neurorobotics user, you are currently on Ubuntu 16 or older                     |\n"
