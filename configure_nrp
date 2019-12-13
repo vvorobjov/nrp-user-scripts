@@ -124,10 +124,9 @@ else
 fi
 
 
-printf "\033[1;33mWould you like to apply the XML transfer function migration script to your local experiments? (Y/n)\033[0m\n"
+printf "\033[1;33mWould you like to apply the XML transfer function migration script to your local experiments? (y/N)\033[0m\n"
 read -t 5 p
-if [ "$p" == "Y" -o "$p" == "y" ]
-then
+if [ "$p" == "Y" -o "$p" == "y" ]; then
     if [[ -d  "${NRP_VIRTUAL_ENV}" ]]; then
         source ${NRP_VIRTUAL_ENV}/bin/activate
         echo "Generating older bibi scheme parser for XML TF Migration"
@@ -141,7 +140,7 @@ then
         echo "NRP_VIRTUAL_ENV not defined. Skipping old XML transfer function migration."
     fi
 else
-  echo "Skipping.."
+    echo "Skipping..."
 fi
 
 

@@ -326,6 +326,21 @@ function process_models {
   ./create-symlinks.sh || { echo ERROR; exit 1; }
 }
 
+function build_spinnaker {
+  echo
+  echo ------------------------------
+  echo Installing Spinnaker framework
+  echo ------------------------------
+  sleep 2
+  # matplotlib needs to be explicitly installed before hand
+  # see https://github.com/SpiNNakerManchester/sPyNNaker/issues/753
+  source $NRP_VIRTUAL_ENV/bin/activate || { echo ERROR loading platform_venv virtual env; exit 1; }
+  pip install matplotlib || { echo ERROR installing matplotlib; exit 1; }
+  pip install spynnaker8 || { echo ERROR installing spynnaker8; exit 1; }
+  python -m spynnaker8.setup_pynn || { echo ERROR installing pyNN-spinnaker; exit 1; }
+  python -c "import pyNN.spiNNaker as sim; sim.setup(); sim.end()" || { echo ERROR initializing spinnaker config; exit 1; }
+  deactivate || { echo ERROR deactivating venv; exit 1; }
+}
 
 function nrp_build {
   build_all=$1
@@ -358,6 +373,7 @@ function nrp_build {
   fi
 
   build_gazebo_ros_packages
+  build_spinnaker
 
   for i in ExperimentControl BrainSimulation VirtualCoach CLE ExDBackend
   do
@@ -374,7 +390,7 @@ function nrp_build {
   if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
     ubuntu_fix_cv2
   fi
- 
+
   for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
   do
     echo
@@ -569,7 +585,7 @@ function add_new_user_tingoDB {
       exit 0
     fi
   fi
-  pushd $HBP/nrpBackendProxy >/dev/null || { echo ERROR; exit 1; } 
+  pushd $HBP/nrpBackendProxy >/dev/null || { echo ERROR; exit 1; }
   node_modules/ts-node/dist/bin.js $HBP/nrpBackendProxy/utils/createFSUser.ts --user $username --password $password || { echo ERROR; exit 1; }
   popd >/dev/null || { echo ERROR; exit 1; }
 }
