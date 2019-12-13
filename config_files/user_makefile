@@ -19,7 +19,7 @@ TIMEOUT?=530
 PYTHON_PIP_VERSION?=pip==1.4.1
 #setuptools needs to be >= 1.0 because of:
 # https://github.com/pypa/pip/issues/1059
-SETUPTOOLS_VERSION:=setuptools==15.2
+SETUPTOOLS_VERSION:=setuptools==33.1.0
 DOC_REQS?=sphinx==1.1.3 sphinxcontrib-napoleon==0.2.7
 
 PIP=$(shell readlink -f $(PLATFORM_VENV)/bin/pip)
