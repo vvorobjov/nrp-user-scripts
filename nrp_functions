@@ -326,22 +326,6 @@ function process_models {
   ./create-symlinks.sh || { echo ERROR; exit 1; }
 }
 
-function build_spinnaker {
-  echo
-  echo ------------------------------
-  echo Installing Spinnaker framework
-  echo ------------------------------
-  sleep 2
-  # matplotlib needs to be explicitly installed before hand
-  # see https://github.com/SpiNNakerManchester/sPyNNaker/issues/753
-  source $NRP_VIRTUAL_ENV/bin/activate || { echo ERROR loading platform_venv virtual env; exit 1; }
-  pip install matplotlib || { echo ERROR installing matplotlib; exit 1; }
-  pip install spynnaker8 || { echo ERROR installing spynnaker8; exit 1; }
-  python -m spynnaker8.setup_pynn || { echo ERROR installing pyNN-spinnaker; exit 1; }
-  python -c "import pyNN.spiNNaker as sim; sim.setup(); sim.end()" || { echo ERROR initializing spinnaker config; exit 1; }
-  deactivate || { echo ERROR deactivating venv; exit 1; }
-}
-
 function nrp_build {
   build_all=$1
   spiking_cerebellum_option=$2
@@ -373,7 +357,6 @@ function nrp_build {
   fi
 
   build_gazebo_ros_packages
-  build_spinnaker
 
   for i in ExperimentControl BrainSimulation VirtualCoach CLE ExDBackend
   do
@@ -385,6 +368,20 @@ function nrp_build {
     cd $HBP/$i || { echo ERROR; exit 1; }
     make devinstall || { echo $i BUILD ERROR; exit 1; }
   done
+
+  echo
+  echo -------------------------
+  echo "Fixing Issue with PyNN 0.9.4"
+  echo -------------------------
+  sleep 2
+  # As of 2019-12-21 spynnaker doesn't work with PyNN 0.9.5
+  # There is a bug in PyNN 0.9.4, which is fixed with the following patch.
+  # This Bugfix is needed to run cerebellum.
+  # Remove this Bugfix after upgrading to PyNN 0.9.5
+  sed -i "792s/label=self.id)/label=str(self.id))/" $NRP_VIRTUAL_ENV/lib/python2.7/site-packages/pyNN/serialization/sonata.py
+  sed -i "792s/label=self.id)/label=str(self.id))/" $NRP_VIRTUAL_ENV/local/lib/python2.7/site-packages/pyNN/serialization/sonata.py
+  rm $NRP_VIRTUAL_ENV/lib/python2.7/site-packages/pyNN/serialization/sonata.pyc
+  rm $NRP_VIRTUAL_ENV/local/lib/python2.7/site-packages/pyNN/serialization/sonata.pyc
 
   # Only perform this step for Ubuntu16
   if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
