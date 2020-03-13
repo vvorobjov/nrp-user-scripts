@@ -15,7 +15,8 @@
       "v1": "https://services.humanbrainproject.eu/storage/v1/api"
     },
     "proxy": {
-      "url": "http://localhost:9000/proxy"
+      "url": "http://localhost:9000/proxy",
+      "productionUrl": "http://148.187.97.48/proxy" 
     },
     "kg": {
       "url": "https://nexus-int.humanbrainproject.org/v0/data/sp10",
