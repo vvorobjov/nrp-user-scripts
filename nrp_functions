@@ -69,7 +69,7 @@ function build_nest {
   echo -------------------------
   echo
   sleep 2
-  cd $HBP/nest-simulator || { echo ERROR: $HBP/nest-simulator NOT FOUND; exit 1; }
+  cd $HBP/nest-simulator || { echo ERROR: $HBP/nest-simulator NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   ( # use a subshell to avoid "nested" virtualenv issues
     virtualenv build_venv || { echo ERROR; exit 1; }
     source build_venv/bin/activate
@@ -155,7 +155,7 @@ function build_gazebo {
   if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
     cmake_args="-DENABLE_TESTS_COMPILATION:BOOL=False"
   fi
-  cd $HBP/gazebo || { echo ERROR: $HBP/gazebo NOT FOUND; exit 1; }
+  cd $HBP/gazebo || { echo ERROR: $HBP/gazebo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   mkdir -p build
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo gazebo; print_build_error_message gazebo; exit 1; }
@@ -169,7 +169,7 @@ function build_gazebo_ros_packages {
   echo GazeboRosPackages
   echo -------------------------
   sleep 2
-  cd $HBP/GazeboRosPackages || { echo ERROR: $HBP/GazeboRosPackages NOT FOUND; exit 1; }
+  cd $HBP/GazeboRosPackages || { echo ERROR: $HBP/GazeboRosPackages NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   rm -rf build devel
   catkin_make || { echo GAZEBO_ROSPACKAGES BUILD ERROR; exit 1; }
   cd $HBP
@@ -181,7 +181,7 @@ function build_gzweb {
   echo gzweb
   echo -------------------------
   sleep 2
-  cd $HBP/gzweb || { echo ERROR: $HBP/gzweb NOT FOUND ; exit 1; }
+  cd $HBP/gzweb || { echo ERROR: $HBP/gzweb NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   ./deploy-gzbridge-nrp.sh || { echo GZBRIDGE BUILD ERROR; exit 1; }
   # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
   # For more information see: https://github.com/zurb/foundation-sites/issues/10826
@@ -192,6 +192,18 @@ function build_gzweb {
   npm dedupe || { echo  GZ3D INSTALL ERROR; exit 1; }
   git checkout -- package.json
   npm install --no-save || { echo GZ3D INSTALL ERROR; exit 1; }
+}
+
+function build_frontend_state_machine_editor {
+  echo
+  echo -------------------------
+  echo frontendStateMachineEditor
+  echo -------------------------
+  sleep 2
+  cd $HBP/frontendStateMachineEditor || { echo ERROR: $HBP/frontendStateMachineEditor NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  git checkout -- package.json || { echo frontendStateMachineEditor CHECKOUT ERROR; exit 1; }
+  npm install --no-save || { echo frontendStateMachineEditor INSTALL ERROR; exit 1; }
+  npm run-script build || { echo frontendStateMachineEditor BUILD ERROR; exit 1; }
 }
 
 function nest_version_switch {
@@ -241,7 +253,7 @@ function nrp_rebase {
     echo $i
     echo -------------------------
     sleep 2
-    cd $i || { echo ERROR; exit 1; }
+    cd $i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
 
     # if users (u16 or u18) dont have the master18 branch, get it
     if [ "$NRP_INSTALL_MODE" == "user" ]; then
@@ -322,7 +334,7 @@ function process_models {
   if [ ! -d "$HOME/.gazebo/models" ]; then
    mkdir -p $HOME/.gazebo/models || { echo ERROR; exit 1;}
   fi
-  cd $HBP/Models || { echo ERROR; exit 1; }
+  cd $HBP/Models || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   ./create-symlinks.sh || { echo ERROR; exit 1; }
 }
 
@@ -342,7 +354,7 @@ function nrp_build {
       echo $i
       echo -------------------------
       sleep 2
-      cd $HBP/$i || { echo ERROR: $HBP/$i NOT FOUND ; exit 1; }
+      cd $HBP/$i || { echo ERROR: $HBP/$i NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
       mkdir -p build
       cd build
       cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo $i: CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
@@ -365,7 +377,7 @@ function nrp_build {
     echo $i
     echo -------------------------
     sleep 2
-    cd $HBP/$i || { echo ERROR; exit 1; }
+    cd $HBP/$i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
     make devinstall || { echo $i BUILD ERROR; exit 1; }
   done
 
@@ -395,7 +407,7 @@ function nrp_build {
     echo $i
     echo -----------------------
     sleep 2
-    cd $HBP/$i || { echo ERROR; exit 1; }
+    cd $HBP/$i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
 
     # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
     # For more information see: https://github.com/zurb/foundation-sites/issues/10826
@@ -408,6 +420,7 @@ function nrp_build {
   done
 
   build_gzweb
+  build_frontend_state_machine_editor
   process_models
   install_template_experiments_requirements
 }
@@ -534,7 +547,7 @@ function set_up_tingoDB {
   if [ ! -d "$STORAGE_PATH" ]; then
    mkdir -p $STORAGE_PATH || { echo ERROR; exit 1;}
   fi
-  cd $HBP/nrpBackendProxy || { echo ERROR; exit 1; }
+  cd $HBP/nrpBackendProxy || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   node_modules/ts-node/dist/bin.js $HBP/nrpBackendProxy/utils/createFSUser.ts --user nrpuser --password password || { echo ERROR; exit 1; }
 }
 

@@ -18,6 +18,7 @@ nrp_js=(
     nrpBackendProxy
     brainvisualizer
     ExDFrontend
+    frontendStateMachineEditor
 )
 nrp_repos=(
     ${nrp_python[*]}
