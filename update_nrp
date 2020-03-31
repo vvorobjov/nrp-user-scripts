@@ -73,7 +73,20 @@ case "$command" in
   ;;
 "update")
   nrp_rebase $all $branch
+  echo
+  echo "-------------------------------------------------------------------------------------"
+  echo "Running a first pass of nrp_configure. Just let run and don't answer questions so far"
+  echo "-------------------------------------------------------------------------------------"
+  echo
+  sleep 3
+  nrp_configure
   nrp_build $all ${spiking_cerebellum_option}
+  echo
+  echo "----------------------------"
+  echo "Second pass of nrp_configure"
+  echo "----------------------------"
+  echo
+  sleep 2
   nrp_configure
   ;;
 "itmaster")
