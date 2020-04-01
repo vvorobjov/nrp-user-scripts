@@ -23,8 +23,8 @@ printf "\033[1;33mWould you like to NOT backup your local versions? (this also p
 read -t 5 p
 if [ "$p" == "y" -o "$p" == "Y" ]; then NOBACKUP=1;fi
 
-$HOME/.local/etc/init.d/nginx stop
-rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
+if [ -f $HOME/.local/etc/init.d/nginx ]; then $HOME/.local/etc/init.d/nginx stop; fi
+rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d/nginx $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
 if [ $NOBACKUP ]; then rm -f $HBP/ExDFrontend/app/config.json.bak*; else backup $HBP/ExDFrontend/app/config.json; fi
 rm -f $HBP/ExDFrontend/app/config.json.local
 if [ $NOBACKUP ]; then rm -f $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.bak*; else backup $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini; fi
