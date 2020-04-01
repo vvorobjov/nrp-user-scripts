@@ -7,7 +7,7 @@ Author: mgevaert
 Author-email: michael.gevaert@epfl.ch
 License: UNKNOWN
 Platform: UNKNOWN
-Requires-Dist: PyYAML (==3.10)
+Requires-Dist: PyYAML (==3.11)
 
 UNKNOWN
 
