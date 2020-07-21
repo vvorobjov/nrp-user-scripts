@@ -20,15 +20,7 @@ export PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.majo
 export PYTHON_VERSION_MAJOR_MINOR=$(python -c "import sys; print('{}.{}'.format(sys.version_info.major, sys.version_info.minor))")
 
 # ROS variables
-if [ "$PYTHON_VERSION_MAJOR" -ge 3 ]
-then
-  source $HOME/ros_catkin_ws/install/setup.bash # TODO let the user specify ros_catkin_ws
-elif $(lsb_release -r | grep 16 >>/dev/null)
-  then
-    source /opt/ros/kinetic/setup.$CURR_SHELL
-  else
-    source /opt/ros/melodic/setup.$CURR_SHELL
-fi
+source /opt/ros/noetic/setup.$CURR_SHELL
 
 export ROS_PARALLEL_JOBS=-j4
 export ROS_IP=127.0.0.1
