@@ -30,7 +30,7 @@ fi
 if [ -z "$NRP_NUM_MAKE_PROCESSES" ]; then
 printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ---------------------------+\n"
 printf "| Dear Neurorobotics user, your NRP_NUM_MAKE_PROCESSES is not defined.                |\n"
-printf "| This could mean you forgot to source the nrp_variables script before sourcing %s.   |\n", "$0"
+printf "| This could mean you forgot to source the nrp_variables script before sourcing %s.   |\n" "$0"
 printf "| NRP_NUM_MAKE_PROCESSES will be set to the number of cores of your CPU by default.   |\n"
 printf "+-------------------------------------------------------------------------------------+\033[0m\n"
 NRP_NUM_MAKE_PROCESSES=$(nproc)
@@ -39,19 +39,18 @@ fi
 
 ubuntu_version=$(lsb_release -rs)
 
-if ! echo "$ubuntu_version" | grep 20 >> /dev/null; then
-printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ----------------------------+\n"
-printf "| Dear Neurorobotics user, you are currently on Ubuntu 16 or older                     |\n"
-printf "| We recommend that you upgrade your ubuntu version to 18 which is fully supported in  |\n"
-printf "| the NRP.                                                                             |\n"
+if [[ ${ubuntu_version::2} -lt 20 ]]; then
+printf "\033[1;31m+-------------------------- Neurorobotics Platform warning --------------------+\n"
+printf "| Dear Neurorobotics user, you are currently on an Ubuntu version older than 20.04 .    |\n"
+printf "| The recommended Ubuntu version is 18.04 for python 2.7 and 20.04 for python 3.        |\n"
 printf "+--------------------------------------------------------------------------------------+\033[0m\n"
 printf "Hit Enter to continue\n"
 read -r
 fi
 
 function print_build_error_message {
-printf "\033[1;31m+-------------------------- %s build FAILED -------------------------------------+\n", "$1"
-printf "| If you are upgrading from Ubuntu 16 to 18, try removing the %s/build folder      |\n", "$1"
+printf "\033[1;31m+-------------------------- %s build FAILED -------------------------------------+\n" "$1"
+printf "| If you are upgrading from and older Ubuntu version, try removing the %s/build folder      |\n" "$1"
 printf "| and relaunch this script.                                                            |\n"
 printf "+-------------------------------------------------------------------------------------+\033[0m\n"
 }
@@ -84,7 +83,7 @@ function waitforall {
     replacelist=$(echo "$finished" | sed 's/^.*'"$touchbase"'\(.*\)/\1/' | xargs)
     if [ -n "$replacelist" ]
     then
-      printf "Still %s: %s\n", "$1", "$replacelist"
+      printf "Still %s: %s\n" "$1" "$replacelist"
     fi
   done
 }
