@@ -39,7 +39,7 @@ fi
 
 ubuntu_version=$(lsb_release -rs)
 
-if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
+if ! echo "$ubuntu_version" | grep 20 >> /dev/null; then
 printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ----------------------------+\n"
 printf "| Dear Neurorobotics user, you are currently on Ubuntu 16 or older                     |\n"
 printf "| We recommend that you upgrade your ubuntu version to 18 which is fully supported in  |\n"
@@ -441,7 +441,7 @@ function nrp_build {
   # rm {"$VENV_LIB","$VENV_LOCAL_LIB"}/site-packages/pyNN/serialization/sonata.pyc
 
   # Only perform this step for Ubuntu16
-  # if ! echo "$ubuntu_version" | grep 18 >> /dev/null; then
+  # if ! echo "$ubuntu_version" | grep 20 >> /dev/null; then
   #   ubuntu_fix_cv2
   # fi
 

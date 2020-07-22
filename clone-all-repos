@@ -41,7 +41,7 @@ function clone_repo {
     then
       git clone -b master --depth 1 https://bitbucket.org/hbpneurorobotics/$1.git $1
       pushd $1;git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*";git pull
-      if echo "$ubuntu_version" | grep 18 >> /dev/null; then
+      if echo "$ubuntu_version" | grep 20 >> /dev/null; then
         git checkout master18
       fi
       popd

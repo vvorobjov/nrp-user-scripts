@@ -8,7 +8,7 @@ if [ -z $GZBRIDGE_BIN_DIR ]; then
 fi
 
 source $HOME/.bashrc
-if echo "$ubuntu_version" | grep 18 >> /dev/null; then
+if echo "$ubuntu_version" | grep 20 >> /dev/null; then
     exec="$GZBRIDGE_BIN_DIR/server.js"
 else
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
