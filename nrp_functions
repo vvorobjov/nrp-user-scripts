@@ -101,7 +101,7 @@ function build_nest {
   ( # use a subshell to avoid "nested" virtualenv issues
 	$VIRTUALENV_CMD build_venv || { echo ERROR; exit 1; }
     source build_venv/bin/activate
-    $PIP_CMD install Cython==0.26.1 mpi4py==2.0.0 || { echo ERROR; exit 1; }
+    $PIP_CMD install Cython==0.29.14 mpi4py==3.0.3 || { echo ERROR; exit 1; }
     xargs rm -rf < "$HBP"/user-scripts/nest-delete-filelist.txt || { echo ERROR; exit 1; }
     # shellcheck disable=SC2086
     if [ ! -d "$HBP"/nest-simulator/build ]; then
