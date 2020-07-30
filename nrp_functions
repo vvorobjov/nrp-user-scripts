@@ -192,6 +192,23 @@ function build_gazebo {
   make install || { echo GAZEBO INSTALL ERROR; exit 1; }
 }
 
+function build_gazebo_dependencies {
+  for i in simbody opensim sdformat
+    do
+      echo
+      echo -------------------------
+      echo $i
+      echo -------------------------
+      sleep 2
+      cd "$HBP"/$i || { echo ERROR: "$HBP"/$i NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+      mkdir -p build
+      cd build
+      cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo $i: CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
+      make -j"$NRP_NUM_MAKE_PROCESSES" || { echo $i; print_build_error_message $i; exit 1; }
+      make install || { echo $i: INSTALL ERROR; exit 1; }
+    done
+}
+
 function build_gazebo_ros_packages {
   echo
   echo -------------------------
@@ -363,21 +380,7 @@ function nrp_build {
   echo Building
   echo =========================
   if [ "$build_all" = "all" ]; then
-    for i in simbody opensim sdformat
-    do
-      echo
-      echo -------------------------
-      echo $i
-      echo -------------------------
-      sleep 2
-      cd "$HBP"/$i || { echo ERROR: "$HBP"/$i NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-      mkdir -p build
-      cd build
-      cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo $i: CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
-      make -j"$NRP_NUM_MAKE_PROCESSES" || { echo $i; print_build_error_message $i; exit 1; }
-      make install || { echo $i: INSTALL ERROR; exit 1; }
-    done
-
+    build_gazebo_dependencies
     build_gazebo
     clean_old_mvapich2_installation
     build_mpich
