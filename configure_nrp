@@ -89,10 +89,6 @@ cp $HBP/user-scripts/config_files/nginx/uwsgi-nrp.ini $HOME/.local/etc/nginx/uws
 
 echo "Copying VirtualCoach config.json file"
 cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
-if [ "$NRP_INSTALL_MODE" == "user" ]; then
-  echo "Copying VirtualCoach bbpclient"
-  cp -af $HBP/user-scripts/config_files/platform_venv/* $VIRTUAL_ENV/lib/python3.8/site-packages/
-fi
 
 echo "Generating schema parsers for ExDBackend"
 if [[ -d  "${NRP_VIRTUAL_ENV}" ]]; then
