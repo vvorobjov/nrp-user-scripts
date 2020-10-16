@@ -3,12 +3,6 @@
         "user": "https://services.humanbrainproject.eu/idm/v1/api/user"
     },
 
-    "proxy": {
-        "staging": "http://148.187.97.48/proxy",
-        "dev": "http://148.187.96.224/proxy",
-        "local": "http://localhost:9000/proxy"
-    },
-
     "proxy-services": {
         "experiment-list": "experiments",
         "available-servers": "availableServers",
@@ -20,13 +14,16 @@
         "storage-experiment-list": "storage/experiments",
         "csv-files": "experiment/%s/csvfiles",
         "experiment-file": "storage/%s/%s",
-        "save-data": "experiment"
+        "save-data": "experiment",
+        "rosbridge": "rosbridge"
     },
+
     "proxy-save": {
         "transfer-function": "transferFunctions",
         "state-machine": "stateMachines",
         "brain": "brain"
      },
+
     "simulation-services": {
         "create": "simulation",
         "state": "state",
