@@ -1,5 +1,5 @@
 #!/bin/bash
-# A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE, VirtualCoach
+# A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE
 
 source "$HBP"/user-scripts/repos.txt
 
@@ -86,9 +86,6 @@ sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/frontend.conf
 
 echo "Copying uwsgi config file"
 cp $HBP/user-scripts/config_files/nginx/uwsgi-nrp.ini $HOME/.local/etc/nginx/uwsgi-nrp.ini
-
-echo "Copying VirtualCoach config.json file"
-cp $HBP/user-scripts/config_files/VirtualCoach/config.json $HBP/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json
 
 echo "Generating schema parsers for ExDBackend"
 if [[ -d  "${NRP_VIRTUAL_ENV}" ]]; then

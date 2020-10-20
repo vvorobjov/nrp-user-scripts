@@ -33,5 +33,4 @@ if [ $NOBACKUP ]; then rm -f "$HBP"/nrpBackendProxy/config.json.bak*; else backu
 rm -f "$HBP"/nrpBackendProxy/config.json.sample.local
 if [ $NOBACKUP ]; then rm -f "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.bak*; else backup "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json; fi
 rm -f "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample
-if [ $NOBACKUP ]; then rm -f "$HBP"/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json.bak*; else backup "$HBP"/VirtualCoach/hbp_nrp_virtual_coach/hbp_nrp_virtual_coach/config.json; fi
 echo "DONE"

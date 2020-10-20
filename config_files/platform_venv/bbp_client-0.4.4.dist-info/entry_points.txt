@@ -1,3 +1,0 @@
-[console_scripts]
-doc_import = bbp_client.document_service.utils.doc_import:main
-
