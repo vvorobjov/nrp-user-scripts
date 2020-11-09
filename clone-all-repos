@@ -40,13 +40,12 @@ function clone_repo {
     if [ "$NRP_INSTALL_MODE" == "user" ]
     then
       git clone -b master --depth 1 https://bitbucket.org/hbpneurorobotics/$1.git $1
-      pushd $1;git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*";git pull
-      if echo "$ubuntu_version" | grep 20 >> /dev/null; then
-        git checkout master18
-      fi
-      popd
     else
       git clone $user@bitbucket.org:hbpneurorobotics/$1.git $1
+      # TODO: remove after merging
+      cd $1
+      git checkout dev_nrp4
+      cd ..
     fi
   fi
   echo
@@ -87,7 +86,8 @@ daint)
 repos=(
   ${nrp_3rd_party[*]}
   ${nrp_repos[*]}
-)
+  admin-scripts
+) # TODO: remove after merging
   ;;
 esac
 
