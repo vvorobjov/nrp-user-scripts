@@ -60,7 +60,7 @@ if echo "$ubuntu_version" | grep 20 >> /dev/null; then
   cp /usr/lib/nginx/modules/ndk_http_module.so $HOME/.local/etc/nginx/modules
   cp /usr/lib/nginx/modules/ngx_http_lua_module.so $HOME/.local/etc/nginx/modules
 fi
-sed -e 's/ \/etc\// \/home\/'"$USER"'\/.local\/etc\//' -i /home/$USER/.local/etc/init.d/nginx
+sed -e 's: \/etc\/: '"$HOME"'\/.local\/etc\/:' -i $HOME/.local/etc/init.d/nginx
 echo 'DAEMON_OPTS="-c $HOME/.local/etc/nginx/nginx.conf -p $HOME/.local/etc/nginx"' >  $HOME/.local/etc/default/nginx
 
 if echo "$ubuntu_version" | grep 20 >> /dev/null; then
