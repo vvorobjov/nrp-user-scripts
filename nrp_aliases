@@ -16,6 +16,7 @@ alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
 alias cle-nginx='$HOME/.local/etc/init.d/nginx restart'
 alias cle-proxy='cd $HBP/nrpBackendProxy && npm start'
 alias cle-rosvideo='rosrun web_video_server web_video_server _port:=8081'
+alias cle-use-sim-time='rosparam set use_sim_time true'
 
 cle-virtual-coach()
 {
@@ -33,11 +34,11 @@ cle-virtual-coach()
 
     # user specified Python script, convenience to avoid the extra 'python' in arguments
     elif [[ "$1" == *\.py ]] ; then
-        python $@
+        python "$@"
 
     # otherwise just run whatever command as provided
     else
-        eval $@      # run any user commands with the modified PYTHONPATH
+        eval "$@"      # run any user commands with the modified PYTHONPATH
     fi
 
     # save the exit code for last executed command
@@ -52,7 +53,7 @@ cle-virtual-coach()
 
 cle_restart_backend()
 {
-  killlist=("python.*roscore"
+  kill_list=("python.*roscore"
             "python\\s.*rosmaster"
             "python\\s.*rosbridge"
             "lib/rosout/rosout"
@@ -66,7 +67,7 @@ cle_restart_backend()
             "web_video_server"
             "uwsgi")
 
-  kill_hbp_processes "${killlist[@]}"
+  kill_hbp_processes "${kill_list[@]}"
 
   roscore & sleep 1
   cle-rosvideo & sleep 1
@@ -77,7 +78,7 @@ cle_restart_backend()
 
 kill_hbp_cle()
 {
-  killlist=("python.*roscore"
+  kill_list=("python.*roscore"
             "python\\s.*rosmaster"
             "python\\s.*rosbridge"
             "lib/rosout/rosout"
@@ -92,7 +93,7 @@ kill_hbp_cle()
             "web_video_server"
             "uwsgi")
 
-  kill_hbp_processes "${killlist[@]}"
+  kill_hbp_processes "${kill_list[@]}"
 }
 
 kill_single_hbp_process()
@@ -109,13 +110,13 @@ kill_single_hbp_process()
 
 kill_hbp_processes()
 {
-    declare -a killlist=("${@}")
+    declare -a kill_list=("${@}")
 
     # find the unique process groups for any matches, this will ensure all
     # spawned subprocesses are also cleanly killed
     # tip: use http:/explainshell.com to understand the entire command expansion
     pgids=($(ps -eo pgid,cmd |
-             grep -E "$(IFS=$'|'; echo "${killlist[*]}")" |
+             grep -E "$(IFS=$'|'; echo "${kill_list[*]}")" |
              grep -v grep |
              sed -e 's/^\s*//' |
              cut -d ' ' -f1 |
@@ -135,18 +136,18 @@ kill_hbp_processes()
     wait
 
     # force clean NRP gzserver and gzbridge lock files (required for next clean start/launch)
-    rm -f $HOME/.gazebo/gzserver.lock
-    rm -f $HBP/gzweb/gzbridge.lock
+    rm -f "$HOME"/.gazebo/gzserver.lock
+    rm -f "$HBP"/gzweb/gzbridge.lock
 
     # double check everything is killed, this is mostly to ensure a cle-kill
     # during a startup or process spawning is as successful as we can make it
     if [[ ${#pgids[@]} -gt 0 ]]
     then
-        kill_hbp_processes "${killlist[@]}"
+        kill_hbp_processes "${kill_list[@]}"
     fi
 }
 
-alias cle-start='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-rosvideo & sleep 1;cle-factory & sleep 1;cle-backend & sleep 1; cle-proxy & cle-rosbridge'
-alias cle-debug='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-rosvideo & sleep 1;cle-factory-debug & sleep 1;cle-backend-debug & sleep 1; cle-proxy & cle-rosbridge'
+alias cle-start='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-use-sim-time & sleep 1; cle-rosvideo & sleep 1;cle-factory & sleep 1;cle-backend & sleep 1; cle-proxy & cle-rosbridge'
+alias cle-debug='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-use-sim-time & sleep 1; cle-rosvideo & sleep 1;cle-factory-debug & sleep 1;cle-backend-debug & sleep 1; cle-proxy & cle-rosbridge'
 alias cle-kill='kill_hbp_cle'
 alias cle-postgres='pg_ctl -D $HOME/.local/postgres/data/ -l logfile restart'
