@@ -76,8 +76,8 @@ export PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/hbp_nrp_virtual_coach
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_distributed_nest
 
 # retina
-export RETINA_INSTALL_DIR=$HBP/retina
-export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
+# export RETINA_INSTALL_DIR=$HBP/retina
+# export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
 
 # HBP NEST. will conflict with the virtual environment when preceding $VIRTUAL_ENV/lib/python*/site-packages
 export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages:$HOME/.local/lib/x86_64-linux-gnu/python$PYTHON_VERSION_MAJOR_MINOR/site-packages

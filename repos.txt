@@ -31,5 +31,5 @@ nrp_3rd_party=(
     opensim
     gazebo
     nest-simulator
-    retina
+    # retina
 )
