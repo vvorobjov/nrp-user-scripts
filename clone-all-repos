@@ -1,7 +1,6 @@
 #!/bin/bash
 # A script to clone all necessary repos when installing from scratch. the $HBP need to be set-up for this script to work successfully
 
-ubuntu_version=`lsb_release -rs`
 if [[ -z $HBP ]] ; then
   echo "Please set the \$HBP variable to your desired installation path first."
   exit

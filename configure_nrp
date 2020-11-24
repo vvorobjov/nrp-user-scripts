@@ -3,7 +3,6 @@
 
 source "$HBP"/user-scripts/repos.txt
 
-ubuntu_version=`lsb_release -rs`
 $HBP/user-scripts/purge
 export GROUPNAME=`/usr/bin/id -gn`
 mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.local/etc/nginx/conf.d $HOME/.opt/bbp
@@ -51,32 +50,22 @@ echo "Copying Nginx config files"
 
 cp -r /etc/nginx/* $HOME/.local/etc/nginx/
 cp /etc/init.d/nginx $HOME/.local/etc/init.d/nginx
-if echo "$ubuntu_version" | grep 20 >> /dev/null; then
-  # as of nginx 2.9 in order to use lua related commands we have to dynamically load 
-  # the following two modules, which are found in /usr/lib/nginx/modules
-  # since we are running everything in $HOME/.local the libraries have to be copied manually
-  # to $HOME/.local/etc/nginx/modules
-  mkdir $HOME/.local/etc/nginx/modules
-  cp /usr/lib/nginx/modules/ndk_http_module.so $HOME/.local/etc/nginx/modules
-  cp /usr/lib/nginx/modules/ngx_http_lua_module.so $HOME/.local/etc/nginx/modules
-fi
+
+# as of nginx 2.9 in order to use lua related commands we have to dynamically load 
+# the following two modules, which are found in /usr/lib/nginx/modules
+# since we are running everything in $HOME/.local the libraries have to be copied manually
+# to $HOME/.local/etc/nginx/modules
+mkdir $HOME/.local/etc/nginx/modules
+cp /usr/lib/nginx/modules/ndk_http_module.so $HOME/.local/etc/nginx/modules
+cp /usr/lib/nginx/modules/ngx_http_lua_module.so $HOME/.local/etc/nginx/modules
+
 sed -e 's: \/etc\/: '"$HOME"'\/.local\/etc\/:' -i $HOME/.local/etc/init.d/nginx
 echo 'DAEMON_OPTS="-c $HOME/.local/etc/nginx/nginx.conf -p $HOME/.local/etc/nginx"' >  $HOME/.local/etc/default/nginx
 
-if echo "$ubuntu_version" | grep 20 >> /dev/null; then
-  cp $HBP/user-scripts/config_files/nginx/nginx.conf $HOME/.local/etc/nginx/nginx.conf
-  sed -e 's/<username>/'"$USER"'/g' -i $HOME/.local/etc/nginx/nginx.conf
-  sed -e 's/<groupname>/'"$GROUPNAME"'/g' -i $HOME/.local/etc/nginx/nginx.conf
-
-  cp $HBP/user-scripts/config_files/nginx/conf.d/* $HOME/.local/etc/nginx/conf.d
-else
-  cp $HBP/user-scripts/config_files/nginxUbuntu16/nginx.conf $HOME/.local/etc/nginx/nginx.conf
-  sed -e 's/<username>/'"$USER"'/g' -i $HOME/.local/etc/nginx/nginx.conf
-  sed -e 's/<groupname>/'"$GROUPNAME"'/g' -i $HOME/.local/etc/nginx/nginx.conf
-  
-  cp $HBP/user-scripts/config_files/nginxUbuntu16/conf.d/* $HOME/.local/etc/nginx/conf.d
-fi
-
+cp $HBP/user-scripts/config_files/nginx/nginx.conf $HOME/.local/etc/nginx/nginx.conf
+sed -e 's/<username>/'"$USER"'/g' -i $HOME/.local/etc/nginx/nginx.conf
+sed -e 's/<groupname>/'"$GROUPNAME"'/g' -i $HOME/.local/etc/nginx/nginx.conf
+cp $HBP/user-scripts/config_files/nginx/conf.d/* $HOME/.local/etc/nginx/conf.d
 
 sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
 sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf

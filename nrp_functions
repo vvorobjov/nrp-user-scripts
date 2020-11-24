@@ -37,24 +37,6 @@ NRP_NUM_MAKE_PROCESSES=$(nproc)
 export NRP_NUM_MAKE_PROCESSES
 fi
 
-ubuntu_version=$(lsb_release -rs)
-
-if [[ ${ubuntu_version::2} -lt 20 ]]; then
-printf "\033[1;31m+-------------------------- Neurorobotics Platform warning --------------------+\n"
-printf "| Dear Neurorobotics user, you are currently on an Ubuntu version older than 20.04 .    |\n"
-printf "| The recommended Ubuntu version is 18.04 for python 2.7 and 20.04 for python 3.        |\n"
-printf "+--------------------------------------------------------------------------------------+\033[0m\n"
-printf "Hit Enter to continue\n"
-read -r
-fi
-
-function print_build_error_message {
-printf "\033[1;31m+-------------------------- %s build FAILED -------------------------------------+\n" "$1"
-printf "| If you are upgrading from and older Ubuntu version, try removing the %s/build folder      |\n" "$1"
-printf "| and relaunch this script.                                                            |\n"
-printf "+-------------------------------------------------------------------------------------+\033[0m\n"
-}
-
 function checkssh {
     echo "Checking $1"
     touch "$touchfilebase""$1"
@@ -108,9 +90,8 @@ function build_nest {
     fi
     cd "$HBP"/nest-simulator/build || { echo ERROR: "$HBP"/nest-simulator/build NOT FOUND; exit 1;}
     cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=${HOME}/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-python=${PYTHON_VERSION_MAJOR}"
-
-    cmake $cmake_args .. || { echo CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
-    make -j"$NRP_NUM_MAKE_PROCESSES" || { echo nest-simulator; print_build_error_message nest-simulator; exit 1; }
+    cmake $cmake_args .. || { echo CMAKE ERROR;  exit 1; }
+    make -j$NRP_NUM_MAKE_PROCESSES || { echo nest-simulator; exit 1; }
     make install || { echo NEST: INSTALL ERROR; exit 1; }
 
     # Optional: install UGR's Cerebellum model plugin
@@ -125,8 +106,8 @@ function build_nest {
       cd ../../../../build/ || { echo ERROR; exit 1; }
       cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local \
           -Dwith-gsl=ON -Dwith-mpi=ON -Dexternal-modules=cerebellum \
-          .. || { echo CMAKE spiking-cerebellum; print_build_error_message nest-simulator; exit 1; }
-      make -j$NRP_NUM_MAKE_PROCESSES || { echo spiking-cerebellum; print_build_error_message nest-simulator; exit 1; }
+          .. || { echo CMAKE spiking-cerebellum; exit 1; }
+      make -j$NRP_NUM_MAKE_PROCESSES || { echo spiking-cerebellum; exit 1; }
       make install || { echo NEST-SPIKING-CEREBELLUM: INSTALL ERROR; exit 1; }
     fi
 
@@ -171,7 +152,7 @@ function build_mpich {
   fi
   cd mpich-3.1.4 || { echo ERROR accessing mpich-3.1.4 directory; exit 1; }
   ./configure --enable-fast=all,O3 --prefix=$HOME/.local || { echo ERROR configuring mpich build; exit 1; }
-  make -j"$NRP_NUM_MAKE_PROCESSES" || { echo mpich; print_build_error_message mpich; exit 1; }
+  make -j$NRP_NUM_MAKE_PROCESSES || { echo mpich; exit 1; }
   make install || { echo ERROR installing mpich in $HOME/.local; exit 1; }
 }
 
@@ -181,14 +162,12 @@ function build_gazebo {
   echo Gazebo
   echo -------------------------
   sleep 2
-  if ! echo "$ubuntu_version" | grep 20 >> /dev/null; then
-    cmake_args="-DENABLE_TESTS_COMPILATION:BOOL=False"
-  fi
-  cd "$HBP"/gazebo || { echo ERROR: "$HBP"/gazebo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+
+  cd $HBP/gazebo || { echo ERROR: $HBP/gazebo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
   mkdir -p build
   cd build
-  cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo gazebo; print_build_error_message gazebo; exit 1; }
-  make -j"$NRP_NUM_MAKE_PROCESSES" || { echo gazebo; print_build_error_message gazebo; exit 1; }
+  cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo gazebo; exit 1; }
+  make -j$NRP_NUM_MAKE_PROCESSES || { echo gazebo; exit 1; }
   make install || { echo GAZEBO INSTALL ERROR; exit 1; }
 }
 
@@ -203,8 +182,8 @@ function build_gazebo_dependencies {
       cd "$HBP"/$i || { echo ERROR: "$HBP"/$i NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
       mkdir -p build
       cd build
-      cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo $i: CMAKE ERROR; print_build_error_message nest-simulator; exit 1; }
-      make -j"$NRP_NUM_MAKE_PROCESSES" || { echo $i; print_build_error_message $i; exit 1; }
+      cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo $i: CMAKE ERROR; exit 1; }
+      make -j"$NRP_NUM_MAKE_PROCESSES" || { echo $i; exit 1; }
       make install || { echo $i: INSTALL ERROR; exit 1; }
     done
 }
@@ -254,27 +233,9 @@ function build_frontend_state_machine_editor {
   npm run-script build || { echo frontendStateMachineEditor BUILD ERROR; exit 1; }
 }
 
-function nest_version_switch {
-  source $HBP/nest-simulator/hbp/version
-  if [[ "$BUILD_VERSION" =~ ^2\.10.*hbp.* ]]
-  then
-    echo
-    echo =========================
-    echo Cleaning up Nest 2.10
-    echo =========================
-    cd "$HBP"/nest-simulator || { echo ERROR; exit 1; }
-    make clean >/dev/null 2>&1
-    make distclean >/dev/null 2>&1
-    rm -rf build_venv
-  fi
-  sleep 2
-}
-
 function nrp_rebase {
   rebase_all=$1
   rebase_branch=$2
-
-  if [ "$rebase_all" == "all" ];then nest_version_switch;fi
 
   cd "$HBP" || { echo ERROR; exit 1; }
   source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
@@ -303,18 +264,10 @@ function nrp_rebase {
     sleep 2
     cd "$i"|| { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
 
-    # if users (u16 or u18) dont have the master18 branch, get it
-    if [ "$NRP_INSTALL_MODE" == "user" ]; then
-      if ! [ "$(git branch --list master18)" ]; then
-        git config remote.origin.fetch "+refs/heads/master*:refs/remotes/origin/master*" || { echo ERROR; exit 1; }
-        git pull || { echo ERROR; exit 1; }
-      fi
-    fi
-
     # in case there are unstaged changes we prompt the user to stash them
     if git status --short | grep -v "??" > /dev/null 2>&1
     then
-      echo >&2 "About to checkout the $branch branch, you have the following unstaged changes:"
+      echo >&2 "About to checkout the $rebase_branch branch, you have the following unstaged changes:"
       git status --short | grep -v "??" >&2
       echo "Would you like to stash your changes [y] or you would like to abort?"
       read -p "[Y/n] " -n 1 -r REPLY || { echo ERROR; exit 1; }
@@ -327,7 +280,7 @@ function nrp_rebase {
       fi
     fi
 
-    git checkout $branch && git pull --rebase || { echo ERROR; exit 1; }
+    git checkout $rebase_branch && git pull --rebase || { echo ERROR; exit 1; }
     cd ..
   done
 }
@@ -428,7 +381,7 @@ function nrp_build {
   sed -i "792s/label=self.id)/label=str(self.id))/" {"$VENV_LIB","$VENV_LOCAL_LIB"}/site-packages/pyNN/serialization/sonata.py
   rm {"$VENV_LIB","$VENV_LOCAL_LIB"}/site-packages/pyNN/serialization/sonata.pyc
 
-  # npm repos
+
   for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
   do
    echo
@@ -496,8 +449,8 @@ function clean_branches {
     echo "$i"
     echo -------------------------
     sleep 2
-    cd "$i" || { echo ERROR; exit 1; }
-    git branch | grep -v "master" | grep -v "development" | grep -v "master16" | xargs git branch -D 2>/dev/null
+    cd $i || { echo ERROR; exit 1; }
+    git branch | grep -v "master" | grep -v "development" | xargs git branch -D 2>/dev/null
     cd ..
   done
 }
@@ -543,7 +496,7 @@ function merge_dev {
 
   echo
   echo ===============================
-  echo Merging development on master18
+  echo Merging development on master
   echo ===============================
   repos=(
   ${nrp_3rd_party[*]}
@@ -560,7 +513,7 @@ function merge_dev {
     cd $i || { echo ERROR; exit 1; }
     git checkout development || { echo ERROR; exit 1; }
     git pull --rebase || { echo ERROR; exit 1; }
-    git checkout master18 || { echo ERROR; exit 1; }
+    git checkout master || { echo ERROR; exit 1; }
     git pull --rebase || { echo ERROR; exit 1; }
     git merge development || { echo ERROR; exit 1; }
     git push || { echo ERROR; exit 1; }
