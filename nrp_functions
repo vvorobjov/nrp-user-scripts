@@ -198,7 +198,7 @@ function build_gazebo_ros_packages {
   rm -rf build devel
   git submodule init
   git submodule update
-  catkin_make || { echo GAZEBO_ROSPACKAGES BUILD ERROR; exit 1; }
+  catkin build || { echo GAZEBO_ROSPACKAGES BUILD ERROR; exit 1; }
   cd "$HBP"
 }
 
