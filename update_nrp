@@ -12,12 +12,12 @@ function contains {
 function help {
   echo
   if [ "$NRP_INSTALL_MODE" != "user" ]; then
-    echo "Usage: "`basename $0`" <command> [all] [spiking-cerebellum] [master]"
+    echo "Usage: "$(basename $0)" <command> [all] [spiking-cerebellum] [master]"
     echo
     echo "  If 'master' is provided, checkout the master branch"
     echo "  If 'master' is NOT provided, checkout the development branch (default)"
   else
-    echo "Usage: "`basename $0`" <command> [all] [spiking-cerebellum]"
+    echo "Usage: "$(basename $0)" <command> [all] [spiking-cerebellum]"
     echo
   fi
   echo "  If 'all' is provided, include 3rd party repos (gazebo, opensim, nest, ...)"
@@ -48,7 +48,7 @@ if [[ $(contains "${args}" "all") == "yes" ]]; then
 else
   all="no";
 fi
-if [[ `contains "${args}" "master"` == "yes" || "$NRP_INSTALL_MODE" == "user" ]]; then
+if [[ $(contains "${args}" "master") == "yes" || "$NRP_INSTALL_MODE" == "user" ]]; then
   branch="master"
 else
   branch="development";

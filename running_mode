@@ -113,7 +113,7 @@ function ensureNoVPN {
 
 chosenIP=0
 function testIPs {
-  IFS=' ' read -ra IPs <<< `hostname -I`
+  IFS=' ' read -ra IPs <<< $(hostname -I)
   if [[ ${#IPs[@]} > 1 ]]; then
     count=0
     echo "more than one possible IP:"
