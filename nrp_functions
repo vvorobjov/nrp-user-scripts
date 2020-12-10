@@ -14,18 +14,14 @@ if [ -z ${PYTHON_VERSION_MAJOR_MINOR+x} ]; then
 fi
 
 if [[ $PYTHON_VERSION_MAJOR -lt 3 ]]; then
+  PYTHON_PATHNAME="python3"
   VIRTUALENV_CMD="virtualenv"
 else
+  PYTHON_PATHNAME="python2.7"
   VIRTUALENV_CMD="python -m venv"
 fi
 
 PIP_CMD="python -m pip"
-
-if [[ $PYTHON_VERSION_MAJOR -lt 3 ]]; then
-	PYTHON_PATHNAME="python3"
-else
-	PYTHON_PATHNAME="python2.7"
-fi
 
 if [ -z "$NRP_NUM_MAKE_PROCESSES" ]; then
 printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ---------------------------+\n"
@@ -240,10 +236,9 @@ function nrp_rebase {
   cd "$HBP" || { echo ERROR; exit 1; }
   source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
 
-  echo
-  echo =========================
-  echo Rebasing repos
-  echo =========================
+  printf '\n=====================================\n'
+  printf 'Rebasing repos (branch %s)\n' "$rebase_branch"
+  printf '=====================================\n'
   if [ "$rebase_all" = "all" ]
   then
     repos=(
