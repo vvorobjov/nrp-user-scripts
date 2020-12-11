@@ -26,15 +26,8 @@ function help {
   echo "    help    : Print this message"
   echo "    rebase  : Switch repos to master and rebase"
   echo "    build   : Build all buildable repos (except 3rd party)"
-
-  if [ "$NRP_INSTALL_MODE" != "user" ]; then
-    echo "              Requires VPN connection"
-  fi
   echo "    update  : Run rebase followed by build"
   echo "              You will be prompted to run configure_nrp"
-  if [ "$NRP_INSTALL_MODE" != "user" ]; then
-    echo "              Requires connection to the EPFL VPN"
-  fi
   echo "    itmaster: Rebases your NRP and create a clean IT branch in each repo"
   echo "    gitclean: Removes all local branches except master and development"
 }
