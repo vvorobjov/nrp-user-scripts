@@ -1,18 +1,20 @@
 #!/bin/bash
 # A script to clone all necessary repos when installing from scratch. the $HBP need to be set-up for this script to work successfully
 
-if [[ -z $HBP ]] ; then
+install_dir="$HBP"
+
+if [[ -z "$install_dir" ]] ; then
   echo "Please set the \$HBP variable to your desired installation path first."
   exit
 else
-  if [[ -d $HBP ]] ; then
-    echo "The NRP repos will be cloned to the already-existing directory" $HBP
-  elif [[ -f $HBP ]] ; then
-    echo "Invalid destination." $HBP "is a file."
+  if [[ -d "$install_dir" ]] ; then
+    echo "The NRP repos will be cloned to the already-existing directory" "$install_dir"
+  elif [[ -f "$install_dir" ]] ; then
+    echo "Invalid destination." "$install_dir" "is a file."
     exit 1
   else
-    echo "The NRP repos will be cloned to the newly created directory" $HBP
-    mkdir -p -v $HBP
+    echo "The NRP repos will be cloned to the newly created directory" "$install_dir"
+    mkdir -p -v "$install_dir"
   fi
 fi
 
@@ -26,10 +28,7 @@ echo
 
 function clone_repo {
 
-  if [ "$#" -ne 1 ] ; then
-    echo "Invalid number of arguments to clone_repo. Aborting."
-    exit 1
-  fi
+  [ "$#" -ne 1 ] && echo "Invalid number of arguments to clone_repo. Aborting." && exit 1
 
   echo
   echo $1
@@ -82,11 +81,13 @@ repos=(
   ${nrp_3rd_party[*]}
   ${nrp_repos[*]}
   admin-scripts
-) # TODO: remove after merging
+) # TODO: remove admin-scripts after merging
   ;;
 esac
 
 echo "Cloning repos:"
-pushd $HBP > /dev/null
-for repo in ${repos[@]} ; do clone_repo $repo ; done
+pushd "$install_dir" > /dev/null
+for repo in "${repos[@]}" ; do
+  clone_repo "$repo";
+done
 popd > /dev/null
