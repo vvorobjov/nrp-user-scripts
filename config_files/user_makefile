@@ -16,7 +16,7 @@ endif
 #below the jenkins timeout
 TIMEOUT?=530
 
-PYTHON_PIP_VERSION?='pip>=19'
+PYTHON_PIP_VERSION?=pip>=19
 SETUPTOOLS_VERSION?=setuptools>=40
 DOC_REQS?=sphinx==1.1.3 sphinxcontrib-napoleon==0.2.7
 
