@@ -14,7 +14,6 @@ nrp_other=(
 )
 nrp_js=(
     gzweb
-#    SlurmClusterMonitor
     nrpBackendProxy
     brainvisualizer
     ExDFrontend

@@ -362,7 +362,7 @@ function nrp_build {
   #    deactivate
   # fi
 
-  for i in brainvisualizer ExDFrontend nrpBackendProxy SlurmClusterMonitor
+  for i in brainvisualizer ExDFrontend nrpBackendProxy
   do
    echo
    echo -----------------------
