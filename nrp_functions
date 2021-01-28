@@ -217,18 +217,6 @@ function build_gzweb {
   npm install --no-save || { echo GZ3D INSTALL ERROR; exit 1; }
 }
 
-function build_frontend_state_machine_editor {
-  echo
-  echo -------------------------
-  echo frontendStateMachineEditor
-  echo -------------------------
-  sleep 2
-  cd $HBP/frontendStateMachineEditor || { echo ERROR: $HBP/frontendStateMachineEditor NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-  git checkout -- package.json || { echo frontendStateMachineEditor CHECKOUT ERROR; exit 1; }
-  npm install --no-save || { echo frontendStateMachineEditor INSTALL ERROR; exit 1; }
-  npm run-script build || { echo frontendStateMachineEditor BUILD ERROR; exit 1; }
-}
-
 function nrp_rebase {
   rebase_all=$1
   rebase_branch=$2
@@ -386,7 +374,6 @@ function nrp_build {
   done
 
   build_gzweb
-  build_frontend_state_machine_editor
   process_models
   install_template_experiments_requirements
 }
