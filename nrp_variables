@@ -10,10 +10,34 @@ printf "| to your ~/.bashrc                                                     
 printf "+-------------------------------------------------------------------------------------+\033[0m\n"
 fi
 
+SUPPORTED_SHELLS=("sh" "bash" "zsh")
+
+# Extract shell type from process name
+
 CURR_SHELL=$(basename $(ps -p $$ --no-headers -o comm))
-if [ -z "$CURR_SHELL" ]
+
+# Check if extracted shell type matches any of supported shells
+
+SUPPORTED_SHELL=""
+for value in "${SUPPORTED_SHELLS[@]}"
+do
+    [ "$CURR_SHELL" = "$value" ] && SUPPORTED_SHELL="yes"
+done
+
+if [ -z "$SUPPORTED_SHELL" ]
 then
-      CURR_SHELL='sh'
+    # Shell type couldn't be determined from process name, use heuristics
+
+    if [ -n "$BASH" ]
+    then
+        CURR_SHELL="bash"
+    elif [ -n "$ZSH_NAME" ]
+    then
+        CURR_SHELL="zsh"
+    else
+        >&2 echo "WARNING: Unknown shell '$CURR_SHELL', falling back to 'sh' for ROS setup"
+        CURR_SHELL="sh"
+    fi
 fi
 
 export PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.major)")
