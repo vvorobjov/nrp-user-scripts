@@ -338,18 +338,6 @@ function nrp_build {
     make devinstall || { echo $i BUILD ERROR; exit 1; }
   done
 
-  # sPynnaker8 requires enum34, which is problematic in python > 3.4
-  # TODO remove as soon as sPyNNaker8 is updated
-  # if [[ ($PYTHON_VERSION_MAJOR -ge 3) && ($PYTHON_VERSION_MINOR -ge 4) ]]; then
-  #    echo
-  #    echo ---------------------------------------------------------------------
-  #    echo "Uninstalling enum34 (requirement of sPyNNaker8) from NRP_VIRTUAL_ENV"
-  #    echo ---------------------------------------------------------------------
-  #    source ${NRP_VIRTUAL_ENV}/bin/activate
-  #    $PIP_CMD uninstall -y enum34
-  #    deactivate
-  # fi
-
   for i in brainvisualizer ExDFrontend nrpBackendProxy
   do
    echo
