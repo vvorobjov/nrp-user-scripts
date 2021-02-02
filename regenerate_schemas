@@ -7,6 +7,7 @@ pyxbgen -u $HBP/Models/environment_model_configuration.xsd -m environment_conf_a
 pyxbgen -u $HBP/Models/robot_model_configuration.xsd -m robot_conf_api_gen
 deactivate
 
+mkdir -p $HBP/nrpBackendProxy/xsds  && cp $HBP/Experiments/ExDConfFile.xsd $HBP/nrpBackendProxy/xsds
 function appendLicenseHeader {
     read -r -d '' LICENSE << EndLicense
 # ---LICENSE-BEGIN - DO NOT CHANGE OR MOVE THIS HEADER
