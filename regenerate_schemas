@@ -46,9 +46,6 @@ mv bibi_api_gen.py $gen_file_path
 appendLicenseHeader exp_conf_api_gen.py
 mv exp_conf_api_gen.py $gen_file_path
 
-appendLicenseHeader _sc.py
-mv _sc.py $gen_file_path
-
 appendLicenseHeader robot_conf_api_gen.py
 mv robot_conf_api_gen.py $gen_file_path
 

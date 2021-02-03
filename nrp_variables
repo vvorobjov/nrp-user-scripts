@@ -85,7 +85,7 @@ export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python$PYTHON_VER
 export PYTHONPATH=$PYTHONPATH:$HBP/CLE/hbp_nrp_cle
 
 # HBP ExperimentControl
-export PYTHONPATH=$PYTHONPATH:$HBP/ExperimentControl/hbp_nrp_excontrol:$HBP/ExperimentControl/hbp_nrp_scxml
+export PYTHONPATH=$PYTHONPATH:$HBP/ExperimentControl/hbp_nrp_excontrol
 
 # HBP ExDBackend
 export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp_nrp_backend:$HBP/ExDBackend/hbp_nrp_cleserver:$HBP/ExDBackend/hbp_nrp_commons:$HBP/ExDBackend/hbp_nrp_watchdog

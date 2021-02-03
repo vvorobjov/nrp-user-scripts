@@ -86,7 +86,6 @@ if [[ -d  "${NRP_VIRTUAL_ENV}" ]]; then
     gen_file_path=$HBP/ExDBackend/hbp_nrp_commons/hbp_nrp_commons/generated
     mv bibi_api_gen.py $gen_file_path
     mv exp_conf_api_gen.py $gen_file_path
-    mv _sc.py $gen_file_path
     mv robot_conf_api_gen.py $gen_file_path
     mv environment_conf_api_gen.py $gen_file_path
     deactivate
