@@ -12,6 +12,7 @@
   "experimentsPath": "$HBP/Experiments",
   "servers": {
     "localhost": {
+      "internalIp": "http://localhost:8080",
       "gzweb": {
         "assets": "http://localhost:8080/assets",
         "nrp-services": "http://localhost:8080",

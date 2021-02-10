@@ -53,7 +53,7 @@ stop() {
         return 0
     fi
 
-    procid=`cat $lockfile`
+    procid=$(cat $lockfile)
     echo -n "Stopping $procid: "
     kill $procid
     retval=$?

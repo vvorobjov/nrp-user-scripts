@@ -10,13 +10,41 @@ printf "| to your ~/.bashrc                                                     
 printf "+-------------------------------------------------------------------------------------+\033[0m\n"
 fi
 
-CURR_SHELL=$(basename `ps -p $$ --no-headers -o comm`)
-if [ -z "$CURR_SHELL" ]
+SUPPORTED_SHELLS=("sh" "bash" "zsh")
+
+# Extract shell type from process name
+
+CURR_SHELL=$(basename $(ps -p $$ --no-headers -o comm))
+
+# Check if extracted shell type matches any of supported shells
+
+SUPPORTED_SHELL=""
+for value in "${SUPPORTED_SHELLS[@]}"
+do
+    [ "$CURR_SHELL" = "$value" ] && SUPPORTED_SHELL="yes"
+done
+
+if [ -z "$SUPPORTED_SHELL" ]
 then
-      CURR_SHELL='sh'
+    # Shell type couldn't be determined from process name, use heuristics
+
+    if [ -n "$BASH" ]
+    then
+        CURR_SHELL="bash"
+    elif [ -n "$ZSH_NAME" ]
+    then
+        CURR_SHELL="zsh"
+    else
+        >&2 echo "WARNING: Unknown shell '$CURR_SHELL', falling back to 'sh' for ROS setup"
+        CURR_SHELL="sh"
+    fi
 fi
+
+export PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.major)")
+export PYTHON_VERSION_MAJOR_MINOR=$(python -c "import sys; print('{}.{}'.format(sys.version_info.major, sys.version_info.minor))")
+
 # ROS variables
-{ lsb_release -r | grep 16 >>/dev/null; } && source /opt/ros/kinetic/setup.$CURR_SHELL || source /opt/ros/melodic/setup.$CURR_SHELL
+source /opt/ros/noetic/setup.$CURR_SHELL
 
 export ROS_PARALLEL_JOBS=-j4
 export ROS_IP=127.0.0.1
@@ -50,17 +78,14 @@ source $HBP/GazeboRosPackages/devel/setup.$CURR_SHELL
 # use HBP version of gazebo in scripts
 export GZSERVER_BIN_DIR=$HOME/.local/bin
 
-# HBP NEST
-export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python2.7/site-packages:$HOME/.local/lib/x86_64-linux-gnu/python2.7/site-packages
-
 # GazeboRosPackages
-export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python2.7/dist-packages
+export PYTHONPATH=$PYTHONPATH:$HBP/GazeboRosPackages/devel/lib/python$PYTHON_VERSION_MAJOR_MINOR/dist-packages
 
 # HBP CLE
 export PYTHONPATH=$PYTHONPATH:$HBP/CLE/hbp_nrp_cle
 
 # HBP ExperimentControl
-export PYTHONPATH=$PYTHONPATH:$HBP/ExperimentControl/hbp_nrp_excontrol:$HBP/ExperimentControl/hbp_nrp_scxml
+export PYTHONPATH=$PYTHONPATH:$HBP/ExperimentControl/hbp_nrp_excontrol
 
 # HBP ExDBackend
 export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp_nrp_backend:$HBP/ExDBackend/hbp_nrp_cleserver:$HBP/ExDBackend/hbp_nrp_commons:$HBP/ExDBackend/hbp_nrp_watchdog
@@ -71,15 +96,15 @@ export PYTHONPATH=$PYTHONPATH:$HBP/ExDBackend/hbp-flask-restful-swagger-master
 # HBP VirtualCoach
 export PYTHONPATH=$PYTHONPATH:$HBP/VirtualCoach/hbp_nrp_virtual_coach
 
-# HBP MUSIC pyNN/NEST Support
-export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_music_xml:$HBP/BrainSimulation/hbp_nrp_music_interface
-
 # HBP Distributed NEST Support
 export PYTHONPATH=$PYTHONPATH:$HBP/BrainSimulation/hbp_nrp_distributed_nest
 
 # retina
-export RETINA_INSTALL_DIR=$HBP/retina
-export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
+# export RETINA_INSTALL_DIR=$HBP/retina
+# export PYTHONPATH=$RETINA_INSTALL_DIR/build/lib:$PYTHONPATH
+
+# HBP NEST. will conflict with the virtual environment when preceding $VIRTUAL_ENV/lib/python*/site-packages
+export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages:$HOME/.local/lib/x86_64-linux-gnu/python$PYTHON_VERSION_MAJOR_MINOR/site-packages
 
 # HBP models directory
 export NRP_MODELS_DIRECTORY=$HBP/Models
@@ -109,7 +134,7 @@ export CPATH=$HOME/.local/include:$CPATH
 
 # Make number of make processes user-configurable
 if [ -z "$NRP_NUM_CORES" ]; then
-    export NRP_NUM_MAKE_PROCESSES=`nproc`
+    export NRP_NUM_MAKE_PROCESSES=$(nproc)
 else
     export NRP_NUM_MAKE_PROCESSES=$NRP_NUM_CORES
 fi

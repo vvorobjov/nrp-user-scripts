@@ -9,12 +9,11 @@ nrp_other=(
     GazeboRosPackages
     Models
     Experiments
-    server-scripts
     user-scripts
+#    server-scripts # Used by CLE's LuganoVizClusterGazebo
 )
 nrp_js=(
     gzweb
-    SlurmClusterMonitor
     nrpBackendProxy
     brainvisualizer
     ExDFrontend
@@ -29,7 +28,6 @@ nrp_3rd_party=(
     simbody
     opensim
     gazebo
-    MUSIC
     nest-simulator
-    retina
+#    retina
 )
