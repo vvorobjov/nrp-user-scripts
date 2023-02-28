@@ -18,19 +18,19 @@ function backup() {
 
 
 # Remove already existing config files that will be set-up using the configure_nrp script
-echo "Removing existing config files for nginx, ExDFrontend, ExDBackend, CLE, nrpBackendProxy and the gzserver/gzbridge scripts."
+echo "Removing existing config files for nginx, Haproxy, nrp-frontend, nrp-backend, nrp-proxy"
 printf "\033[1;33mWould you like to NOT backup your local versions? (this also purges your existing backups) (y/N)\033[0m\n"
 read -t 5 p
 if [ "$p" == "y" -o "$p" == "Y" ]; then NOBACKUP=1;fi
 
 if [ -f $HOME/.local/etc/init.d/nginx ]; then $HOME/.local/etc/init.d/nginx stop; fi
+if [ -f $HOME/.local/etc/init.d/haproxy ]; then $HOME/.local/etc/init.d/haproxy stop; fi
+
 rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d/nginx $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.opt/bbp
-if [ $NOBACKUP ]; then rm -f "$HBP"/ExDFrontend/app/config.json.bak*; else backup "$HBP"/ExDFrontend/app/config.json; fi
-rm -f "$HBP"/ExDFrontend/app/config.json.local
-if [ $NOBACKUP ]; then rm -f "$HBP"/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.bak*; else backup "$HBP"/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini; fi
-rm -f "$HBP"/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
-if [ $NOBACKUP ]; then rm -f "$HBP"/nrpBackendProxy/config.json.bak*; else backup "$HBP"/nrpBackendProxy/config.json; fi
-rm -f "$HBP"/nrpBackendProxy/config.json.sample.local
-if [ $NOBACKUP ]; then rm -f "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.bak*; else backup "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json; fi
-rm -f "$HBP"/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample
+rm -rf $HOME/.local/etc/haproxy $HOME/.local/etc/init.d/haproxy $HOME/.local/var/log/haproxy
+
+if [ $NOBACKUP ]; then rm -f "$HBP"/nrp-frontend/src/config.json.bak*; else backup "$HBP"/nrp-frontend/src/config.json; fi
+rm -f "$HBP"/nrp-frontend/src/config.json.local
+if [ $NOBACKUP ]; then rm -f "$HBP"/nrp-proxy/config.json.bak*; else backup "$HBP"/nrp-proxy/config.json; fi
+rm -f "$HBP"/nrp-proxy/config.json.local
 echo "DONE"

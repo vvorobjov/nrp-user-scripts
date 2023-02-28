@@ -1,0 +1,7 @@
+#!/bin/bash
+# This script updates the user storage and the models database (to be run when a new template model has been added).
+
+$HBP/Models/copy-to-storage.sh || { echo ERROR; exit 1; }
+
+cd $HBP/nrp-proxy
+npm run update_template_models || { echo ERROR; exit 1; } # to be run after $HBP/Models/copy-to-storage.sh

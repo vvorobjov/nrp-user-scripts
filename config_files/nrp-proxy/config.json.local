@@ -1,0 +1,27 @@
+{
+  "nrpVersion": "4.0.0",
+  "refreshInterval": 5000,
+  "auth": {
+    "renewInternal": 600000,
+    "clientId": "nrp-backend-proxy",
+    "clientSecret": "<client_oidc_secret>",
+    "url": "https://iam.ebrains.eu/auth/realms/hbp",
+    "deactivate": true
+  },
+  "port": 8443,
+  "modelsPath": "$HBP/Models",
+  "experimentsPath": "$HBP/nrp-core/examples/templates",
+  "servers": {
+    "localhost": {
+      "internalIp": "http://localhost:8090",
+      "nrp-services": "http://localhost:9000/nrp-services",
+      "serverJobLocation": "local"
+    }
+  },
+  "storage": "FS",
+  "authentication": "FS",
+  "backendScripts": {
+    "restart-backend":
+      "$HBP/nrp-user-scripts/config_files/nrp-proxy/restart-backend.sh"
+  }
+}

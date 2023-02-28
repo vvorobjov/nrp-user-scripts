@@ -3,13 +3,13 @@
 
 install_dir="$HBP"
 
-if [[ -z "$install_dir" ]] ; then
+if [[ -z "$install_dir" ]]; then
   echo "Please set the \$HBP variable to your desired installation path first."
   exit
 else
-  if [[ -d "$install_dir" ]] ; then
+  if [[ -d "$install_dir" ]]; then
     echo "The NRP repos will be cloned to the already-existing directory" "$install_dir"
-  elif [[ -f "$install_dir" ]] ; then
+  elif [[ -f "$install_dir" ]]; then
     echo "Invalid destination." "$install_dir" "is a file."
     exit 1
   else
@@ -18,75 +18,57 @@ else
   fi
 fi
 
-# Get Bitbucket username to clone repos for developers
-echo
-if [ "$NRP_INSTALL_MODE" != "user" ]
-then
-  read -p "Enter your Bitbucket username: " user
-fi
-echo
+git_branch=$(git rev-parse --abbrev-ref HEAD)
 
-function clone_repo {
+function clone_repo() {
 
   [ "$#" -ne 1 ] && echo "Invalid number of arguments to clone_repo. Aborting." && exit 1
 
   echo
-  echo $1
-  if [ -d "$1" ] ; then
+  echo "$1"
+  if [ -d "$1" ]; then
     echo "Skipped, directory already exists."
   else
-    if [ "$NRP_INSTALL_MODE" == "user" ]
-    then
-      git clone -b master --depth 1 https://bitbucket.org/hbpneurorobotics/$1.git $1
+    if [ "$NRP_INSTALL_MODE" == "user" ]; then
+      git clone -b master --depth 1 https://bitbucket.org/hbpneurorobotics/"$1".git "$1"
     else
-      git clone $user@bitbucket.org:hbpneurorobotics/$1.git $1
+      git clone https://bitbucket.org/hbpneurorobotics/"$1".git "$1"
+      pushd "$1" >/dev/null
+      git checkout "$git_branch" || git checkout development
+      popd >/dev/null
     fi
   fi
   echo
 }
 
 # Cloning repos
-option=$1
-source $HBP/user-scripts/repos.txt
+option="$1"
+source $( dirname -- "$0"; )/repos.txt
 
 case $option in
 backend)
   repos=(
-    ${nrp_python[*]}
-    GazeboRosPackages
-    ${nrp_3rd_party[*]}
-    gzweb
+    nrp-backend
+    nrp-core
   )
   ;;
 frontend)
   repos=(
-    nrpBackendProxy
-    ExDFrontend
-    VirtualCoach
-  )
-  ;;
-daint)
-  repos=(
-    ${nrp_python[*]}
-    GazeboRosPackages
-    ${nrp_3rd_party[*]}
-    gzweb
-    Models
-    Experiments
+    nrp-proxy
+    nrp-frontend
   )
   ;;
 *)
-repos=(
-  ${nrp_3rd_party[*]}
-  ${nrp_repos[*]}
-  admin-scripts
-) # TODO: remove admin-scripts after merging
+  repos=(
+    ${nrp_repos[*]}
+  )
   ;;
 esac
 
 echo "Cloning repos:"
-pushd "$install_dir" > /dev/null
-for repo in "${repos[@]}" ; do
-  clone_repo "$repo";
+pushd "$install_dir" >/dev/null
+for repo in "${repos[@]}"; do
+  clone_repo "$repo"
 done
-popd > /dev/null
+
+popd >/dev/null

@@ -1,39 +1,35 @@
 #!/bin/bash
-# A script to set-up config files for nginx, Frontend, gzserver & gzbridge, CLE
+# A script to set-up config files for nginx, Frontend
 
-source "$HBP"/user-scripts/repos.txt
+source "$HBP"/nrp-user-scripts/repos.txt
 
-$HBP/user-scripts/purge
-export GROUPNAME=`/usr/bin/id -gn`
-mkdir -p -v $HOME/.local/etc/nginx $HOME/.local/etc/init.d $HOME/.local/etc/default $HOME/nginx $HOME/.local/var/log/nginx $HOME/.local/etc/nginx/lua $HOME/.local/etc/nginx/conf.d $HOME/.opt/bbp
+"$HBP"/nrp-user-scripts/purge
+GROUPNAME=$(/usr/bin/id -gn)
+export GROUPNAME
+mkdir -p -v "$HOME"/.local/etc/nginx "$HOME"/.local/etc/init.d "$HOME"/.local/etc/default "$HOME"/nginx "$HOME"/.local/var/log/nginx "$HOME"/.local/etc/nginx/lua "$HOME"/.local/etc/nginx/conf.d "$HOME"/.opt/bbp "$HOME"/.local/run/haproxy
 
-echo "Copying user_makefile to python repos"
-for i in ${nrp_python[@]} ; do cp -f $HBP/user-scripts/config_files/user_makefile $HBP/$i; done
+# Create haproxy folder in .local
+mkdir -p -v "$HOME"/.local/etc/haproxy "$HOME"/.local/var/log/haproxy "$HOME"/.local/var/run
+
+# echo "Copying user_makefile to python repos"
+# for i in "${nrp_python[@]}" ; do cp -f "$HBP"/nrp-user-scripts/config_files/user_makefile "$HBP"/$i; done
 
 echo "Copying Frontend config.json file"
-ln -s $HBP/user-scripts/config_files/ExDFrontend/config.json.local $HBP/ExDFrontend/app/config.json.local
-cp $HBP/ExDFrontend/app/config.json.local $HBP/ExDFrontend/app/config.json
-sed -e 's/<username>/'"$USER"'/' -i $HBP/ExDFrontend/app/config.json
+ln -s "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.json.local "$HBP"/nrp-frontend/src/config.json.local
+cp "$HBP"/nrp-frontend/src/config.json.local "$HBP"/nrp-frontend/src/config.json
+cp "$HBP"/nrp-frontend/src/config.json.local "$HBP"/nrp-frontend/build/config.json
 
-echo "Copying start/stop scripts for gzserver and gzbridge"
-cp -r $HBP/user-scripts/nrp-services $HOME/.opt/bbp
-chmod u+x $HOME/.opt/bbp/nrp-services/gzbridge
-chmod u+x $HOME/.opt/bbp/nrp-services/gzserver
-
-echo "Copying CLE config.ini file"
-ln -s $HBP/user-scripts/config_files/CLE/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample
-cp $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini.sample $HBP/CLE/hbp_nrp_cle/hbp_nrp_cle/config.ini
-
-echo "Copying hbp-flask-restful config files."
-ln -s $HBP/user-scripts/config_files/hbp-flask-restful-swagger-master/config.json.sample $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample
-cp $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json.sample $HBP/ExDBackend/hbp-flask-restful-swagger-master/flask_restful_swagger/static/config.json
+# echo "Copying start/stop scripts for gzserver and gzbridge"
+# cp -r "$HBP"/nrp-user-scripts/nrp-services "$HOME"/.opt/bbp
+# chmod u+x "$HOME"/.opt/bbp/nrp-services/gzbridge
+# chmod u+x "$HOME"/.opt/bbp/nrp-services/gzserver
 
 echo "Copying Proxy config files."
-ln -s $HBP/user-scripts/config_files/nrpBackendProxy/config.json.sample.local $HBP/nrpBackendProxy/config.json.sample.local
+ln -s "$HBP"/nrp-user-scripts/config_files/nrp-proxy/config.json.local "$HBP"/nrp-proxy/config.json.local
 
 if ! node --version | grep  -q v8.
 then
-  source $HOME/.bashrc
+  source "$HOME"/.bashrc
   [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
   nvm use 8 >/dev/null
   if [ $? -ne 0 ]
@@ -43,55 +39,54 @@ then
   fi
   nvm alias default 8
   printf "\033[0;31mSwitched to node v8. Please reopen all your shells and restart the server.\033[0m\n"
-  read -t 5
+  # read -tr 5
 fi
 
 echo "Copying Nginx config files"
 
-cp -r /etc/nginx/* $HOME/.local/etc/nginx/
-cp /etc/init.d/nginx $HOME/.local/etc/init.d/nginx
+cp -r /etc/nginx/* "$HOME"/.local/etc/nginx/
+cp /etc/init.d/nginx "$HOME"/.local/etc/init.d/nginx
 
-# as of nginx 2.9 in order to use lua related commands we have to dynamically load 
+echo "Copying Haproxy config files"
+
+cp -r /etc/haproxy/* "$HOME"/.local/etc/haproxy/
+cp /etc/init.d/haproxy "$HOME"/.local/etc/init.d/haproxy
+
+# as of nginx 2.9 in order to use lua related commands we have to dynamically load
 # the following two modules, which are found in /usr/lib/nginx/modules
-# since we are running everything in $HOME/.local the libraries have to be copied manually
-# to $HOME/.local/etc/nginx/modules
-mkdir $HOME/.local/etc/nginx/modules
-cp /usr/lib/nginx/modules/ndk_http_module.so $HOME/.local/etc/nginx/modules
-cp /usr/lib/nginx/modules/ngx_http_lua_module.so $HOME/.local/etc/nginx/modules
+# since we are running everything in "$HOME"/.local the libraries have to be copied manually
+# to "$HOME"/.local/etc/nginx/modules
+mkdir "$HOME"/.local/etc/nginx/modules
+cp /usr/lib/nginx/modules/ndk_http_module.so "$HOME"/.local/etc/nginx/modules
+cp /usr/lib/nginx/modules/ngx_http_lua_module.so "$HOME"/.local/etc/nginx/modules
 
-sed -e 's: \/etc\/: '"$HOME"'\/.local\/etc\/:' -i $HOME/.local/etc/init.d/nginx
-echo 'DAEMON_OPTS="-c $HOME/.local/etc/nginx/nginx.conf -p $HOME/.local/etc/nginx"' >  $HOME/.local/etc/default/nginx
+sed -e 's: \/etc\/: '"$HOME"'\/.local\/etc\/:' -i "$HOME"/.local/etc/init.d/nginx
+sed -e 's:\/var\/run\/:'"$HOME"'\/.local\/var\/run\/:' -i "$HOME"/.local/etc/init.d/haproxy
+sed -e 's:=\/etc\/:='"$HOME"'\/.local\/etc\/:' -i "$HOME"/.local/etc/init.d/haproxy
+sed -e 's:chown haproxy:#chown haproxy:' -i "$HOME"/.local/etc/init.d/haproxy
+sed -e 's:chmod 2775:#chmod 2775:' -i "$HOME"/.local/etc/init.d/haproxy
+sed -e 's:start-stop-daemon --quiet:start-stop-daemon --quiet --chuid $USER\:$USER:' -i "$HOME"/.local/etc/init.d/haproxy
+echo 'DAEMON_OPTS="-c "$HOME"/.local/etc/nginx/nginx.conf -p "$HOME"/.local/etc/nginx"' >  "$HOME"/.local/etc/default/nginx
 
-cp $HBP/user-scripts/config_files/nginx/nginx.conf $HOME/.local/etc/nginx/nginx.conf
-sed -e 's/<username>/'"$USER"'/g' -i $HOME/.local/etc/nginx/nginx.conf
-sed -e 's/<groupname>/'"$GROUPNAME"'/g' -i $HOME/.local/etc/nginx/nginx.conf
-cp $HBP/user-scripts/config_files/nginx/conf.d/* $HOME/.local/etc/nginx/conf.d
+cp "$HBP"/nrp-user-scripts/config_files/nginx/nginx.conf "$HOME"/.local/etc/nginx/nginx.conf
+sed -e 's/<username>/'"$USER"'/g' -i "$HOME"/.local/etc/nginx/nginx.conf
+sed -e 's/<groupname>/'"$GROUPNAME"'/g' -i "$HOME"/.local/etc/nginx/nginx.conf
+cp "$HBP"/nrp-user-scripts/config_files/nginx/conf.d/* "$HOME"/.local/etc/nginx/conf.d
 
-sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
-sed -e 's/<username>/'"$USER"'/' -i $HOME/.local/etc/nginx/conf.d/nrp-services.conf
+sed -e 's|<HBP>|'"$HBP"'|' -i "$HOME"/.local/etc/nginx/conf.d/nrp-services.conf
+sed -e 's/<username>/'"$USER"'/' -i "$HOME"/.local/etc/nginx/conf.d/nrp-services.conf
 
-sed -e 's|<HBP>|'"$HBP"'|' -i $HOME/.local/etc/nginx/conf.d/frontend.conf
+sed -e 's|<HBP>|'"$HBP"'|' -i "$HOME"/.local/etc/nginx/conf.d/frontend.conf
+
+echo "Copying Haproxy config file"
+cp "$HBP"/nrp-user-scripts/config_files/haproxy/local_source/haproxy.cfg "$HOME"/.local/etc/haproxy/
+cp "$HBP"/nrp-user-scripts/config_files/haproxy/cors.lua "$HOME"/.local/etc/haproxy/cors.lua
+sed -e 's/<username>/'"$USER"'/' -i "$HOME"/.local/etc/haproxy/haproxy.cfg
 
 
 echo "Copying uwsgi config file"
-cp $HBP/user-scripts/config_files/nginx/uwsgi-nrp.ini $HOME/.local/etc/nginx/uwsgi-nrp.ini
+cp "$HBP"/nrp-user-scripts/config_files/nginx/uwsgi-nrp.ini "$HOME"/.local/etc/nginx/uwsgi-nrp.ini
 
-echo "Generating schema parsers for ExDBackend"
-if [[ -d  "${NRP_VIRTUAL_ENV}" ]]; then
-    source ${NRP_VIRTUAL_ENV}/bin/activate
-    pyxbgen -u $HBP/Experiments/bibi_configuration.xsd -m bibi_api_gen 2>&1 | grep -v "^WARNING" || { echo ERROR;exit 1; }
-    pyxbgen -u $HBP/Experiments/ExDConfFile.xsd -m exp_conf_api_gen 2>&1 | grep -v "^WARNING" || { echo ERROR;exit 1; }
-    pyxbgen -u $HBP/Models/environment_model_configuration.xsd -m environment_conf_api_gen 2>&1 | grep -v "^WARNING" || { echo ERROR;exit 1; }
-    pyxbgen -u $HBP/Models/robot_model_configuration.xsd -m robot_conf_api_gen 2>&1 | grep -v "^WARNING" || { echo ERROR;exit 1; }
-    gen_file_path=$HBP/ExDBackend/hbp_nrp_commons/hbp_nrp_commons/generated
-    mv bibi_api_gen.py $gen_file_path
-    mv exp_conf_api_gen.py $gen_file_path
-    mv robot_conf_api_gen.py $gen_file_path
-    mv environment_conf_api_gen.py $gen_file_path
-    deactivate
-else
-   echo "ExDBackend is not built yet. Skipping schema parsers generation."
-fi
 
 printf "\033[1;33mWould you like to setup your local storage database with a default user? (Y/n)\033[0m\n"
 read -t 5 p
@@ -100,33 +95,12 @@ then
   echo "Skipping default database user creation"
 else
   echo "Setting up local storage database"
-  chmod +x $HBP/user-scripts/configure_storage_database
-  $HBP/user-scripts/configure_storage_database
+  chmod +x "$HBP"/nrp-user-scripts/configure_storage_database
+  "$HBP"/nrp-user-scripts/configure_storage_database
 fi
-
-
-printf "\033[1;33mWould you like to apply the XML transfer function migration script to your local experiments? (y/N)\033[0m\n"
-read -t 5 p
-if [ "$p" == "Y" -o "$p" == "y" ]; then
-    if [[ -d  "${NRP_VIRTUAL_ENV}" ]]; then
-        source ${NRP_VIRTUAL_ENV}/bin/activate
-        echo "Generating older bibi scheme parser for XML TF Migration"
-        pyxbgen -u $HBP/user-scripts/migrate_xmltf/xsd/xml-tf-bibi.xsd -m $HBP/user-scripts/migrate_xmltf/lib/bibi_api_gen 2>&1 | grep -v "^WARNING" || { echo ERROR;exit 1; }
-        deactivate
-
-        echo "Applying xml TF migration steps"
-        printf "\033[1;34m[Developer note] If pyxb raises exception, make sure that 'user-scripts/migrate_xmltf/xsd/xml-tf-bibi.xsd' is updated with the changes made in 'Experiments/bibi_configuration.xsd'.\033[0m\n"
-        $HBP/user-scripts/migrate_xmltf/migrate_cloned.sh
-    else
-        echo "NRP_VIRTUAL_ENV not defined. Skipping old XML transfer function migration."
-    fi
-else
-    echo "Skipping..."
-fi
-
 
 echo "Setting configuration files to default mode (offline mode)"
-$HBP/user-scripts/running_mode "2"
+"$HBP"/nrp-user-scripts/running_mode "2"
 echo "DONE"
 echo
 echo "Warning: your running mode has been switched to full local (2)."

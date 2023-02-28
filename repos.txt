@@ -1,33 +1,19 @@
 nrp_python=(
-    BrainSimulation
-    ExperimentControl
-    VirtualCoach
-    CLE
-    ExDBackend
+    nrp-backend
 )
 nrp_other=(
-    GazeboRosPackages
-    Models
-    Experiments
-    user-scripts
-#    server-scripts # Used by CLE's LuganoVizClusterGazebo
+    nrp-user-scripts
 )
 nrp_js=(
-    gzweb
-    nrpBackendProxy
-    brainvisualizer
-    ExDFrontend
+    nrp-proxy
+    nrp-frontend
+)
+nrp_cpp=(
+    nrp-core
 )
 nrp_repos=(
     ${nrp_python[*]}
     ${nrp_other[*]}
     ${nrp_js[*]}
-)
-nrp_3rd_party=(
-    sdformat
-    simbody
-    opensim
-    gazebo
-    nest-simulator
-#    retina
+    ${nrp_cpp[*]}
 )

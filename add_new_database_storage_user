@@ -7,6 +7,6 @@
 
 
 
-source $HBP/user-scripts/nrp_functions || { echo ERROR;exit 1; }
+source $HBP/nrp-user-scripts/nrp_functions || { echo ERROR;exit 1; }
 
 add_new_user_tingoDB "$@"

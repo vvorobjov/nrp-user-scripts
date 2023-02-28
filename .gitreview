@@ -1,6 +1,6 @@
 [gerrit]
 host=bbpcode.epfl.ch
 port=22
-project=neurorobotics/user-scripts
+project=neurorobotics/nrp-user-scripts
 defaultbranch=development
 defaultremote=origin

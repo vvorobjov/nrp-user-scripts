@@ -1,228 +1,36 @@
 #!/bin/bash
 # This script holds common functions
 
-if [ -z ${PYTHON_VERSION_MAJOR+x} ]; then
-	PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.major)")
-fi
+PIP_CMD="python3 -m pip"
 
-if [ -z ${PYTHON_VERSION_MINOR+x} ]; then
-	PYTHON_VERSION_MINOR=$(python -c "import sys; print(sys.version_info.minor)")
-fi
+source "$HBP"/nrp-user-scripts/nrp_variables || { echo ERROR; exit 1; }
+source "$HBP"/nrp-user-scripts/nrp_aliases || { echo ERROR; exit 1; }
 
-if [ -z ${PYTHON_VERSION_MAJOR_MINOR+x} ]; then
-	PYTHON_VERSION_MAJOR_MINOR=$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR
-fi
-
-if [[ $PYTHON_VERSION_MAJOR -lt 3 ]]; then
-  PYTHON_PATHNAME="python3"
-  VIRTUALENV_CMD="virtualenv"
-else
-  PYTHON_PATHNAME="python2.7"
-  VIRTUALENV_CMD="python -m venv"
-fi
-
-PIP_CMD="python -m pip"
-
-if [ -z "$NRP_NUM_MAKE_PROCESSES" ]; then
-printf "\033[1;31m+-------------------------- Neurorobotics Platform warning ---------------------------+\n"
-printf "| Dear Neurorobotics user, your NRP_NUM_MAKE_PROCESSES is not defined.                |\n"
-printf "| This could mean you forgot to source the nrp_variables script before sourcing %s.   |\n" "$0"
-printf "| NRP_NUM_MAKE_PROCESSES will be set to the number of cores of your CPU by default.   |\n"
-printf "+-------------------------------------------------------------------------------------+\033[0m\n"
-NRP_NUM_MAKE_PROCESSES=$(nproc)
-export NRP_NUM_MAKE_PROCESSES
-fi
-
-function checkssh {
-    echo "Checking $1"
-    touch "$touchfilebase""$1"
-    ssh -o 'BatchMode yes' -o 'StrictHostKeyChecking no' -K root@$1 2>"$touchfilebase""$1" 1>/dev/null /bin/uname
-    offends=$(grep "Offending" "$touchfilebase""$1")
-    if [ -n "$offends" ]
-    then
-      echo "yes" > "$2"
-      echo
-      echo ------------------------------------------------------------
-      echo "$1"
-      echo "$offends"
-#      cat "$touchfilebase""$1"
-      echo ------------------------------------------------------------
-    fi
-    rm "$touchfilebase""$1"
-}
-
-function waitforall {
-  finished="NOT"
-  while [ -n "$finished" ]
-  do
-    sleep 5
-    finished=$(ls "$touchfilebase"* 2>/dev/null)
-    touchbase=$(basename "$touchfilebase")
-    replacelist=$(echo "$finished" | sed 's/^.*'"$touchbase"'\(.*\)/\1/' | xargs)
-    if [ -n "$replacelist" ]
-    then
-      printf "Still %s: %s\n" "$1" "$replacelist"
-    fi
-  done
-}
-
-function build_nest {
-  option=$1
-  echo
-  echo -------------------------
-  echo Nest
-  echo -------------------------
-  echo
-  sleep 2
-  cd "$HBP"/nest-simulator || { echo ERROR: "$HBP"/nest-simulator NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-  ( # use a subshell to avoid "nested" virtualenv issues
-	$VIRTUALENV_CMD build_venv || { echo ERROR; exit 1; }
-    source build_venv/bin/activate
-    $PIP_CMD install Cython==0.29.14 mpi4py==3.0.3 || { echo ERROR; exit 1; }
-    xargs rm -rf < "$HBP"/user-scripts/nest-delete-filelist.txt || { echo ERROR; exit 1; }
-    # shellcheck disable=SC2086
-    if [ ! -d "$HBP"/nest-simulator/build ]; then
-      mkdir "$HBP"/nest-simulator/build || { echo ERROR; exit 1;}
-    fi
-    cd "$HBP"/nest-simulator/build || { echo ERROR: "$HBP"/nest-simulator/build NOT FOUND; exit 1;}
-    cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=${HOME}/.local -Dwith-gsl=ON -Dwith-mpi=ON -Dwith-python=${PYTHON_VERSION_MAJOR}"
-    cmake $cmake_args .. || { echo CMAKE ERROR;  exit 1; }
-    make -j$NRP_NUM_MAKE_PROCESSES || { echo nest-simulator; exit 1; }
-    make install || { echo NEST: INSTALL ERROR; exit 1; }
-
-    # Optional: install UGR's Cerebellum model plugin
-    if [[ $option == "spiking-cerebellum" ]]; then
-      echo
-      echo -------------------------
-      echo Nest: SpikingCerebellum
-      echo -------------------------
-      echo
-      cd "$HBP"/nest-simulator/SpikingCerebellum/src/CerebellumModule
-      mkdir -p build && cd build && cmake .. && make && make install
-      cd ../../../../build/ || { echo ERROR; exit 1; }
-      cmake -DCMAKE_INSTALL_PREFIX:PATH=$HOME/.local \
-          -Dwith-gsl=ON -Dwith-mpi=ON -Dexternal-modules=cerebellum \
-          .. || { echo CMAKE spiking-cerebellum; exit 1; }
-      make -j$NRP_NUM_MAKE_PROCESSES || { echo spiking-cerebellum; exit 1; }
-      make install || { echo NEST-SPIKING-CEREBELLUM: INSTALL ERROR; exit 1; }
-    fi
-
-    deactivate
-  ) || { exit 1; }
-  rm -rf build_venv || { echo ERROR; exit 1; }
-}
-
-function clean_old_mvapich2_installation {
-  if [ -d "$HBP/mvapich2" ]; then
-    echo
-    echo -------------------------
-    echo Removing previous mvapich2 installation
-    echo -------------------------
-    echo
-    cd "$HBP"/mvapich2 || { echo ERROR; exit 1; }
-    #make uninstall || { echo ERROR: Could not uninstall mvapich2 properly, please uninstall manually and rerun this script; exit 1; }
-    #make clean || { echo ERROR: Could not clean the build files. Please clean manually; exit 1; }
-    #make distclean || { echo ERROR: Could not clean the configure files. Please distclean manually; exit 1; }
-    cd .. && mv -f $HBP/mvapich2 $HBP/mvapich2.$(date +%Y-%m-%d) || { echo ERROR: Could not rename mvapich2 folder, please remove it manually; exit 1; }
-    ls $HOME/.local/lib/libmpi* 1>/dev/null 2>&1 && { echo ERROR: There seems to be MPI leftovers in your ~/.local. Please remove them manually before rerunning this script; exit 1; }
-    ls $HOME/.local/include/*mpi* 1>/dev/null 2>&1 && { echo ERROR: There seems to be MPI leftovers in your ~/.local. Please remove them manually before rerunning this script; exit 1; }
-    cd "$HBP"/nest-simulator/build || { echo ERROR: $HBP/nest-simulator/build not found; exit 1; }
-    make clean  # option step, no need to error here
-    cd "$HBP"/nest-simulator || { echo ERROR; exit 1; }
-    rm -rf build || { echo ERROR: could not remove $HBP/nest-simulator/build. Please do so manually.; exit 1; }
-  fi
-}
-
-function build_mpich {
-  # install standard mpich distribution
-  echo
-  echo -------------------------
-  echo mpich
-  echo -------------------------
-  echo
-  cd "$HBP"
-  if [ ! -d "mpich-3.1.4" ]; then
-    wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz || { echo ERROR downloading mpich source; exit 1; }
-    tar xf mpich-3.1.4.tar.gz || { echo ERROR unzipping mpich source archive; exit 1; }
-    rm mpich-3.1.4.tar.gz || { echo ERROR deleting mpich source archive, ignoring; }
-  fi
-  cd mpich-3.1.4 || { echo ERROR accessing mpich-3.1.4 directory; exit 1; }
-  ./configure --enable-fast=all,O3 --prefix=$HOME/.local || { echo ERROR configuring mpich build; exit 1; }
-  make -j$NRP_NUM_MAKE_PROCESSES || { echo mpich; exit 1; }
-  make install || { echo ERROR installing mpich in $HOME/.local; exit 1; }
-}
-
-function build_gazebo {
-  echo
-  echo -------------------------
-  echo Gazebo
-  echo -------------------------
-  sleep 2
-
-  cd $HBP/gazebo || { echo ERROR: $HBP/gazebo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-  mkdir -p build
-  cd build
-  cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local $cmake_args .. || { echo gazebo; exit 1; }
-  make -j$NRP_NUM_MAKE_PROCESSES || { echo gazebo; exit 1; }
-  make install || { echo GAZEBO INSTALL ERROR; exit 1; }
-}
-
-function build_gazebo_dependencies {
-  for i in simbody opensim sdformat
-    do
-      echo
-      echo -------------------------
-      echo $i
-      echo -------------------------
-      sleep 2
-      cd "$HBP"/$i || { echo ERROR: "$HBP"/$i NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-      mkdir -p build
-      cd build
-      cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local .. || { echo $i: CMAKE ERROR; exit 1; }
-      make -j"$NRP_NUM_MAKE_PROCESSES" || { echo $i; exit 1; }
-      make install || { echo $i: INSTALL ERROR; exit 1; }
-    done
-}
-
-function build_gazebo_ros_packages {
-  echo
-  echo -------------------------
-  echo GazeboRosPackages
-  echo -------------------------
-  sleep 2
-  cd "$HBP"/GazeboRosPackages || { echo ERROR: "$HBP"/GazeboRosPackages NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-  rm -rf build devel
-  git submodule init
-  git submodule update
-  catkin build || { echo GAZEBO_ROSPACKAGES BUILD ERROR; exit 1; }
-  cd "$HBP"
-}
-
-function build_gzweb {
-  echo
-  echo -------------------------
-  echo gzweb
-  echo -------------------------
-  sleep 2
-  cd "$HBP"/gzweb || { echo ERROR: "$HBP"/gzweb NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-  ./deploy-gzbridge-nrp.sh || { echo GZBRIDGE BUILD ERROR; exit 1; }
-  # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
-  # For more information see: https://github.com/zurb/foundation-sites/issues/10826
-  npm dedupe || { echo  GZWEB INSTALL ERROR; exit 1; }
-  git checkout -- package.json
-  npm install --no-save || { echo GZBRIDGE INSTALL ERROR; exit 1; }
-  cd gz3d/utils || { echo gz3d/utils ERROR: DIRECTORY NOT FOUND; exit 1; }
-  npm dedupe || { echo  GZ3D INSTALL ERROR; exit 1; }
-  git checkout -- package.json
-  npm install --no-save || { echo GZ3D INSTALL ERROR; exit 1; }
-}
+#function build_gzweb {
+#  echo
+#  echo -------------------------
+#  echo gzweb
+#  echo -------------------------
+#  sleep 2
+#  cd "$HBP"/gzweb || { echo ERROR: "$HBP"/gzweb NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+#  ./deploy-gzbridge-nrp.sh || { echo GZBRIDGE BUILD ERROR; exit 1; }
+#  # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
+#  # For more information see: https://github.com/zurb/foundation-sites/issues/10826
+#  npm dedupe || { echo  GZWEB INSTALL ERROR; exit 1; }
+#  git checkout -- package.json
+#  npm install --no-save || { echo GZBRIDGE INSTALL ERROR; exit 1; }
+#  cd gz3d/utils || { echo gz3d/utils ERROR: DIRECTORY NOT FOUND; exit 1; }
+#  npm dedupe || { echo  GZ3D INSTALL ERROR; exit 1; }
+#  git checkout -- package.json
+#  npm install --no-save || { echo GZ3D INSTALL ERROR; exit 1; }
+#}
 
 function nrp_rebase {
   rebase_all=$1
   rebase_branch=$2
 
   cd "$HBP" || { echo ERROR; exit 1; }
-  source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
+  source "$HBP"/nrp-user-scripts/repos.txt || { echo ERROR; exit 1; }
 
   printf '\n=====================================\n'
   printf 'Rebasing repos (branch %s)\n' "$rebase_branch"
@@ -230,7 +38,6 @@ function nrp_rebase {
   if [ "$rebase_all" = "all" ]
   then
     repos=(
-    ${nrp_3rd_party[*]}
     ${nrp_repos[*]}
   )
   else
@@ -238,14 +45,23 @@ function nrp_rebase {
       ${nrp_repos[*]}
     )
   fi
-  for i in "${repos[@]}"
+
+  # developer installation repos
+  if [ "$NRP_INSTALL_MODE" != "user" ]; then
+    repos=(
+      ${repos[*]}
+      ${nrp_dev[*]}
+    )
+  fi
+
+  for repo in "${repos[@]}"
   do
     echo
     echo -------------------------
-    echo $i
+    echo $repo
     echo -------------------------
     sleep 2
-    cd "$i"|| { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+    pushd "$repo" > /dev/null 2>&1 || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
 
     # in case there are unstaged changes we prompt the user to stash them
     if git status --short | grep -v "??" > /dev/null 2>&1
@@ -263,33 +79,28 @@ function nrp_rebase {
       fi
     fi
 
-    git checkout $rebase_branch && git pull --rebase || { echo ERROR; exit 1; }
-    cd ..
+    if ! git checkout "$rebase_branch"
+    then
+      git checkout master || { echo ERROR; exit 1; }
+    fi
+
+    git pull --rebase || { echo ERROR; exit 1; }
+
+    popd > /dev/null 2>&1
   done
 }
 
-function install_template_experiments_requirements {
-  echo
-  echo -------------------------
-  echo Experiments
-  echo -------------------------
-  sleep 2
-  echo "Install Experiments'requirements"
-  source "${NRP_VIRTUAL_ENV}"/bin/activate || { echo ERROR; exit 1; } # pip installation is done inside ${NRP_VIRTUAL_ENV}
-  requirements=$HBP/Experiments/template_requirements.txt # TODO(Luc) create $HBP/Experiments/templates and use a requirements.txt file per each template experiment
-  $PIP_CMD install -r "${requirements}" || { echo EXPERIMENTS: PIP INSTALL ERROR; exit 1; }
-  deactivate
-}
-
 function generate_low_resolution_pbr_textures {
+  OLD_VIRTUAL_ENV="${VIRTUAL_ENV}"
   cd "$HBP"
   $VIRTUALENV_CMD lower_res || { echo ERROR; exit 1; }
   source lower_res/bin/activate
   $PIP_CMD install 'pip>=19' wheel --upgrade
   $PIP_CMD install pillow==4.3.0 future
-  python "$HBP"/user-scripts/generatelowrespbr.py
+  python "$HBP"/nrp-user-scripts/generatelowrespbr.py
   deactivate
   rm -rf lower_res
+  export VIRTUAL_ENV="${OLD_VIRTUAL_ENV}"
 }
 
 function process_models {
@@ -307,63 +118,93 @@ function process_models {
   cd "$HBP"/Models || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
 
   ./create-symlinks.sh || { echo ERROR; exit 1; }
-}
+
+  echo
+  echo "Copying the models from Models to nrpStorage/TEMPLATE_MODELS"
+  # to be run before "npm run $HBP/nrpProxyBackend/update_template_models" (see nrpProxyBackend build)
+  ./copy-to-storage.sh || { echo ERROR; exit 1; }
+  }
+
+#function backup_storage() {
+#  # Get the NRP version using the git tag of one of main repositories (in this case CLE)
+#  pushd "$HBP"/CLE >/dev/null || { echo ERROR; exit 1; }
+#  nrp_version=$(git describe --abbrev=0 --tags)
+#  popd >/dev/null || { echo ERROR; exit 1; }
+#  if [ "$nrp_version" == "3.1.0" ]
+#  then
+#    read -t 5 -p "You are upgrading from 3.1.0. It is suggested to create a backup of your nrpStorage first. Would you like to create it? [n/Y] " -n 1 -r REPLY
+#    echo
+#    if [[ ( -z "$REPLY" ) || ( $REPLY =~ ^[Yy] ) ]]; then
+#      # Create Zip file of nrpStorage folder
+#      pushd "$STORAGE_PATH" >/dev/null || { echo ERROR; exit 1; }
+#      if ls ../*.bak.zip 1> /dev/null 2>&1
+#      then
+#        echo "Already backed up. continue.. "
+#      else
+#        my_date=$(date +%d.%m.%y-%H:%I)
+#        back_name=NRP_STORAGE_"$my_date".bak.zip
+#        zip -r  ../"$back_name" ./* 1> /dev/null 2>&1
+#        echo "$back_name was created in $(dirname "$STORAGE_PATH")"
+#      fi
+#      popd >/dev/null || { echo ERROR; exit 1; }
+#    fi
+#  fi
+#}
 
 function nrp_build {
-  build_all=$1
-  spiking_cerebellum_option=$2
-
   echo
   echo =========================
   echo Building
   echo =========================
-  if [ "$build_all" = "all" ]; then
-    build_gazebo_dependencies
-    build_gazebo
-    clean_old_mvapich2_installation
-    build_mpich
-    build_nest ${spiking_cerebellum_option}
-  fi
 
-  build_gazebo_ros_packages
+  source "$HBP"/nrp-user-scripts/repos.txt || { echo ERROR; exit 1; }
+#  backup_storage
 
-  for i in ExperimentControl BrainSimulation VirtualCoach CLE ExDBackend
-  do
+  #process_models  # to be run before nrpProxyBackend build
+
+  for python_repo in "${nrp_python[@]}"; do
     echo
     echo -------------------------
-    echo $i
+    echo "$python_repo"
     echo -------------------------
     sleep 2
-    cd "$HBP"/$i || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-    make devinstall || { echo $i BUILD ERROR; exit 1; }
+    cd "$HBP"/"$python_repo" || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+    make devinstall || { echo "$python_repo" BUILD ERROR; exit 1; }
   done
 
-  for i in brainvisualizer ExDFrontend nrpBackendProxy
-  do
-   echo
-   echo -----------------------
-   echo $i
-   echo -----------------------
-   sleep 2
-   cd "$HBP"/$i || { echo ERROR; exit 1; }
+  for js_repo in "${nrp_js[@]}"; do
+    echo
+    echo -----------------------
+    echo "$js_repo"
+    echo -----------------------
+    sleep 2
+    cd "$HBP"/"$js_repo" || { echo ERROR; exit 1; }
 
-   # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
-   # For more information see: https://github.com/zurb/foundation-sites/issues/10826
-   npm dedupe || { echo  $i INSTALL ERROR; exit 1; }
-   rm package-lock.json
-   git checkout -- package.json
-   VENV_CMD=$VIRTUALENV_CMD
-   export VENV_CMD  # used by nrpBackendProxy's install
-   npm install --no-save || { echo  $i INSTALL ERROR; exit 1; }
-   if [ "$i" == "ExDFrontend" ]; then
-       grunt build || { echo GRUNT BUILD FAILED; exit 1; }
-   fi
-   unset VENV_CMD
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    if [ "$js_repo" == "nrp-proxy" ]; then
+      nvm use 8
+    else
+      nvm use 14
+    fi
+
+    git checkout -- package.json
+    if [ "$js_repo" == "nrp-frontend" ]; then
+      npm ci || { echo "$js_repo" INSTALL ERROR; exit 1; }
+      npm run-script build || { echo REACT BUILD FAILED; exit 1; } # TODO nrp-frontend
+    else
+      # Dedupe helps prevents known issue "npm ERR! enoent ENOENT: no such file or directory, rename"
+      # For more information see: https://github.com/zurb/foundation-sites/issues/10826
+      npm dedupe || { echo "$js_repo" INSTALL ERROR; exit 1; }
+      npm install --no-save || { echo "$js_repo" INSTALL ERROR; exit 1; }
+    fi
+    # if [ "$js_repo" == "nrp-proxy" ]; then
+    #   npm run update_template_models # to be run after $HBP/Models/copy-to-storage.sh (see process_models)
+    #   npm run refactor_storage
+    # fi
+    unset VENV_CMD
   done
 
-  build_gzweb
-  process_models
-  install_template_experiments_requirements
+  #build_gzweb
 }
 
 function nrp_configure {
@@ -372,109 +213,8 @@ function nrp_configure {
   read -t 5 -p "Note that this will backup your local config files with then .bak extension. [Y/n] " -n 1 -r REPLY
   echo
   if [[ ( -z "$REPLY" ) || ( $REPLY =~ ^[Yy] ) ]]; then
-    $HBP/user-scripts/configure_nrp || { echo ERROR; exit 1; }
+    "$HBP"/nrp-user-scripts/configure_nrp || { echo ERROR; exit 1; }
   fi
-}
-
-function clean_branches {
-  clean_all=$1
-
-  cd "$HBP" || { echo ERROR: $HBP NOT FOUND; exit 1; }
-  source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
-
-  echo
-  echo =========================
-  echo Cleaning up branches
-  echo =========================
-  if [ "$clean_all" = "all" ]
-  then
-    repos=(
-    ${nrp_3rd_party[*]}
-    ${nrp_repos[*]}
-  )
-  else
-    repos=(
-      ${nrp_repos[*]}
-    )
-  fi
-  for i in "${repos[@]}"
-  do
-    echo
-    echo -------------------------
-    echo "$i"
-    echo -------------------------
-    sleep 2
-    cd $i || { echo ERROR; exit 1; }
-    git branch | grep -v "master" | grep -v "development" | xargs git branch -D 2>/dev/null
-    cd ..
-  done
-}
-
-function it_branch {
-  itbranch_all=$1
-
-  cd "$HBP" || { echo ERROR; exit 1; }
-  source "$HBP"/user-scripts/repos.txt || { echo ERROR; exit 1; }
-
-  echo
-  echo =========================
-  echo Creating clean IT branch
-  echo =========================
-  if [ "$itbranch_all" = "all" ]
-  then
-    repos=(
-    ${nrp_3rd_party[*]}
-    ${nrp_repos[*]}
-  )
-  else
-    repos=(
-      ${nrp_repos[*]}
-    )
-  fi
-  for i in "${repos[@]}"
-  do
-    echo
-    echo -------------------------
-    echo $i
-    echo -------------------------
-    sleep 2
-    cd "$i" || { echo ERROR; exit 1; }
-    { git branch | grep "^ *IT$" && git branch -D IT || true; } && git checkout -b IT || { echo ERROR; exit 1; }
-    cd ..
-  done
-}
-
-function merge_dev {
-
-  cd "$HBP" || { echo ERROR; exit 1; }
-  source $HBP/user-scripts/repos.txt || { echo ERROR; exit 1; }
-
-  echo
-  echo ===============================
-  echo Merging development on master
-  echo ===============================
-  repos=(
-  ${nrp_3rd_party[*]}
-  ${nrp_repos[*]}
-  )
-
-  for i in "${repos[@]}"
-  do
-    echo
-    echo -------------------------
-    echo $i
-    echo -------------------------
-    sleep 2
-    cd $i || { echo ERROR; exit 1; }
-    git checkout development || { echo ERROR; exit 1; }
-    git pull --rebase || { echo ERROR; exit 1; }
-    git checkout master || { echo ERROR; exit 1; }
-    git pull --rebase || { echo ERROR; exit 1; }
-    git merge development || { echo ERROR; exit 1; }
-    git push || { echo ERROR; exit 1; }
-    gitk
-    cd ..
-  done
 }
 
 function set_up_tingoDB {
@@ -488,8 +228,8 @@ function set_up_tingoDB {
   if [ ! -d "$STORAGE_PATH" ]; then
    mkdir -p $STORAGE_PATH || { echo ERROR; exit 1;}
   fi
-  cd "$HBP"/nrpBackendProxy || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
-  node_modules/ts-node/dist/bin.js "$HBP"/nrpBackendProxy/utils/createFSUser.ts --user nrpuser --password password || { echo ERROR; exit 1; }
+  cd "$HBP"/nrp-proxy || { echo NOT FOUND. You might want to run the clone-all-repos script to get this repo; exit 1; }
+  node_modules/ts-node/dist/bin.js "$HBP"/nrp-proxy/utils/createFSUser.ts --user nrpuser --password password || { echo ERROR; exit 1; }
 }
 
 function add_new_user_tingoDB {
@@ -536,7 +276,7 @@ function add_new_user_tingoDB {
       exit 0
     fi
   fi
-  pushd "$HBP"/nrpBackendProxy >/dev/null || { echo ERROR; exit 1; }
-  node_modules/ts-node/dist/bin.js "$HBP"/nrpBackendProxy/utils/createFSUser.ts --user "$username" --password "$password" || { echo ERROR; exit 1; }
+  pushd "$HBP"/nrp-proxy >/dev/null || { echo ERROR; exit 1; }
+  node_modules/ts-node/dist/bin.js "$HBP"/nrp-proxy/utils/createFSUser.ts --user "$username" --password "$password" || { echo ERROR; exit 1; }
   popd >/dev/null || { echo ERROR; exit 1; }
 }

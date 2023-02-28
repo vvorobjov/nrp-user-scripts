@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script gives many NRP updating options to users
 
-source "$HBP"/user-scripts/nrp_functions || { echo ERROR; exit 1; }
+source "$HBP"/nrp-user-scripts/nrp_functions || { echo ERROR; exit 1; }
 
 # Python2.7 compatible branch in NRP 3.1
 python2_branches=("master18" "master16")
@@ -81,23 +81,19 @@ function branch_is_valid () {
 function help () {
   echo
   if [ "$NRP_INSTALL_MODE" != "user" ]; then
-    echo "Usage: "$(basename $0)" <command> [--all] [--spiking-cerebellum] [--branch=<branch_name>]"
+    echo "Usage: "$(basename $0)" <command> [--branch=<branch_name>]"
     echo
     echo "  If '--branch' is not provided, <branch_name> defaults to development"
   else
     echo "Usage: "$(basename $0)" <command> [--all] [--spiking-cerebellum]"
     echo
   fi
-  echo "  If '--all' is provided, include 3rd party repos (gazebo, opensim, nest, ...)"
-  echo "  If '--spiking-cerebellum' is provided with 'build', build NEST/SpikingCerebellum"
   echo "  Available commands:"
   echo "    help    : Print this message"
   echo "    rebase  : Switch repos to master and rebase"
-  echo "    build   : Build all buildable repos (except 3rd party)"
+  echo "    build   : Build all buildable repos"
   echo "    update  : Run rebase followed by build"
   echo "              You will be prompted to run configure_nrp"
-  echo "    itmaster: Rebases your NRP and create a clean IT branch in each repo"
-  echo "    gitclean: Removes all local branches except master and development"
 }
 
 # parse command
@@ -140,7 +136,7 @@ while :; do
   shift
 done
 
-[ -z $branch_name ] && branch_name="development" # default to development
+[ -z "$branch_name" ] && branch_name="development" # default to development
 # validate branch: check whether is compatible with the Python version in use
 if ! branch_is_valid "$branch_name"; then
   exit_with_message 'ERROR: "%s" branch is not compatible with Python %s' "$branch_name" "$PYTHON_VERSION_MAJOR"
@@ -152,7 +148,7 @@ case "$command" in
   nrp_rebase $all $branch_name
   ;;
 "build")
-  nrp_build $all $spiking_cerebellum_option
+  nrp_build
   ;;
 "update")
   nrp_rebase $all $branch_name
@@ -163,7 +159,7 @@ case "$command" in
   echo
   sleep 3
   nrp_configure
-  nrp_build $all $spiking_cerebellum_option
+  nrp_build
   echo
   echo "----------------------------"
   echo "Second pass of nrp_configure"
@@ -171,13 +167,6 @@ case "$command" in
   echo
   sleep 2
   nrp_configure
-  ;;
-"itmaster")
-  nrp_rebase $all $branch_name
-  it_branch $all
-  ;;
-"gitclean")
-  clean_branches $all
   ;;
 *)
   help

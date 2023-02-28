@@ -75,12 +75,8 @@ print-%:
 
 devinstall: virtualenv
 	for f in $(INSTALL_MODULES); do \
-		if [ -f $$f/setup_requirements.txt ]; then \
-			$(PIP) install $(PIPPROXY) -r $$f/setup_requirements.txt; \
-                fi; \
-		sed -i 's/.*# *EPFL_SPECIFIC/#&/' $$f/requirements.txt; \
-		(cd $$f && $(PIP) install $(PIPPROXY) --pre -e .$(OPTIONAL_FEATURES)); \
-		sed -i '/# *EPFL_SPECIFIC/s/^#*//' $$f/requirements.txt; \
+		[ -f $$f/setup_requirements.txt ] && $(PIP) install $(PIPPROXY) -r $$f/setup_requirements.txt; \
+		(cd $$f && $(PIP) install $(PIPPROXY) --pre -e .$(OPTIONAL_FEATURES)) || exit 1; \
 	done
 
 #delete everything we don't need
@@ -91,6 +87,44 @@ clean:
 	done
 
 .PHONY: devinstall clean download-req
+
+###########################################################
+######################### SCHEMAS #########################
+###########################################################
+
+#$(info $$SCHEMA_GENERATION is [${SCHEMA_GENERATION}])
+
+ifdef SCHEMA_GENERATION
+
+schemas-build: virtualenv 
+	for f in $(SCHEMA_GENERATION); do \
+		IFS=':' read -r -a schema <<< "$$f"; \
+		. $(PLATFORM_VENV)/bin/activate;\
+		pyxbgen -u $(HBP)/"$${schema[0]}"/"$${schema[1]}" -m "$${schema[2]}" 2>&1 | grep -v "^WARNING" || { echo ERROR;exit 1; }; \
+	done
+
+schemas-install: schemas-build $(SCHEMA_TARGET_LOCATION)/__init__.py
+	for f in $(SCHEMA_GENERATION); do \
+		IFS=':' read -r -a schema <<< "$$f"; \
+		mv "$${schema[2]}".py $(SCHEMA_TARGET_LOCATION)/ ;\
+	done
+
+schemas-clean:
+	for f in $(SCHEMA_GENERATION); do \
+		IFS=':' read -r -a schema <<< "$$f"; \
+		rm -rf $(SCHEMA_TARGET_LOCATION)/"$${schema[2]}".py; \
+	done
+
+$(SCHEMA_TARGET_LOCATION)/__init__.py: 
+	[ -z $$SCHEMA_TARGET_LOCATION ] || touch $@
+
+devinstall-schemas: devinstall schemas-install
+
+.PHONY: devinstall-schemas schemas-install schemas-build schemas-get schemas-dep
+
+#...ifdef SCHEMA_GENERATION
+endif  
+
 ###########################################################
 ######################### VirtualEnv ######################
 ###########################################################
@@ -119,3 +153,16 @@ $(PLATFORM_VENV)/new-pip.txt: $(PLATFORM_VENV)/bin/activate
 	$(CHECK_PYTHON_PATH)
 	$(PIP) install $(PIPPROXY) -r $< --upgrade --pre
 	touch $@
+
+###########################################################
+######################### VERSION #########################
+###########################################################
+
+# Get version from the git tagging
+set-nrp-version:
+	$(eval SCM_VERSION := $(shell source $(HBP)/nrp-user-scripts/nrp_get_scm_version.sh get_scm_version))
+	for f in $(TEST_MODULES); do \
+		echo "VERSION = '$(SCM_VERSION)'" > $$f/version.py; \
+	done
+
+.PHONY: set-nrp-version

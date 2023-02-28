@@ -1,97 +1,37 @@
-PYTHON_VERSION_MAJOR_MINOR=$(python -c "from sys import version_info as v_i; print('{}.{}'.format(v_i.major, v_i.minor))")
-PYTHON_VERSION_MAJOR=$(python -c "import sys; print(sys.version_info.major)")
+backend_pythonpath='export PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages'
+backend_cmd='uwsgi --ini $HOME/.local/etc/nginx/uwsgi-nrp.ini --plugin $UWSGI_PLUGIN'
+backend_debug_pycharm='export NRP_DEBUG=pycharm'
+backend_debug_vscode='export NRP_DEBUG=vscode'
 
-if [[ $PYTHON_VERSION_MAJOR -lt 3 ]]; then
-    UWSGI_PLUGIN="python"
-else
-    UWSGI_PLUGIN="python3" 
-fi
+nrp_backend="${backend_pythonpath}; ${backend_cmd}"
+nrp_backend_debug_vscode="${backend_pythonpath}; ${backend_debug_vscode}; ${backend_cmd} --pyargv \"--debug --verbose\""
+nrp_backend_debug_pycharm="${backend_pythonpath}; ${backend_debug_pycharm}; ${backend_cmd} --pyargv \"--debug --verbose\""
 
-alias cle-backend='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages && uwsgi --ini $HOME/.local/etc/nginx/uwsgi-nrp.ini --plugin $UWSGI_PLUGIN'
-alias cle-backend-debug='PYTHONPATH=$PYTHONPATH:$HOME/.opt/platform_venv/lib/python$PYTHON_VERSION_MAJOR_MINOR/site-packages && export CLE_DEBUG=1 && uwsgi --ini $HOME/.local/etc/nginx/uwsgi-nrp.ini --plugin $UWSGI_PLUGIN'
-alias cle-factory='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py'
-alias cle-factory-debug='$HOME/.opt/platform_venv/bin/python $HBP/ExDBackend/hbp_nrp_cleserver/hbp_nrp_cleserver/server/ROSCLESimulationFactory.py --vsdebug'
-alias cle-rosbridge='rosrun rosbridge_server rosbridge_websocket'
-alias cle-frontend='cd $HBP/ExDFrontend && grunt serve'
-alias cle-nginx='$HOME/.local/etc/init.d/nginx restart'
-alias cle-proxy='cd $HBP/nrpBackendProxy && npm start'
-alias cle-rosvideo='rosrun web_video_server web_video_server _port:=8081'
-alias cle-use-sim-time='rosparam set use_sim_time true'
+alias nrp-backend="${nrp_backend}"
+alias nrp-backend-verbose="${nrp_backend} --pyargv \"--verbose\""
+alias nrp-backend-debug-vscode="${nrp_backend_debug_vscode}"
+alias nrp-backend-debug-pycharm="${nrp_backend_debug_pycharm}"
 
-cle-virtual-coach()
+#alias nrp-frontend='cd $HBP/nrp-frontend && grunt serve'
+alias nrp-proxy='nvm use 8 && npm start --prefix $HBP/nrp-proxy'
+alias nrp-nginx='$HOME/.local/etc/init.d/nginx restart'
+alias nrp-haproxy='$HOME/.local/etc/init.d/haproxy restart'
+alias nrp-reverse-proxies='nrp-nginx && nrp-haproxy'
+alias nrp-frontend-dev='nvm use 14 && npm start --prefix $HBP/nrp-frontend'
+
+
+nrp_restart_backend()
 {
-    # activate virtual environment
-    source ~/.opt/platform_venv/bin/activate
-
-    # usage information and examples for no arguments or -h flag
-    if [ "$#" -eq 0 ]  || [ "$1" == "-h" ] ; then
-        echo "Usage: cle-virtual-coach [-h] [args]"
-        echo "       [-h] Print this usage information."
-        echo "       [args] arguments to run in a VirtualCoach configured environment, e.g.:"
-        echo "              cle-virtual-coach foo.py a b c -> launches foo.py with arguments"
-        echo "              cle-virtual-coach jupyter notebook -> launches a jupyter notebook session"
-        echo "              cle-virtual-coach python -> launches a python interpreter session"
-
-    # user specified Python script, convenience to avoid the extra 'python' in arguments
-    elif [[ "$1" == *\.py ]] ; then
-        python "$@"
-
-    # otherwise just run whatever command as provided
-    else
-        eval "$@"      # run any user commands with the modified PYTHONPATH
-    fi
-
-    # save the exit code for last executed command
-    RES=$?
-
-    # deactivate virtual environment
-    deactivate
-
-    # propagate the exit codes if needed above
-    return $RES
-}
-
-cle_restart_backend()
-{
-  kill_list=("python.*roscore"
-            "python\\s.*rosmaster"
-            "python\\s.*rosbridge"
-            "lib/rosout/rosout"
-            "${GZSERVER_BIN_DIR}/gzserver"
-            "python\\s.*runserver\\.py"
-            "python\\s.*ROSCLESimulationFactory\\.py"
-            "python\\s.*StateMachineRunner\\.py"
-            "python\\s.*BrainProcess"
-            "python\\s.*CLELauncher"
-            "node\\s.*ws_server\\.js"
-            "web_video_server"
-            "uwsgi")
+  kill_list=("uwsgi")
 
   kill_hbp_processes "${kill_list[@]}"
 
-  roscore & sleep 1
-  cle-rosvideo & sleep 1
-  cle-factory & sleep 1
-  cle-backend &
-  cle-rosbridge &
+  nrp-backend &
 }
 
-kill_hbp_cle()
+kill_hbp_nrp()
 {
-  kill_list=("python.*roscore"
-            "python\\s.*rosmaster"
-            "python\\s.*rosbridge"
-            "lib/rosout/rosout"
-            "${GZSERVER_BIN_DIR}/gzserver"
-            "python\\s.*runserver\\.py"
-            "python\\s.*ROSCLESimulationFactory\\.py"
-            "python\\s.*StateMachineRunner\\.py"
-            "python\\s.*BrainProcess"
-            "python\\s.*CLELauncher"
-            "[0-9]+\\snode\\s.*\\sapp\\.ts$"
-            "node\\s.*ws_server\\.js"
-            "web_video_server"
-            "uwsgi")
+  kill_list=("uwsgi")
 
   kill_hbp_processes "${kill_list[@]}"
 }
@@ -139,7 +79,7 @@ kill_hbp_processes()
     rm -f "$HOME"/.gazebo/gzserver.lock
     rm -f "$HBP"/gzweb/gzbridge.lock
 
-    # double check everything is killed, this is mostly to ensure a cle-kill
+    # double check everything is killed, this is mostly to ensure a nrp-kill
     # during a startup or process spawning is as successful as we can make it
     if [[ ${#pgids[@]} -gt 0 ]]
     then
@@ -147,7 +87,7 @@ kill_hbp_processes()
     fi
 }
 
-alias cle-start='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-use-sim-time & sleep 1; cle-rosvideo & sleep 1;cle-factory & sleep 1;cle-backend & sleep 1; cle-proxy & cle-rosbridge'
-alias cle-debug='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;roscore & sleep 1;cle-use-sim-time & sleep 1; cle-rosvideo & sleep 1;cle-factory-debug & sleep 1;cle-backend-debug & sleep 1; cle-proxy & cle-rosbridge'
-alias cle-kill='kill_hbp_cle'
-alias cle-postgres='pg_ctl -D $HOME/.local/postgres/data/ -l logfile restart'
+alias nrp-start='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;nrp-backend & sleep 1; nrp-proxy'
+alias nrp-debug-vscode='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;nrp-backend-debug-vscode & sleep 1; nrp-proxy'
+alias nrp-debug-pycharm='export VIRTUAL_ENV=$NRP_VIRTUAL_ENV;nrp-backend-debug-pycharm & sleep 1; nrp-proxy'
+alias nrp-kill='kill_hbp_nrp'
