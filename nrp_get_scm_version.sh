@@ -76,7 +76,6 @@ function set_scm_version {
 
   # update Python modules versions
   for i in "${nrp_python[@]}"; do
-    cp -f "$HBP/nrp-user-scripts/config_files/user_makefile" "$HBP/$i"
     pushd "$HBP/$i" || continue
       make set-nrp-version
     popd
