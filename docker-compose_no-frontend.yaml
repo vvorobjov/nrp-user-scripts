@@ -1,0 +1,63 @@
+version: '3.0'
+
+services:
+  mqtt-broker-service:
+    image: eclipse-mosquitto
+    volumes:
+      - ${HBP}/nrp-user-scripts/config_files/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - 1883:1883
+      - 8883:8883
+    container_name: mqtt-broker
+
+  haproxy-service:
+    image: haproxy:2.7
+    container_name: nrp-haproxy
+    volumes:
+      - ${HBP}/nrp-user-scripts/config_files/haproxy/local_docker/haproxy.docker.nofrontend.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ${HBP}/nrp-user-scripts/config_files/haproxy/cors.lua:/usr/local/etc/haproxy/lua_scripts/cors.lua
+    ports:
+      - 9000:9000
+    depends_on:
+      - nrp-proxy-service
+
+  #nrp-frontend-service:
+    #image: docker-registry.ebrains.eu/nrp/nrp-core/nrp-frontend${NRP_CORE_TAG}
+    #container_name: nrp-frontend
+    # TODO: [NRRPLT-8789] Configuration not working
+    # volumes:
+      # - ${HBP}/nrp-user-scripts/config_files/nrp-frontend/config.json.local.docker:/nrp-frontend-app/build/config.json
+
+
+  nrp-proxy-service:
+    image: docker-registry.ebrains.eu/nrp/nrp-core/nrp-proxy${NRP_CORE_TAG}
+    container_name: nrp-proxy
+    volumes:
+      - ${HBP}/nrp-user-scripts/config_files/nrp-proxy/config.json.local.docker:/nrp-proxy-app/config.json
+      # - <Your-local-templates-folder>:/nrp-templates
+      - nrp-templates:/nrp-templates
+      - ${STORAGE_PATH}:/nrpStorage
+    depends_on:
+      - nrp-backend-service
+
+  nrp-backend-service:
+    # image: docker-registry.ebrains.eu/nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_CORE_TAG}
+    image: docker-registry.ebrains.eu/nrp/nrp-core/backend-nrp-gazebo-nest-ubuntu20${NRP_CORE_TAG}
+    container_name: nrp-backend
+    ports:
+      - 8090:8090
+    environment:
+      - STORAGE_ADDRESS=nrp-haproxy
+      - STORAGE_PORT=9000
+      - NRP_MQTT_BROKER_ADDRESS=mqtt-broker:1883
+    volumes:
+      - ${HBP}/nrp-user-scripts/config_files/nginx.docker/uwsgi-nrp.ini:/usr/uwsgi-nrp.ini
+      - ${HBP}/nrp-user-scripts/config_files/nginx.docker/nginx.conf:/etc/nginx/nginx.conf
+      - ${HBP}/nrp-user-scripts/config_files/nginx.docker/conf.d/nrp-services.conf:/etc/nginx/conf.d/nrp-services.conf
+      # - <Your-local-templates-folder>:/nrp-templates
+      - nrp-templates:/nrp-templates
+      - ${STORAGE_PATH}:/nrpStorage
+
+# You can specify your own Templates folder by nounting it instead of nrp-templates volume
+volumes:
+  nrp-templates:
