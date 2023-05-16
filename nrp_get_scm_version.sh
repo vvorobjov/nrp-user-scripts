@@ -65,7 +65,11 @@ function get_scm_version {
   fi
   
   # The resulting version is X.Y.patch[+development-distance][(+1).revHASH-non-development-branch]
-  echo -n "${version}.${patch}${suffix}"
+  if [ -z "$1" ]; then
+    echo -n "${version}.${patch}${suffix}"
+  else
+    echo -n "${version}.${patch}"
+  fi
 }
 
 ## The function for writing the calculated version to version files of the repositories
@@ -84,7 +88,7 @@ function set_scm_version {
   # update js versions
   for i in "${nrp_js[@]}"; do
     pushd "$HBP/$i" || continue
-      versionSCM=$(get_scm_version)
+      versionSCM=$(get_scm_version short)
       sed -i "s|\"version\".*\".*\"|\"version\": \"$versionSCM\"|" package.json
     popd
   done
