@@ -21,9 +21,8 @@ services:
   nrp-frontend-service:
     image: docker-registry.ebrains.eu/nrp/nrp-core/nrp-frontend${NRP_CORE_TAG}
     container_name: nrp-frontend
-    # TODO: [NRRPLT-8789] Configuration not working
-    # volumes:
-      # - ${HBP}/nrp-user-scripts/config_files/nrp-frontend/config.json.local.docker:/nrp-frontend-app/build/config.json
+    volumes:
+      - ${HBP}/nrp-user-scripts/config_files/nrp-frontend/config.js.local.docker:/nrp-frontend-app/build/config.js
 
 
   nrp-proxy-service:
