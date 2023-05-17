@@ -14,10 +14,9 @@ mkdir -p -v "$HOME"/.local/etc/haproxy "$HOME"/.local/var/log/haproxy "$HOME"/.l
 # echo "Copying user_makefile to python repos"
 # for i in "${nrp_python[@]}" ; do cp -f "$HBP"/nrp-user-scripts/config_files/user_makefile "$HBP"/$i; done
 
-echo "Copying Frontend config.json file"
-ln -s "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.json.local "$HBP"/nrp-frontend/src/config.json.local
-cp "$HBP"/nrp-frontend/src/config.json.local "$HBP"/nrp-frontend/src/config.json
-cp "$HBP"/nrp-frontend/src/config.json.local "$HBP"/nrp-frontend/build/config.json
+echo "Copying Frontend config.js file"
+ln -s "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.js.local "$HBP"/nrp-frontend/src/config.js.local
+cp "$HBP"/nrp-frontend/src/config.js.local "$HBP"/nrp-frontend/public/config.js
 
 # echo "Copying start/stop scripts for gzserver and gzbridge"
 # cp -r "$HBP"/nrp-user-scripts/nrp-services "$HOME"/.opt/bbp

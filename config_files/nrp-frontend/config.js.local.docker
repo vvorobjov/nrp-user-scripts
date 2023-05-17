@@ -1,0 +1,21 @@
+window.appConfig = {
+  api: {
+    proxy: {
+      url: "http://localhost:9000/proxy"
+    }
+  },
+  auth: {
+    enableOIDC: false,
+    clientId: "nrp_test_frontend",
+    url: "/authentication/loginpage?origin=FS"
+  },
+  mqtt: {
+    url: "localhost",
+    port: "9000",
+    topics: {
+      base: "nrp_simulation",
+      errors: "runtime_error",
+      status: "status"
+    }
+  }
+}

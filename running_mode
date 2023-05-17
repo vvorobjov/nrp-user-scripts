@@ -19,10 +19,11 @@ if [[ -z $mode ]]; then
 fi
 
 function enableFrontendOIDC {
-  echo "Editing Frontend config.json"
-  cp "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.json.oidc "$HBP"/nrp-frontend/src/config.json
+  echo "Editing Frontend config.js"
+  ln -s "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.js.oidc "$HBP"/nrp-frontend/src/config.js.oidc
+  cp "$HBP"/nrp-frontend/src/config.js.oidc "$HBP"/nrp-frontend/public/config.js
   if [ -d "$HBP"/nrp-frontend/build ]; then
-    cp "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.json.oidc "$HBP"/nrp-frontend/build/config.json
+    cp "$HBP"/nrp-frontend/src/config.js.oidc "$HBP"/nrp-frontend/build/config.js
   fi
 }
 
@@ -39,10 +40,11 @@ function enableNginxOIDC {
 }
 
 function disableFrontendOIDC {
-  echo "Editing Frontend config.json"
-  cp $HBP/nrp-user-scripts/config_files/nrp-frontend/config.json.local $HBP/nrp-frontend/src/config.json
+  echo "Editing Frontend config.js"
+  ln -s "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.js.local "$HBP"/nrp-frontend/src/config.js.local
+  cp "$HBP"/nrp-frontend/src/config.js.local "$HBP"/nrp-frontend/public/config.js
   if [ -d $HBP/nrp-frontend/build ]; then
-    cp $HBP/nrp-user-scripts/config_files/nrp-frontend/config.json.local $HBP/nrp-frontend/build/config.json
+    cp "$HBP"/nrp-frontend/src/config.js.local "$HBP"/nrp-frontend/build/config.js
   fi
 }
 
@@ -98,13 +100,8 @@ function disableCollabSupport {
   sed -e '/deactivate/ s/false/true/' -i config.json
 }
 
-function disableVersionUpdateCheck {
-  # set "checkEnabled: false" to the versionCheck object in the config
-  sed -e '/"checkEnabled"/ s/true/false/' -i $HBP/nrp-frontend/src/config.json
-}
-
 function replaceLocalhostByIP {
-  frontend_config=$HBP/nrp-frontend/src/config.json
+  frontend_config=$HBP/nrp-frontend/public/config.js
   proxy_config=$HBP/nrp-proxy/config.json
   sed -i "s/http:\/\/localhost/http:\/\/$local_host/g" $frontend_config $proxy_config
   sed -i "s/ws:\/\/localhost/ws:\/\/$local_host/g" $frontend_config $proxy_config
@@ -152,14 +149,12 @@ case $mode in
   enableNginxOIDC
   proxyUseLocalhostCollab
   enableCollabSupport
-  disableVersionUpdateCheck
   ;;
 4)
   enableFrontendOIDC
   enableNginxOIDC
   proxyUseLocalhostCollabAuthFsStorage
   enableCollabSupport
-  disableVersionUpdateCheck
   ;;
 5)
   ensureNoVPN
@@ -169,7 +164,6 @@ case $mode in
   proxyUseLocalhostFS
   disableCollabSupport
   replaceLocalhostByIP
-  disableVersionUpdateCheck
   ;;
 esac
 
