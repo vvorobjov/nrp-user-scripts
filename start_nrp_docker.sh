@@ -2,7 +2,7 @@
 
 # NOTE:
 # set the tag and repository if needed
-export NRP_CORE_TAG="${NRP_CORE_TAG:-:latest}"
+export NRP_IMAGE_TAG="${NRP_IMAGE_TAG:-:latest}"
 export NRP_DOCKER_REGISTRY="${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}"
 
 if [ -z "$HBP" ]; then

@@ -19,7 +19,7 @@ services:
       - nrp-proxy-service
 
   nrp-frontend-service:
-    image: docker-registry.ebrains.eu/nrp/nrp-core/nrp-frontend${NRP_CORE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-frontend${NRP_IMAGE_TAG}
     container_name: nrp-frontend
     # TODO: [NRRPLT-8789] Configuration not working
     # volumes:
@@ -27,7 +27,7 @@ services:
 
 
   nrp-proxy-service:
-    image: docker-registry.ebrains.eu/nrp/nrp-core/nrp-proxy${NRP_CORE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-proxy${NRP_IMAGE_TAG}
     container_name: nrp-proxy
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/nrp-proxy/config.json.local.docker:/nrp-proxy-app/config.json
@@ -38,8 +38,8 @@ services:
       - nrp-backend-service
 
   nrp-backend-service:
-    # image: docker-registry.ebrains.eu/nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_CORE_TAG}
-    image: docker-registry.ebrains.eu/nrp/nrp-core/backend-nrp-gazebo-nest-ubuntu20${NRP_CORE_TAG}
+    # image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_IMAGE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend
     environment:
       - STORAGE_ADDRESS=nrp-haproxy
