@@ -3,37 +3,37 @@ version: '3.9'
 services:
 
   nrp-frontend-service:
-    image: docker-registry.ebrains.eu/nrp/nrp-core/nrp-frontend${NRP_CORE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-frontend${NRP_IMAGE_TAG}
     container_name: nrp-frontend
     build:
       context: ${HBP}/nrp-frontend
 
   nrp-proxy-service:
-    image: docker-registry.ebrains.eu/nrp/nrp-core/nrp-proxy${NRP_CORE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-proxy${NRP_IMAGE_TAG}
     container_name: nrp-proxy
     build:
       context: ${HBP}/nrp-proxy
 
   nrp-gazebo-nest-service:
-    image: docker-registry.ebrains.eu/nrp/nrp-core/backend-nrp-gazebo-nest-ubuntu20${NRP_CORE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend
     build:
       context: ${HBP}/nrp-backend
       args:
-        - BASE_IMAGE=${NRP_DOCKER_REGISTRY}nrp-core/nrp-gazebo-nest-ubuntu20${NRP_CORE_TAG}
+        - BASE_IMAGE=${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp-core/nrp-gazebo-nest-ubuntu20${NRP_CORE_TAG:-$NRP_IMAGE_TAG}
 
   nrp-vanilla-service:
-    image: docker-registry.ebrains.eu/nrp/nrp-core/backend-nrp-vanilla-ubuntu20${NRP_CORE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-vanilla-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend
     build:
       context: ${HBP}/nrp-backend
       args:
-        - BASE_IMAGE=${NRP_DOCKER_REGISTRY}nrp-core/nrp-vanilla-ubuntu20${NRP_CORE_TAG}
+        - BASE_IMAGE=${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp-core/nrp-vanilla-ubuntu20${NRP_CORE_TAG:-$NRP_IMAGE_TAG}
 
   nrp-opensim-tvb-service:
-    image: docker-registry.ebrains.eu/nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_CORE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend
     build:
       context: ${HBP}/nrp-backend
       args:
-        - BASE_IMAGE=${NRP_DOCKER_REGISTRY}nrp-core/nrp-opensim-tvb-ubuntu20${NRP_CORE_TAG}
+        - BASE_IMAGE=${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp-core/nrp-opensim-tvb-ubuntu20${NRP_CORE_TAG:-$NRP_IMAGE_TAG}
