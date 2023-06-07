@@ -10,7 +10,7 @@
   },
   "port": 8443,
   "modelsPath": "$HBP/Models",
-  "experimentsPath": "/nrp-templates",
+  "templatesPath": "/nrp-templates",
   "servers": {
     "localhost": {
       "internalIp": "http://nrp-backend:8090",
