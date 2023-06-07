@@ -6,7 +6,7 @@
   },
   "auth": {
     "enableOIDC": false,
-    "clientId": "nrp_test_frontend",
+    "clientId": "nrp-test-frontend",
     "url": "/authentication/loginpage?origin=FS"
   },
   "mqtt": {
