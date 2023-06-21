@@ -81,6 +81,7 @@ sed -e 's|<HBP>|'"$HBP"'|' -i "$HOME"/.local/etc/nginx/conf.d/frontend.conf
 echo "Copying Haproxy config file"
 cp "$HBP"/nrp-user-scripts/config_files/haproxy/local_source/haproxy.cfg "$HOME"/.local/etc/haproxy/
 cp "$HBP"/nrp-user-scripts/config_files/haproxy/cors.lua "$HOME"/.local/etc/haproxy/cors.lua
+cp "$HBP"/nrp-user-scripts/config_files/haproxy/introspect.lua "$HOME"/.local/etc/haproxy/introspect.lua
 sed -e 's/<username>/'"$USER"'/' -i "$HOME"/.local/etc/haproxy/haproxy.cfg
 
 
