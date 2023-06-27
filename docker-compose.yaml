@@ -2,13 +2,13 @@ version: '3.0'
 
 services:
   mqtt-broker-service:
-    image: eclipse-mosquitto:2.0.15
+    image: eclipse-mosquitto
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
     container_name: mqtt-broker
 
   haproxy-service:
-    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-haproxy${NRP_IMAGE_TAG}
+    image: haproxy:2.7
     container_name: nrp-haproxy
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/haproxy/local_docker/haproxy.docker.cfg:/usr/local/etc/haproxy/haproxy.cfg
