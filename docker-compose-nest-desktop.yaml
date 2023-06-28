@@ -18,8 +18,6 @@ services:
       INSITE_ACCESS_ENABLED: true
       INSITE_ACCESS_URL: http://localhost:28080
       # NEST_SERVER_BUFFER_SIZE: 65535
-    ports:
-      - "8000:8000"
     container_name: nrp-nest-desktop
 
   insite-nest-module:
@@ -72,9 +70,8 @@ services:
   nrp-frontend-service:
     image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-frontend${NRP_IMAGE_TAG}
     container_name: nrp-frontend
-    # TODO: [NRRPLT-8789] Configuration not working
-    # volumes:
-      # - ${HBP}/nrp-user-scripts/config_files/nrp-frontend/config.json.local.docker:/nrp-frontend-app/build/config.json
+    volumes:
+      - ${HBP}/nrp-user-scripts/config_files/nrp-frontend/app-settings-nest-desktop.js:/nrp-frontend-app/public/app-settings.js
 
 
   nrp-proxy-service:
@@ -91,7 +88,7 @@ services:
 
   nrp-backend-service:
     # image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_IMAGE_TAG}
-    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend
     environment:
       - STORAGE_ADDRESS=nrp-haproxy
