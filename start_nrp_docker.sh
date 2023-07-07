@@ -24,4 +24,9 @@ if [ ! -d "$STORAGE_PATH/FS_db" ] || [ ! -f "$STORAGE_PATH/FS_db/users" ]; then
     docker compose down
 fi
 
-docker compose up --abort-on-container-exit "$@"
+DOCKER_COMPOSE_FILE="docker-compose.yaml"
+if [ "$NRP_NEST_DESKTOP" = "ON" ]; then
+  DOCKER_COMPOSE_FILE="docker-compose-nest-desktop.yaml"
+fi
+
+docker compose -f "$DOCKER_COMPOSE_FILE" up --abort-on-container-exit "$@"
