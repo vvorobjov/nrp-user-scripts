@@ -3,7 +3,7 @@
 # NOTE:
 # set the tag and repository if needed
 export NRP_IMAGE_TAG="${NRP_IMAGE_TAG:-:latest}"
-export NRP_DOCKER_REGISTRY="${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}"
+export NRP_DOCKER_REGISTRY="${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}"
 
 if [ -z "$HBP" ]; then
   echo "Your HBP variable is not set!"

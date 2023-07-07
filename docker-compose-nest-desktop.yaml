@@ -70,14 +70,14 @@ services:
       - nrp-proxy-service
 
   nrp-frontend-service:
-    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-frontend${NRP_IMAGE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp/nrp-core/nrp-frontend${NRP_IMAGE_TAG}
     container_name: nrp-frontend
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/nrp-frontend/app-settings-nest-desktop.js:/nrp-frontend-app/build/app-config.js
 
 
   nrp-proxy-service:
-    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-proxy${NRP_IMAGE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp/nrp-core/nrp-proxy${NRP_IMAGE_TAG}
     container_name: nrp-proxy
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/nrp-proxy/config.json.local.docker:/nrp-proxy-app/config.json
@@ -89,9 +89,9 @@ services:
       - nrp-backend-service
 
   nrp-backend-service:
-    # image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_IMAGE_TAG}
-    # image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
-    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
+    # image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp/nrp-core/backend-nrp-opensim-tvb-ubuntu20${NRP_IMAGE_TAG}
+    # image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp/nrp-core/backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp/nrp-core/backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend
     environment:
       - STORAGE_ADDRESS=nrp-haproxy
