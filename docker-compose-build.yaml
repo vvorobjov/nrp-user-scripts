@@ -22,6 +22,14 @@ services:
       args:
         - BASE_IMAGE=${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp-core/nrp-gazebo-nest-ubuntu20${NRP_CORE_TAG:-$NRP_IMAGE_TAG}
 
+  nrp-xpra-gazebo-nest-service:
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
+    container_name: nrp-backend
+    build:
+      context: ${HBP}/nrp-backend
+      args:
+        - BASE_IMAGE=${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp-core/nrp-xpra-gazebo-nest-ubuntu20${NRP_CORE_TAG:-$NRP_IMAGE_TAG}
+
   nrp-vanilla-service:
     image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-vanilla-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend

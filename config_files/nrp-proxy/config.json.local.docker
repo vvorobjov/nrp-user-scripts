@@ -15,7 +15,8 @@
     "localhost": {
       "internalIp": "http://nrp-backend:8090",
       "nrp-services": "http://localhost:9000/nrp-services",
-      "serverJobLocation": "local"
+      "serverJobLocation": "local",
+      "xpra": "http://localhost:9000/xpra/index.html"
     }
   },
   "storage": "FS",
