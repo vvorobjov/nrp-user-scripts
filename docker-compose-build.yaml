@@ -14,6 +14,13 @@ services:
     build:
       context: ${HBP}/nrp-proxy
 
+  nrp-haproxy-service:
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/nrp-haproxy${NRP_IMAGE_TAG}
+    container_name: nrp-haproxy
+    build:
+      context: ${HBP}/nrp-user-scripts
+      dockerfile: nrp-haproxy.Dockerfile
+
   nrp-gazebo-nest-service:
     image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/}nrp/nrp-core/backend-nrp-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
     container_name: nrp-backend
