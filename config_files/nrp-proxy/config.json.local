@@ -1,6 +1,8 @@
 {
   "nrpVersion": "4.0.0",
   "refreshInterval": 5000,
+  "bucketUrlApi" : "https://data-proxy-int.ebrains.eu/api/v1/buckets",
+  "searchTagUrl" : "https://wiki-int.ebrains.eu/rest/wikis/xwiki/tags/",
   "auth": {
     "renewInternal": 600000,
     "clientId": "nrp-proxy",

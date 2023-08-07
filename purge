@@ -30,7 +30,5 @@ rm -rf $HOME/.local/etc/nginx $HOME/.local/etc/init.d/nginx $HOME/.local/etc/def
 rm -rf $HOME/.local/etc/haproxy $HOME/.local/etc/init.d/haproxy $HOME/.local/var/log/haproxy
 
 if [ $NOBACKUP ]; then rm -f "$HBP"/nrp-frontend/src/config.json.bak*; else backup "$HBP"/nrp-frontend/src/config.json; fi
-rm -f "$HBP"/nrp-frontend/src/config.json.local
 if [ $NOBACKUP ]; then rm -f "$HBP"/nrp-proxy/config.json.bak*; else backup "$HBP"/nrp-proxy/config.json; fi
-rm -f "$HBP"/nrp-proxy/config.json.local
 echo "DONE"

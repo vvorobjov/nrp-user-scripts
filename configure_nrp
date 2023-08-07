@@ -1,54 +1,27 @@
 #!/bin/bash
 # A script to set-up config files for nginx, Frontend
 
-source "$HBP"/nrp-user-scripts/repos.txt
+set -e
 
 "$HBP"/nrp-user-scripts/purge
 GROUPNAME=$(/usr/bin/id -gn)
 export GROUPNAME
-mkdir -p -v "$HOME"/.local/etc/nginx "$HOME"/.local/etc/init.d "$HOME"/.local/etc/default "$HOME"/nginx "$HOME"/.local/var/log/nginx "$HOME"/.local/etc/nginx/lua "$HOME"/.local/etc/nginx/conf.d "$HOME"/.opt/bbp "$HOME"/.local/run/haproxy
+mkdir -p -v "$HOME"/.local/etc/nginx "$HOME"/.local/etc/init.d "$HOME"/.local/etc/default "$HOME"/nginx "$HOME"/.local/var/log/nginx "$HOME"/.local/etc/nginx/lua "$HOME"/.local/etc/nginx/conf.d "$HOME"/.local/run/haproxy
 
 # Create haproxy folder in .local
 mkdir -p -v "$HOME"/.local/etc/haproxy "$HOME"/.local/var/log/haproxy "$HOME"/.local/var/run
 
-# echo "Copying user_makefile to python repos"
-# for i in "${nrp_python[@]}" ; do cp -f "$HBP"/nrp-user-scripts/config_files/user_makefile "$HBP"/$i; done
-
 echo "Copying Frontend config.json file"
-ln -s "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.json.local "$HBP"/nrp-frontend/src/config.json.local
-cp "$HBP"/nrp-frontend/src/config.json.local "$HBP"/nrp-frontend/src/config.json
-cp "$HBP"/nrp-frontend/src/config.json.local "$HBP"/nrp-frontend/build/config.json
-
-# echo "Copying start/stop scripts for gzserver and gzbridge"
-# cp -r "$HBP"/nrp-user-scripts/nrp-services "$HOME"/.opt/bbp
-# chmod u+x "$HOME"/.opt/bbp/nrp-services/gzbridge
-# chmod u+x "$HOME"/.opt/bbp/nrp-services/gzserver
+cp "$HBP"/nrp-user-scripts/config_files/nrp-frontend/config.json.local "$HBP"/nrp-frontend/src/config.json
 
 echo "Copying Proxy config files."
-ln -s "$HBP"/nrp-user-scripts/config_files/nrp-proxy/config.json.local "$HBP"/nrp-proxy/config.json.local
-
-if ! node --version | grep  -q v8.
-then
-  source "$HOME"/.bashrc
-  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-  nvm use 8 >/dev/null
-  if [ $? -ne 0 ]
-  then
-    printf "\033[0;31mYou must use node v8. Please run 'nvm install 8 && nvm use 8 && nvm alias default 8 && npm install -g grunt', reopen your shells and run again './configure_nrp'\033[0m\n"
-    exit 1
-  fi
-  nvm alias default 8
-  printf "\033[0;31mSwitched to node v8. Please reopen all your shells and restart the server.\033[0m\n"
-  # read -tr 5
-fi
+cp "$HBP"/nrp-user-scripts/config_files/nrp-proxy/config.json.local "$HBP"/nrp-proxy/config.json
 
 echo "Copying Nginx config files"
-
 cp -r /etc/nginx/* "$HOME"/.local/etc/nginx/
 cp /etc/init.d/nginx "$HOME"/.local/etc/init.d/nginx
 
 echo "Copying Haproxy config files"
-
 cp -r /etc/haproxy/* "$HOME"/.local/etc/haproxy/
 cp /etc/init.d/haproxy "$HOME"/.local/etc/init.d/haproxy
 
@@ -86,22 +59,3 @@ sed -e 's/<username>/'"$USER"'/' -i "$HOME"/.local/etc/haproxy/haproxy.cfg
 
 echo "Copying uwsgi config file"
 cp "$HBP"/nrp-user-scripts/config_files/nginx/uwsgi-nrp.ini "$HOME"/.local/etc/nginx/uwsgi-nrp.ini
-
-
-printf "\033[1;33mWould you like to setup your local storage database with a default user? (Y/n)\033[0m\n"
-read -t 5 p
-if [ "$p" == "N" -o "$p" == "n" ]
-then
-  echo "Skipping default database user creation"
-else
-  echo "Setting up local storage database"
-  chmod +x "$HBP"/nrp-user-scripts/configure_storage_database
-  "$HBP"/nrp-user-scripts/configure_storage_database
-fi
-
-echo "Setting configuration files to default mode (offline mode)"
-"$HBP"/nrp-user-scripts/running_mode "2"
-echo "DONE"
-echo
-echo "Warning: your running mode has been switched to full local (2)."
-echo "         you might want to run running_mode to change it."
