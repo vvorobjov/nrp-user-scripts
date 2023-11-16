@@ -10,7 +10,9 @@
   },
   "port": 8443,
   "modelsPath": "$HBP/Models",
-  "templatesPath": "$HBP/nrp-core/examples/templates",
+  "templatesPath": {
+    "FS": "$HBP/nrp-core/examples/templates"
+  },
   "servers": {
     "localhost": {
       "internalIp": "http://localhost:8090",
