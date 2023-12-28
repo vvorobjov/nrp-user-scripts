@@ -52,3 +52,12 @@ services:
       context: ${HBP}/nrp-backend
       args:
         - BASE_IMAGE=${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp-core/nrp-opensim-tvb-ubuntu20${NRP_CORE_TAG:-$NRP_IMAGE_TAG}
+
+  nrp-xpra-opensim-tvb-service:
+    image: ${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp/nrp-core/backend-nrp-xpra-opensim-tvb-ubuntu20${NRP_IMAGE_TAG}
+    container_name: nrp-backend
+    build:
+      context: ${HBP}/nrp-backend
+      args:
+        - BASE_IMAGE=${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}nrp-core/nrp-xpra-opensim-tvb-ubuntu20${NRP_CORE_TAG:-$NRP_IMAGE_TAG}
+  
