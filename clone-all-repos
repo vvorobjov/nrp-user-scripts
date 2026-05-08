@@ -1,5 +1,36 @@
 #!/bin/bash
 # A script to clone all necessary repos when installing from scratch. the $HBP need to be set-up for this script to work successfully
+#
+# Upstream selection (EBR2-54). Default is Bitbucket; set
+# NRP_UPSTREAM=github to clone from the vvorobjov/nrp-* mirrors.
+#
+#   NRP_UPSTREAM=bitbucket  (default)  bitbucket.org/hbpneurorobotics/<repo>.git
+#   NRP_UPSTREAM=github                github.com/vvorobjov/nrp-<repo>.git
+#                                      (the 'nrp-' prefix is added if the
+#                                       bitbucket name doesn't already start
+#                                       with 'nrp-')
+#   NRP_UPSTREAM=<prefix-url>          <prefix-url>/<repo>.git
+NRP_UPSTREAM="${NRP_UPSTREAM:-bitbucket}"
+
+nrp_upstream_url() {
+    local repo="$1"
+    case "$NRP_UPSTREAM" in
+        bitbucket)
+            printf '%s\n' "https://bitbucket.org/hbpneurorobotics/${repo}.git"
+            ;;
+        github)
+            local gh_name="$repo"
+            case "$repo" in
+                nrp-*) ;;
+                *) gh_name="nrp-${repo}" ;;
+            esac
+            printf '%s\n' "https://github.com/vvorobjov/${gh_name}.git"
+            ;;
+        *)
+            printf '%s\n' "${NRP_UPSTREAM%/}/${repo}.git"
+            ;;
+    esac
+}
 
 install_dir="$HBP"
 
@@ -29,10 +60,11 @@ function clone_repo() {
   if [ -d "$1" ]; then
     echo "Skipped, directory already exists."
   else
+    repo_url=$(nrp_upstream_url "$1")
     if [ "$NRP_INSTALL_MODE" == "user" ]; then
-      git clone -b master --depth 1 https://bitbucket.org/hbpneurorobotics/"$1".git "$1"
+      git clone -b master --depth 1 "$repo_url" "$1"
     else
-      git clone https://bitbucket.org/hbpneurorobotics/"$1".git "$1"
+      git clone "$repo_url" "$1"
       pushd "$1" >/dev/null
       git checkout "$git_branch" || git checkout development
       popd >/dev/null
