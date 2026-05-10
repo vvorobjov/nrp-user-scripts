@@ -27,19 +27,15 @@ cp "$HBP"/nrp-frontend/src/config.json.local "$HBP"/nrp-frontend/build/config.js
 echo "Copying Proxy config files."
 ln -s "$HBP"/nrp-user-scripts/config_files/nrp-proxy/config.json.local "$HBP"/nrp-proxy/config.json.local
 
-if ! node --version | grep  -q v8.
-then
-  source "$HOME"/.bashrc
-  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-  nvm use 8 >/dev/null
-  if [ $? -ne 0 ]
-  then
-    printf "\033[0;31mYou must use node v8. Please run 'nvm install 8 && nvm use 8 && nvm alias default 8 && npm install -g grunt', reopen your shells and run again './configure_nrp'\033[0m\n"
-    exit 1
-  fi
-  nvm alias default 8
-  printf "\033[0;31mSwitched to node v8. Please reopen all your shells and restart the server.\033[0m\n"
-  # read -tr 5
+# EBR2-69: drop the hard pin to Node 8. nrp-proxy now needs Node >=20
+# (EBR2-44); the gate here just refuses an obviously-too-old runtime.
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+node_major=$(node --version 2>/dev/null | sed 's/^v\([0-9]*\)\..*/\1/')
+if [ -z "$node_major" ] || [ "$node_major" -lt 20 ]; then
+  printf "\033[0;31mNode >=20 is required (active: %s). " "$(node --version 2>&1)"
+  printf "Install Node 20 LTS — e.g. 'nvm install 20 && nvm alias default 20' "
+  printf "— reopen the shell and re-run ./configure_nrp.\033[0m\n"
+  exit 1
 fi
 
 echo "Copying Nginx config files"

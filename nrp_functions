@@ -180,11 +180,18 @@ function nrp_build {
     sleep 2
     cd "$HBP"/"$js_repo" || { echo ERROR; exit 1; }
 
+    # EBR2-69: stop hard-pinning Node 8 (proxy) / Node 14 (frontend).
+    # nrp-proxy now needs Node >=20 (EBR2-44), nrp-frontend >=18
+    # (EBR2-45). Source nvm if present so an opted-in user's
+    # default-version setup still works, but never force a specific
+    # version — let the active node pass through, with a hard floor.
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-    if [ "$js_repo" == "nrp-proxy" ]; then
-      nvm use 8
-    else
-      nvm use 14
+    node_major=$(node --version 2>/dev/null | sed 's/^v\([0-9]*\)\..*/\1/')
+    required=18
+    [ "$js_repo" == "nrp-proxy" ] && required=20
+    if [ -z "$node_major" ] || [ "$node_major" -lt "$required" ]; then
+      echo "ERROR: $js_repo needs Node >=$required; active node is ${node_major:-none}"
+      exit 1
     fi
 
     git checkout -- package.json

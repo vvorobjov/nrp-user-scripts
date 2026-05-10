@@ -13,11 +13,14 @@ alias nrp-backend-debug-vscode="${nrp_backend_debug_vscode}"
 alias nrp-backend-debug-pycharm="${nrp_backend_debug_pycharm}"
 
 #alias nrp-frontend='cd $HBP/nrp-frontend && grunt serve'
-alias nrp-proxy='nvm use 8 && npm start --prefix $HBP/nrp-proxy'
+# EBR2-69: dropped `nvm use 8/14` from these aliases. nrp-proxy needs
+# Node >=20 (EBR2-44); nrp-frontend >=18 (EBR2-45). Manage that with
+# the active shell's node — `nvm use default` once, not per-alias.
+alias nrp-proxy='npm start --prefix $HBP/nrp-proxy'
 alias nrp-nginx='$HOME/.local/etc/init.d/nginx restart'
 alias nrp-haproxy='$HOME/.local/etc/init.d/haproxy restart'
 alias nrp-reverse-proxies='nrp-nginx && nrp-haproxy'
-alias nrp-frontend-dev='nvm use 14 && npm start --prefix $HBP/nrp-frontend'
+alias nrp-frontend-dev='npm start --prefix $HBP/nrp-frontend'
 
 
 nrp_restart_backend()
