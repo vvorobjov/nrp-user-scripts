@@ -73,9 +73,10 @@ services:
         condition: service_healthy
 
   nrp-backend-service:
-    # image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}backend-nrp-opensim-tvb-ubuntu20${NRP_IMAGE_TAG}
-    # image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
-    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}backend-nrp-xpra-gazebo-nest-ubuntu20${NRP_IMAGE_TAG}
+    # Variant selection moves to NRP_IMAGE_TAG (e.g. :revival-baseline,
+    # :revival-opensim-tvb, …) once those tags are published. Until then,
+    # all variants pull from the single nrp-backend repository.
+    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-backend${NRP_IMAGE_TAG}
     container_name: nrp-backend
     environment:
       - STORAGE_ADDRESS=nrp-haproxy
