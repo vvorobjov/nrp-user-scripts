@@ -13,22 +13,14 @@
 # Optional env:
 #   STORAGE_PATH         — default $HOME/.opt/nrpStorage
 #   NRP_IMAGE_TAG        — default :latest
-#   NRP_DOCKER_REGISTRY  — default docker-registry.ebrains.eu/neurorobotics/
-#                          NOTE: see EBR2-35 / Phase 1 follow-up — to consume
-#                          the Docker Hub baseline (`hbpneurorobotics/nrp-*`)
-#                          the per-service `image:` strings in
-#                          docker-compose.yaml / docker-compose-nest-desktop.yaml
-#                          must be flattened from the legacy
-#                          `<registry>nrp/nrp-core/nrp-frontend<tag>` shape
-#                          to `<registry>nrp-frontend<tag>`. That refactor is
-#                          tracked separately so it doesn't conflict with
-#                          EBR2-37 / EBR2-38.
+#   NRP_DOCKER_REGISTRY  — default docker.io/hbpneurorobotics/
+#                          (compose `image:` paths are flattened, EBR2-56)
 #   NRP_NEST_DESKTOP     — set to ON to use docker-compose-nest-desktop.yaml
 
 set -euo pipefail
 
 export NRP_IMAGE_TAG="${NRP_IMAGE_TAG:-:latest}"
-export NRP_DOCKER_REGISTRY="${NRP_DOCKER_REGISTRY:-docker-registry.ebrains.eu/neurorobotics/}"
+export NRP_DOCKER_REGISTRY="${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}"
 
 if [ -z "${HBP:-}" ]; then
   echo "Your HBP variable is not set!" >&2
