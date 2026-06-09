@@ -12,14 +12,14 @@
 #   HBP                  — path to the parent dir holding nrp-user-scripts
 # Optional env:
 #   STORAGE_PATH         — default $HOME/.opt/nrpStorage
-#   NRP_IMAGE_TAG        — default :latest
-#   NRP_DOCKER_REGISTRY  — default docker.io/hbpneurorobotics/
-#                          (compose `image:` paths are flattened, EBR2-56)
+#   NRP_DOCKER_REGISTRY  — default docker.io/hbpneurorobotics/ ; the only
+#                          image knob. Per-service tags are pinned in the
+#                          compose files (frontend/proxy :development,
+#                          backend :nest-gazebo), so no NRP_IMAGE_TAG.
 #   NRP_NEST_DESKTOP     — set to ON to use docker-compose-nest-desktop.yaml
 
 set -euo pipefail
 
-export NRP_IMAGE_TAG="${NRP_IMAGE_TAG:-:latest}"
 export NRP_DOCKER_REGISTRY="${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}"
 
 if [ -z "${HBP:-}" ]; then
