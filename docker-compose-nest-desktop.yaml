@@ -36,7 +36,8 @@ services:
     image: eclipse-mosquitto
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    container_name: mqtt-broker
+    # [EBR2-86] No hardcoded container_name (collided with nrp-core example
+    # projects' `mqtt-broker`). Reachable via the `mqtt-broker-service` alias.
 
   haproxy-service:
     image: haproxy:2.7
@@ -78,7 +79,7 @@ services:
     environment:
       - STORAGE_ADDRESS=nrp-haproxy
       - STORAGE_PORT=9000
-      - NRP_MQTT_BROKER_ADDRESS=mqtt-broker:1883
+      - NRP_MQTT_BROKER_ADDRESS=mqtt-broker-service:1883
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/nginx.docker/uwsgi-nrp.ini:/usr/uwsgi-nrp.ini
       - ${HBP}/nrp-user-scripts/config_files/nginx.docker/nginx.conf:/etc/nginx/nginx.conf

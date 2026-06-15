@@ -34,6 +34,14 @@ Repo state:
   `hbpneurorobotics/nrp-proxy`, `hbpneurorobotics/nrp-backend`,
   tag `revival-baseline` or whatever the current Phase 1 tag is).
 
+Coexisting compose projects (EBR2-86):
+- The stack no longer hardcodes `container_name: mqtt-broker`, so it can run
+  alongside an nrp-core example project (e.g. the foraging-nest-gazebo experiment)
+  that also brings up a broker, without adopting/stopping it.
+- `start_nrp_docker.sh` still aborts with a clear message if a container it would
+  create (e.g. `nrp-backend`, `nrp-proxy`) already exists under a different
+  compose project — stop that project or rename its services first.
+
 ## Procedure
 
 ### 1. Set environment

@@ -3,7 +3,11 @@ services:
     image: eclipse-mosquitto
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    container_name: mqtt-broker
+    # [EBR2-86] No hardcoded container_name. It collided with the identically
+    # named `mqtt-broker` container declared by nrp-core example compose
+    # projects: `docker compose run/up` would adopt and stop that project's
+    # containers. Other services reach the broker via its compose service
+    # alias `mqtt-broker-service`.
 
   haproxy-service:
     image: haproxy:2.7
@@ -46,7 +50,7 @@ services:
     environment:
       STORAGE_ADDRESS: nrp-haproxy
       STORAGE_PORT: 9000
-      NRP_MQTT_BROKER_ADDRESS: mqtt-broker:1883
+      NRP_MQTT_BROKER_ADDRESS: mqtt-broker-service:1883
       NRP_XPRA_PORT: ${NRP_XPRA_PORT:-9876}
       NRP_DISPLAY: ${NRP_DISPLAY:-100}
     ports:

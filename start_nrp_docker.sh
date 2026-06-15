@@ -34,6 +34,45 @@ if [ -z "${STORAGE_PATH:-}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
+# Compose-file selection (needed before the bootstrap so the collision guard
+# below inspects the right container set).
+# ----------------------------------------------------------------------------
+DOCKER_COMPOSE_FILE="docker-compose.yaml"
+if [ "${NRP_NEST_DESKTOP:-OFF}" = "ON" ]; then
+  DOCKER_COMPOSE_FILE="docker-compose-nest-desktop.yaml"
+fi
+
+# ----------------------------------------------------------------------------
+# [EBR2-86] Cross-project container-name collision guard.
+# `docker compose run/up` adopts any pre-existing container whose name matches
+# one this stack declares — even one owned by an unrelated compose project —
+# and stops it, silently killing e.g. a running nrp-core example experiment.
+# The original trigger was a shared `container_name: mqtt-broker` (now dropped);
+# this guard additionally protects the remaining named containers. Abort with a
+# clear message rather than disrupting another project.
+# ----------------------------------------------------------------------------
+nrp_project_name="${COMPOSE_PROJECT_NAME:-$(basename "$PWD")}"
+nrp_name_conflicts=""
+while IFS= read -r cname; do
+  [ -n "$cname" ] || continue
+  owner=$(docker inspect "$cname" \
+            --format '{{ index .Config.Labels "com.docker.compose.project" }}' 2>/dev/null || true)
+  if [ -n "$owner" ] && [ "$owner" != "$nrp_project_name" ]; then
+    nrp_name_conflicts="${nrp_name_conflicts}  - ${cname} (compose project '${owner}')"$'\n'
+  fi
+done < <(docker compose -f "$DOCKER_COMPOSE_FILE" config 2>/dev/null \
+           | awk '/^[[:space:]]*container_name:/ {print $2}')
+if [ -n "$nrp_name_conflicts" ]; then
+  {
+    echo "ERROR: containers named below already exist under another compose project."
+    echo "Starting this stack would adopt and stop them. Stop that project (or rename"
+    echo "its services) before running this script:"
+    printf '%s' "$nrp_name_conflicts"
+  } >&2
+  exit 1
+fi
+
+# ----------------------------------------------------------------------------
 # TingoDB FS-storage bootstrap.
 # Pre-fix: a Ctrl-C during the createFSUser run (or a non-zero exit from
 # `docker compose down`) could leave $STORAGE_PATH/FS_db/ partially written
@@ -84,13 +123,8 @@ if storage_bootstrap_needed; then
 fi
 
 # ----------------------------------------------------------------------------
-# Compose-file selection and stack boot.
+# Stack boot.
 # ----------------------------------------------------------------------------
-DOCKER_COMPOSE_FILE="docker-compose.yaml"
-if [ "${NRP_NEST_DESKTOP:-OFF}" = "ON" ]; then
-  DOCKER_COMPOSE_FILE="docker-compose-nest-desktop.yaml"
-fi
-
 # Argument parsing: --foreground keeps the legacy
 # `up --abort-on-container-exit` behaviour. Default is `up --wait` so the
 # script returns once HEALTHCHECKs pass (relies on EBR2-37 healthchecks).
