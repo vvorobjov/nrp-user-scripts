@@ -1,5 +1,3 @@
-version: '3.0'
-
 services:
   mqtt-broker-service:
     image: eclipse-mosquitto
@@ -20,7 +18,7 @@ services:
         condition: service_healthy
 
   nrp-frontend-service:
-    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-frontend${NRP_IMAGE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-frontend:development
     container_name: nrp-frontend
     # TODO: [NRRPLT-8789] Configuration not working
     # volumes:
@@ -28,7 +26,7 @@ services:
 
 
   nrp-proxy-service:
-    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-proxy${NRP_IMAGE_TAG}
+    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-proxy:development
     container_name: nrp-proxy
     volumes:
       - ${HBP}/nrp-user-scripts/config_files/nrp-proxy/config.json.local.docker:/nrp-proxy-app/config.json
@@ -39,10 +37,11 @@ services:
         condition: service_healthy
 
   nrp-backend-service:
-    # Variant selection moves to NRP_IMAGE_TAG (e.g. :revival-baseline,
-    # :revival-opensim-tvb, …) once those tags are published. Until then,
-    # all variants pull from the single nrp-backend repository.
-    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-backend${NRP_IMAGE_TAG}
+    # The backend tag selects the nrp-core variant: `nest-gazebo` ships
+    # Gazebo + NEST (needed by most templates). Swap to `vanilla` for the
+    # slim no-simulator image. Frontend/proxy are variant-agnostic and
+    # pinned to `:development` above.
+    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-backend:nest-gazebo
     container_name: nrp-backend
     environment:
       STORAGE_ADDRESS: nrp-haproxy

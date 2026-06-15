@@ -41,12 +41,13 @@ Repo state:
 ```bash
 export HBP=/home/$(whoami)/git-tum            # or wherever your clones live
 export STORAGE_PATH=$HOME/.opt/nrpStorage     # default; can be elsewhere
-export NRP_DOCKER_REGISTRY=docker.io/         # Docker Hub
-export NRP_IMAGE_TAG=:revival-baseline        # match the published tag
 ```
 
-(`start_nrp_docker.sh` sets sensible defaults; setting them
-explicitly here makes the test reproducible.)
+`HBP` is the only required variable. Image registry/tags are baked into
+the compose files — frontend/proxy pull `:development`, backend pulls
+`:nest-gazebo` (Gazebo + NEST) — from `docker.io/hbpneurorobotics/` by
+default. Point at a mirror with `NRP_DOCKER_REGISTRY` if you must; there
+is no longer an `NRP_IMAGE_TAG` to set.
 
 ### 2. Bring the stack up
 
