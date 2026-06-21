@@ -1,0 +1,8 @@
+# [EBR2-96] Acceptance-suite runtime deps. playwright and pytest-playwright are
+# pinned together (0.5.x supports playwright 1.4x) so pip resolves a matching
+# browser driver; the Dockerfile then runs `playwright install chromium`.
+pytest==8.3.3
+pytest-playwright==0.5.2
+playwright==1.47.0
+requests==2.32.3
+paho-mqtt==2.1.0

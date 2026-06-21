@@ -129,22 +129,30 @@ regression — open a follow-up EBR2 ticket and link it to EBR2-33.
 
 ## Automated gate
 
-Step 4 (launch a husky experiment) has an automated, repeatable counterpart at
-`tests/husky_gate.sh`. Against a running stack it authenticates to the proxy,
-clones the `husky_braitenberg` template into FS storage, creates + starts a
-simulation through nrp-backend's REST API (forking nrp-core → Gazebo + NEST),
-asserts it reaches `started` with MQTT `nrp_simulation/<id>/status` events and
-no `runtime_error`, then stops the sim and deletes the clone. Exit 0 = PASS.
+Steps 3–6 (log in, launch a husky experiment, watch it run, stop it) have
+automated, repeatable counterparts under `tests/`:
+
+- **`tests/acceptance/`** — the thorough gate: two pytest suites that run a real
+  husky simulation against the live stack and assert it *actually steps* (sim
+  clock advances), not merely that it launched. `test_cli_experiment.py` drives
+  the REST API; `test_ui_experiment.py` drives the real frontend in a headless
+  browser (Playwright). Run both with `tests/run_acceptance.sh`. See
+  `tests/README.md`.
+- **`tests/husky_gate.sh`** — a fast bash smoke check (REST only) kept for quick
+  manual runs.
 
 ```bash
 cd "$HBP/nrp-user-scripts"
 ./start_nrp_docker.sh        # backend :nest-gazebo
-./tests/husky_gate.sh        # must exit 0
+./tests/run_acceptance.sh    # UI + CLI suites; must exit 0
+#   ./tests/husky_gate.sh    # or the quick bash smoke
 docker compose down
 ```
 
-Run it before opening a backend PR; CI can run it once the backend image is
-published. A non-zero exit is a release blocker.
+Run before opening a backend PR; CI runs the acceptance suites once the backend
+image is published (`.github/workflows/acceptance.yml`). A non-zero exit is a
+release blocker. Note the deep "clock advances" checks require the EBR2-97 fix
+in the published backend image.
 
 ## Recording the result
 

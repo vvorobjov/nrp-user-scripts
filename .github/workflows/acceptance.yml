@@ -1,0 +1,70 @@
+name: Stack acceptance suite (UI + CLI)
+
+# [EBR2-96] Brings the published containerized stack up and runs the pytest
+# acceptance suites (CLI/REST + Playwright UI) against it, launching a real
+# husky_braitenberg simulation and asserting it actually steps.
+#
+# CI runs on the GitHub mirror (Bitbucket holds PRs; development is synced to
+# GitHub, which fires this). The deep "simulation clock advances" assertions
+# require the EBR2-97 fix to be present in the published nrp-backend image; once
+# that fix is merged and the backend image rebuilt, this workflow is green.
+#
+# The suite container shares haproxy's network namespace, so no host port is
+# published and there is no clash with anything already on the runner's :9000.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [development, master]
+  pull_request:
+
+concurrency:
+  group: acceptance-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      # docker-compose mounts config from ${HBP}/nrp-user-scripts/... so HBP must
+      # be the parent of a directory literally named nrp-user-scripts.
+      HBP: ${{ github.workspace }}
+      STORAGE_PATH: ${{ github.workspace }}/nrpStorage
+    steps:
+      - name: Checkout (into nrp-user-scripts/)
+        uses: actions/checkout@v4
+        with:
+          path: nrp-user-scripts
+
+      - name: Bring the stack up
+        working-directory: nrp-user-scripts
+        run: |
+          set -euxo pipefail
+          mkdir -p "${STORAGE_PATH}"
+          ./start_nrp_docker.sh --wait
+
+      - name: Run acceptance suites (UI + CLI)
+        working-directory: nrp-user-scripts
+        run: ./tests/run_acceptance.sh
+
+      - name: Stack logs on failure
+        if: failure()
+        working-directory: nrp-user-scripts
+        run: docker compose -f docker-compose.yaml logs --tail=200 || true
+
+      - name: Upload results (JUnit + Playwright traces)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-results
+          path: nrp-user-scripts/tests/acceptance-results
+          if-no-files-found: ignore
+
+      - name: Tear the stack down
+        if: always()
+        working-directory: nrp-user-scripts
+        run: docker compose -f docker-compose.yaml down || true
