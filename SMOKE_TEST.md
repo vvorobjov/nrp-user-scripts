@@ -127,6 +127,25 @@ launching the experiment from the UI. If a step needs a workaround
 (e.g. "kill the proxy container and restart"), that's a Phase 1
 regression — open a follow-up EBR2 ticket and link it to EBR2-33.
 
+## Automated gate
+
+Step 4 (launch a husky experiment) has an automated, repeatable counterpart at
+`tests/husky_gate.sh`. Against a running stack it authenticates to the proxy,
+clones the `husky_braitenberg` template into FS storage, creates + starts a
+simulation through nrp-backend's REST API (forking nrp-core → Gazebo + NEST),
+asserts it reaches `started` with MQTT `nrp_simulation/<id>/status` events and
+no `runtime_error`, then stops the sim and deletes the clone. Exit 0 = PASS.
+
+```bash
+cd "$HBP/nrp-user-scripts"
+./start_nrp_docker.sh        # backend :nest-gazebo
+./tests/husky_gate.sh        # must exit 0
+docker compose down
+```
+
+Run it before opening a backend PR; CI can run it once the backend image is
+published. A non-zero exit is a release blocker.
+
 ## Recording the result
 
 After running, paste a short result block into the EBR2-40 ticket
