@@ -40,6 +40,19 @@ jobs:
         with:
           path: nrp-user-scripts
 
+      # docker-compose mounts ${HBP}/nrp-core/templates into the proxy + backend
+      # (that's where the husky_braitenberg experiment template lives). nrp-core
+      # is a sibling repo, not present on the runner, so sparse-checkout just its
+      # templates/ into ${HBP}/nrp-core — otherwise clone fails with ENOENT.
+      - name: Checkout nrp-core templates
+        uses: actions/checkout@v4
+        with:
+          repository: vvorobjov/nrp-core
+          ref: development
+          path: nrp-core
+          sparse-checkout: templates
+          sparse-checkout-cone-mode: false
+
       - name: Bring the stack up
         working-directory: nrp-user-scripts
         run: |
