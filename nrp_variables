@@ -91,7 +91,8 @@ export NRP_SIMULATION_DIR=/tmp/nrp-simulation-dir
 export GAZEBO_MODEL_PATH=$NRP_SIMULATION_DIR/assets:$HOME/.gazebo/models:$GAZEBO_MODEL_PATH
 
 # NRP local storage path
-export STORAGE_PATH=$HOME/.opt/nrpStorage
+# Soft default: honor a value the user already exported instead of clobbering it.
+export STORAGE_PATH=${STORAGE_PATH:-$HOME/.opt/nrpStorage}
 
 # General NRP
 export NRP_USER=$USER

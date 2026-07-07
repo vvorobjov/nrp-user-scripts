@@ -102,7 +102,11 @@ if storage_bootstrap_needed; then
   trap 'bootstrap_rollback' EXIT
 
   echo "Bootstrapping FS storage at $STORAGE_PATH (creating user 'nrpuser')..."
-  if ! docker compose run --rm nrp-proxy-service \
+  # --no-deps: createFSUser.ts only writes the TingoDB `users` file into the
+  # mounted $STORAGE_PATH from inside the proxy container; it needs no other
+  # running service. Without it, compose would also start nrp-proxy-service's
+  # dependency chain — the multi-GB nest-gazebo backend — just to write a file.
+  if ! docker compose -f "$DOCKER_COMPOSE_FILE" run --rm --no-deps nrp-proxy-service \
         node_modules/ts-node/dist/bin.js utils/createFSUser.ts \
         --user nrpuser --password password; then
     echo "createFSUser failed; rolling back." >&2
@@ -110,7 +114,9 @@ if storage_bootstrap_needed; then
     trap - INT TERM EXIT
     exit 1
   fi
-  docker compose down
+  # Guarded: a non-zero exit from teardown (e.g. nothing to remove) must not
+  # abort the script under `set -e` before the trap is cleared below.
+  docker compose -f "$DOCKER_COMPOSE_FILE" down || true
 
   trap - INT TERM EXIT
 
@@ -134,6 +140,11 @@ for a in "$@"; do
   case "$a" in
     --foreground|-f)
       mode="foreground"
+      ;;
+    --wait)
+      # Documented flag; the detached path already passes --wait to compose.
+      # Consume it here so it isn't forwarded a second time via extra_args.
+      mode="wait"
       ;;
     --)
       ;;
