@@ -135,6 +135,11 @@ for a in "$@"; do
     --foreground|-f)
       mode="foreground"
       ;;
+    --wait)
+      # Documented flag; the detached path already passes --wait to compose.
+      # Consume it here so it isn't forwarded a second time via extra_args.
+      mode="wait"
+      ;;
     --)
       ;;
     *)
