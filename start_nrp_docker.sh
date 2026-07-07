@@ -102,7 +102,11 @@ if storage_bootstrap_needed; then
   trap 'bootstrap_rollback' EXIT
 
   echo "Bootstrapping FS storage at $STORAGE_PATH (creating user 'nrpuser')..."
-  if ! docker compose -f "$DOCKER_COMPOSE_FILE" run --rm nrp-proxy-service \
+  # --no-deps: createFSUser.ts only writes the TingoDB `users` file into the
+  # mounted $STORAGE_PATH from inside the proxy container; it needs no other
+  # running service. Without it, compose would also start nrp-proxy-service's
+  # dependency chain — the multi-GB nest-gazebo backend — just to write a file.
+  if ! docker compose -f "$DOCKER_COMPOSE_FILE" run --rm --no-deps nrp-proxy-service \
         node_modules/ts-node/dist/bin.js utils/createFSUser.ts \
         --user nrpuser --password password; then
     echo "createFSUser failed; rolling back." >&2
