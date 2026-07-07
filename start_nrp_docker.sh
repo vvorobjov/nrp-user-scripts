@@ -114,7 +114,9 @@ if storage_bootstrap_needed; then
     trap - INT TERM EXIT
     exit 1
   fi
-  docker compose -f "$DOCKER_COMPOSE_FILE" down
+  # Guarded: a non-zero exit from teardown (e.g. nothing to remove) must not
+  # abort the script under `set -e` before the trap is cleared below.
+  docker compose -f "$DOCKER_COMPOSE_FILE" down || true
 
   trap - INT TERM EXIT
 
