@@ -102,7 +102,7 @@ if storage_bootstrap_needed; then
   trap 'bootstrap_rollback' EXIT
 
   echo "Bootstrapping FS storage at $STORAGE_PATH (creating user 'nrpuser')..."
-  if ! docker compose run --rm nrp-proxy-service \
+  if ! docker compose -f "$DOCKER_COMPOSE_FILE" run --rm nrp-proxy-service \
         node_modules/ts-node/dist/bin.js utils/createFSUser.ts \
         --user nrpuser --password password; then
     echo "createFSUser failed; rolling back." >&2
@@ -110,7 +110,7 @@ if storage_bootstrap_needed; then
     trap - INT TERM EXIT
     exit 1
   fi
-  docker compose down
+  docker compose -f "$DOCKER_COMPOSE_FILE" down
 
   trap - INT TERM EXIT
 
