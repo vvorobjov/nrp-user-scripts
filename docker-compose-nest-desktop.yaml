@@ -71,10 +71,10 @@ services:
 
   nrp-backend-service:
     # The backend tag selects the nrp-core variant: `nest-gazebo` ships
-    # Gazebo + NEST (needed by most templates). Swap to `vanilla` for the
-    # slim no-simulator image. Frontend/proxy are variant-agnostic and
-    # pinned to `:development` above.
-    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-backend:nest-gazebo
+    # Gazebo + NEST (needed by most templates). Set NRP_BACKEND_TAG=vanilla
+    # for the slim no-simulator image (default stays nest-gazebo). Frontend/
+    # proxy are variant-agnostic and pinned to `:development` above.
+    image: ${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}nrp-backend:${NRP_BACKEND_TAG:-nest-gazebo}
     container_name: nrp-backend
     environment:
       - STORAGE_ADDRESS=nrp-haproxy
