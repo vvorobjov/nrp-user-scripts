@@ -12,15 +12,19 @@
 #   HBP                  — path to the parent dir holding nrp-user-scripts
 # Optional env:
 #   STORAGE_PATH         — default $HOME/.opt/nrpStorage
-#   NRP_DOCKER_REGISTRY  — default docker.io/hbpneurorobotics/ ; the only
-#                          image knob. Per-service tags are pinned in the
-#                          compose files (frontend/proxy :development,
-#                          backend :nest-gazebo), so no NRP_IMAGE_TAG.
+#   NRP_DOCKER_REGISTRY  — default docker.io/hbpneurorobotics/ ; overrides the
+#                          image registry/namespace for every service.
+#   NRP_BACKEND_TAG      — backend image tag = nrp-core variant, default
+#                          nest-gazebo. Set to `vanilla` for the slim
+#                          no-simulator image. Frontend/proxy stay :development.
 #   NRP_NEST_DESKTOP     — set to ON to use docker-compose-nest-desktop.yaml
 
 set -euo pipefail
 
 export NRP_DOCKER_REGISTRY="${NRP_DOCKER_REGISTRY:-docker.io/hbpneurorobotics/}"
+# Exported so compose interpolation is stable even when unset; default keeps
+# the nest-gazebo variant. Set NRP_BACKEND_TAG=vanilla for the slim image.
+export NRP_BACKEND_TAG="${NRP_BACKEND_TAG:-nest-gazebo}"
 
 if [ -z "${HBP:-}" ]; then
   echo "Your HBP variable is not set!" >&2

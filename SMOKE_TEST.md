@@ -49,13 +49,18 @@ Coexisting compose projects (EBR2-86):
 ```bash
 export HBP=/home/$(whoami)/git-tum            # or wherever your clones live
 export STORAGE_PATH=$HOME/.opt/nrpStorage     # default; can be elsewhere
+export NRP_BACKEND_TAG=nest-gazebo            # default; set to `vanilla` for
+                                              # the slim no-simulator image
 ```
 
 `HBP` is the only required variable. Image registry/tags are baked into
 the compose files — frontend/proxy pull `:development`, backend pulls
 `:nest-gazebo` (Gazebo + NEST) — from `docker.io/hbpneurorobotics/` by
-default. Point at a mirror with `NRP_DOCKER_REGISTRY` if you must; there
-is no longer an `NRP_IMAGE_TAG` to set.
+default. Point at a mirror with `NRP_DOCKER_REGISTRY` if you must. The
+backend variant is the one per-service tag you can override: set
+`NRP_BACKEND_TAG=vanilla` to select the slim no-simulator image (default
+`nest-gazebo`). `start_nrp_docker.sh` exports the default for you, so
+`docker compose` interpolation is stable whether or not you set it.
 
 ### 2. Bring the stack up
 
