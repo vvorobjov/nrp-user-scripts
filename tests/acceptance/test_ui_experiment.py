@@ -36,6 +36,24 @@ def _sim_time_boxes(page):
             if el.is_visible()]
 
 
+def _open_husky_experiment(page):
+    """Log in and open a husky experiment's workbench (the shared UI preamble).
+
+    Mirrors the steps a person takes: log in, open the Experiments overview,
+    select a husky entry and Open it, then land on the workbench route.
+    """
+    _login(page)
+
+    # Open the Experiments overview (My Experiments tab is the default).
+    page.click("text=EXPERIMENTS")
+    page.wait_for_selector(".list-entry-wrapper", timeout=30000)
+
+    # Select the first husky experiment entry, then Open its workbench.
+    page.locator(".list-entry-wrapper", has_text="husky").first.click()
+    page.get_by_role("button", name="Open").first.click()
+    page.wait_for_url("**/experiment/**", timeout=30000)
+
+
 @pytest.fixture
 def ui_cleanup(nrp, husky_experiment):
     """Ensure at least one husky experiment exists (husky_experiment), and stop
@@ -58,16 +76,7 @@ def test_launch_husky_through_ui(page, ui_cleanup):
     simulation) and Start (Play). We assert no error status is shown and the
     simulation clock advances — proving nrp-core is stepping behind the UI.
     """
-    _login(page)
-
-    # Open the Experiments overview (My Experiments tab is the default).
-    page.click("text=EXPERIMENTS")
-    page.wait_for_selector(".list-entry-wrapper", timeout=30000)
-
-    # Select the first husky experiment entry, then Open its workbench.
-    page.locator(".list-entry-wrapper", has_text="husky").first.click()
-    page.get_by_role("button", name="Open").first.click()
-    page.wait_for_url("**/experiment/**", timeout=30000)
+    _open_husky_experiment(page)
 
     # Initialize the simulation (creates it on the backend), then Start it.
     page.wait_for_selector('button[title="Initialize experiment"]:not([disabled])', timeout=30000)
