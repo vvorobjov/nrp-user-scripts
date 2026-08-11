@@ -8,7 +8,7 @@ by the same pytest runner:
 | Suite | File | What it proves |
 | --- | --- | --- |
 | CLI / REST | `acceptance/test_cli_experiment.py` | Drives the proxy + nrp-services REST API the way the frontend does: authenticate → clone → create → start → assert the simulation reaches `started`, the **simulation clock advances**, MQTT status events flow, and no `runtime_error` is published → stop. |
-| UI (Playwright) | `acceptance/test_ui_experiment.py` | Drives the real frontend in a headless browser: FS login → open the Experiments overview → Open a husky experiment → **Initialize + Start** in the workbench → assert no error status and the on-screen simulation clock advances. |
+| UI (Playwright) | `acceptance/test_ui_experiment.py` | Drives the real frontend in a headless browser: FS login → open the Experiments overview → Open a husky experiment → **Initialize + Start** in the workbench → assert no error status and the on-screen simulation clock advances. Also opens the **Edit experiment files** (TF editor) panel and asserts the files load with **no "Could not load the experiment files." error dialog** — the regression net for EBR2-122. |
 
 `husky_gate.sh` remains as a fast bash smoke check; these pytest suites are the
 thorough gate (the CLI suite is its structured, deeper-asserting successor).
