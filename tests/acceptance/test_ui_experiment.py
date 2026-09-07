@@ -12,9 +12,16 @@ import time
 
 import pytest
 
-from conftest import BASE_URL, FS_USER, FS_PASSWORD
+from conftest import BASE_URL, FS_USER, FS_PASSWORD, HUSKY_CONFIG
 
 pytestmark = pytest.mark.ui
+
+# The error dialog (error-dialog.js) renders only while an error is queued, so
+# its mere presence is a failure signal. This exact message is raised by the
+# TF/files editor (tf-editor.js dataError) when the experiment files fail to
+# load — the regression EBR2-122 guards against.
+ERROR_DIALOG = ".error-dialog"
+FILES_LOAD_ERROR = "Could not load the experiment files."
 
 
 def _login(page):
@@ -34,6 +41,38 @@ def _sim_time_boxes(page):
     return [el.inner_text().strip()
             for el in page.query_selector_all(".experiment-time-box")
             if el.is_visible()]
+
+
+def _open_husky_experiment(page):
+    """Log in and open a husky experiment's workbench (the shared UI preamble).
+
+    Mirrors the steps a person takes: log in, open the Experiments overview,
+    select a husky entry and Open it, then land on the workbench route.
+    """
+    _login(page)
+
+    # Open the Experiments overview (My Experiments tab is the default).
+    page.click("text=EXPERIMENTS")
+    page.wait_for_selector(".list-entry-wrapper", timeout=30000)
+
+    # Select the first husky experiment entry, then Open its workbench.
+    page.locator(".list-entry-wrapper", has_text="husky").first.click()
+    page.get_by_role("button", name="Open").first.click()
+    page.wait_for_url("**/experiment/**", timeout=30000)
+
+
+def _error_dialog_messages(page):
+    """Messages of any error dialog currently on screen (empty list when none)."""
+    return [el.inner_text().strip()
+            for el in page.query_selector_all(f"{ERROR_DIALOG} .error-dialog-message")]
+
+
+def _assert_no_error_dialog(page, context):
+    """Fail if an error dialog (or the files-load error text) is displayed."""
+    assert page.query_selector(ERROR_DIALOG) is None, \
+        f"an error dialog is shown {context}: {_error_dialog_messages(page) or '(no message)'}"
+    assert page.query_selector(f"text={FILES_LOAD_ERROR}") is None, \
+        f'"{FILES_LOAD_ERROR}" is shown {context}'
 
 
 @pytest.fixture
@@ -58,16 +97,7 @@ def test_launch_husky_through_ui(page, ui_cleanup):
     simulation) and Start (Play). We assert no error status is shown and the
     simulation clock advances — proving nrp-core is stepping behind the UI.
     """
-    _login(page)
-
-    # Open the Experiments overview (My Experiments tab is the default).
-    page.click("text=EXPERIMENTS")
-    page.wait_for_selector(".list-entry-wrapper", timeout=30000)
-
-    # Select the first husky experiment entry, then Open its workbench.
-    page.locator(".list-entry-wrapper", has_text="husky").first.click()
-    page.get_by_role("button", name="Open").first.click()
-    page.wait_for_url("**/experiment/**", timeout=30000)
+    _open_husky_experiment(page)
 
     # Initialize the simulation (creates it on the backend), then Start it.
     page.wait_for_selector('button[title="Initialize experiment"]:not([disabled])', timeout=30000)
@@ -92,3 +122,41 @@ def test_launch_husky_through_ui(page, ui_cleanup):
             advanced = True
             break
     assert advanced, f"simulation clock did not advance in the UI (time boxes stuck at {before})"
+
+    # Cheap regression net: no error dialog surfaced anywhere in the launch flow.
+    _assert_no_error_dialog(page, "at the end of the launch flow")
+
+
+def test_experiment_files_panel_loads(page, husky_experiment):
+    """Open the 'Edit experiment files' panel and confirm the files load cleanly.
+
+    Regression net for EBR2-122: a "Could not load the experiment files."
+    TypeError shipped because the launch test opened the workbench but never
+    opened the files / TF-editor panel and never asserted the absence of an
+    error dialog. The panel reads the experiment's storage files independent of
+    a running simulation, so opening the workbench is enough to exercise it — no
+    Initialize/Start needed.
+    """
+    _open_husky_experiment(page)
+
+    # The 'Edit experiment files' (TF editor) panel is the workbench's default
+    # flexlayout tab, so it opens automatically. Its shell renders whether or not
+    # the file load succeeds, so waiting for it confirms the panel opened. We do
+    # not click the tab: a failed load pops a modal that would (correctly) block
+    # the click, so the failure is asserted below instead of hanging on it.
+    page.wait_for_selector(".flexlayout__tab_button:has-text('Edit experiment files')", timeout=30000)
+    page.wait_for_selector(".tf-editor-container", timeout=30000)
+
+    # Wait for the load to resolve: either the populated file selector (success)
+    # or the error dialog (failure), so a broken load fails here with a clear
+    # message instead of timing out.
+    page.wait_for_selector(
+        f'select[name="selectTFFile"] option[value="{HUSKY_CONFIG}"], {ERROR_DIALOG}',
+        state="attached", timeout=30000)
+
+    # (a) No error dialog / "Could not load the experiment files." surfaced.
+    _assert_no_error_dialog(page, "after opening the experiment files panel")
+
+    # (b) The files panel listed the experiment config file.
+    assert page.query_selector(f'select[name="selectTFFile"] option[value="{HUSKY_CONFIG}"]') is not None, \
+        f"the file selector does not list {HUSKY_CONFIG}"
