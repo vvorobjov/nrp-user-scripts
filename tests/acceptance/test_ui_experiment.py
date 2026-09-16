@@ -1,7 +1,7 @@
 # [EBR2-96] Browser/UI acceptance suite (pure Playwright in pytest).
 #
 # Drives the REAL frontend the way a person does: log in through the proxy's FS
-# login page, open a husky_braitenberg experiment from the overview, and confirm
+# login page, open the cloned template experiment from the overview, and confirm
 # the workbench actually runs it — the simulation clock advances and no error is
 # shown. This is the human-shaped counterpart of the CLI/REST suite; together
 # they prove the containerized stack works end-to-end through both surfaces.
@@ -12,7 +12,7 @@ import time
 
 import pytest
 
-from conftest import BASE_URL, FS_USER, FS_PASSWORD, HUSKY_CONFIG
+from conftest import BASE_URL, FS_USER, FS_PASSWORD, CONFIG
 
 pytestmark = pytest.mark.ui
 
@@ -43,11 +43,11 @@ def _sim_time_boxes(page):
             if el.is_visible()]
 
 
-def _open_husky_experiment(page):
-    """Log in and open a husky experiment's workbench (the shared UI preamble).
+def _open_experiment(page, title):
+    """Log in and open the workbench of the experiment listed as ``title``.
 
     Mirrors the steps a person takes: log in, open the Experiments overview,
-    select a husky entry and Open it, then land on the workbench route.
+    select the entry and Open it, then land on the workbench route.
     """
     _login(page)
 
@@ -55,8 +55,8 @@ def _open_husky_experiment(page):
     page.click("text=EXPERIMENTS")
     page.wait_for_selector(".list-entry-wrapper", timeout=30000)
 
-    # Select the first husky experiment entry, then Open its workbench.
-    page.locator(".list-entry-wrapper", has_text="husky").first.click()
+    # Select the experiment's entry by its title, then Open its workbench.
+    page.locator(".list-entry-wrapper", has_text=title).first.click()
     page.get_by_role("button", name="Open").first.click()
     page.wait_for_url("**/experiment/**", timeout=30000)
 
@@ -75,10 +75,16 @@ def _assert_no_error_dialog(page, context):
         f'"{FILES_LOAD_ERROR}" is shown {context}'
 
 
+@pytest.fixture(scope="module")
+def experiment_title(nrp, experiment):
+    """Title the Experiments overview lists the cloned experiment under."""
+    return nrp.experiment_title(experiment)
+
+
 @pytest.fixture
-def ui_cleanup(nrp, husky_experiment):
-    """Ensure at least one husky experiment exists (husky_experiment), and stop
-    whatever simulation the UI launches once the test is done."""
+def ui_cleanup(nrp, experiment):
+    """Ensure the cloned experiment exists, and stop whatever simulation the UI
+    launches once the test is done."""
     yield
     nrp.stop_all_running()
 
@@ -89,15 +95,15 @@ def test_login_reaches_dashboard(page):
     assert page.query_selector("text=EXPERIMENTS") is not None
 
 
-def test_launch_husky_through_ui(page, ui_cleanup):
-    """Launch a husky experiment from the workbench and confirm it actually runs.
+def test_launch_experiment_through_ui(page, ui_cleanup, experiment_title):
+    """Launch the cloned experiment from the workbench and confirm it actually runs.
 
-    Steps a person takes: log in, open the Experiments overview, pick a husky
+    Steps a person takes: log in, open the Experiments overview, pick the
     experiment, Open it, then in the workbench hit Initialize (creates the
     simulation) and Start (Play). We assert no error status is shown and the
     simulation clock advances — proving nrp-core is stepping behind the UI.
     """
-    _open_husky_experiment(page)
+    _open_experiment(page, experiment_title)
 
     # Initialize the simulation (creates it on the backend), then Start it.
     page.wait_for_selector('button[title="Initialize experiment"]:not([disabled])', timeout=30000)
@@ -127,7 +133,7 @@ def test_launch_husky_through_ui(page, ui_cleanup):
     _assert_no_error_dialog(page, "at the end of the launch flow")
 
 
-def test_experiment_files_panel_loads(page, husky_experiment):
+def test_experiment_files_panel_loads(page, experiment_title):
     """Open the 'Edit experiment files' panel and confirm the files load cleanly.
 
     Regression net for EBR2-122: a "Could not load the experiment files."
@@ -137,7 +143,7 @@ def test_experiment_files_panel_loads(page, husky_experiment):
     a running simulation, so opening the workbench is enough to exercise it — no
     Initialize/Start needed.
     """
-    _open_husky_experiment(page)
+    _open_experiment(page, experiment_title)
 
     # The 'Edit experiment files' (TF editor) panel is the workbench's default
     # flexlayout tab, so it opens automatically. Its shell renders whether or not
@@ -151,12 +157,12 @@ def test_experiment_files_panel_loads(page, husky_experiment):
     # or the error dialog (failure), so a broken load fails here with a clear
     # message instead of timing out.
     page.wait_for_selector(
-        f'select[name="selectTFFile"] option[value="{HUSKY_CONFIG}"], {ERROR_DIALOG}',
+        f'select[name="selectTFFile"] option[value="{CONFIG}"], {ERROR_DIALOG}',
         state="attached", timeout=30000)
 
     # (a) No error dialog / "Could not load the experiment files." surfaced.
     _assert_no_error_dialog(page, "after opening the experiment files panel")
 
     # (b) The files panel listed the experiment config file.
-    assert page.query_selector(f'select[name="selectTFFile"] option[value="{HUSKY_CONFIG}"]') is not None, \
-        f"the file selector does not list {HUSKY_CONFIG}"
+    assert page.query_selector(f'select[name="selectTFFile"] option[value="{CONFIG}"]') is not None, \
+        f"the file selector does not list {CONFIG}"

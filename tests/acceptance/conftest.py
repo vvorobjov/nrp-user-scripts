@@ -1,8 +1,9 @@
 # [EBR2-96] Shared fixtures for the containerized-stack acceptance suite.
 #
 # Both the CLI/REST suite (test_cli_experiment.py) and the UI suite
-# (test_ui_experiment.py) run an actual husky_braitenberg simulation through the
-# live stack and check the result. These fixtures own the expensive bits — FS
+# (test_ui_experiment.py) run an actual simulation of a template experiment
+# (husky_braitenberg unless NRP_TEMPLATE says otherwise) through the live stack
+# and check the result. These fixtures own the expensive bits — FS
 # authentication, cloning the template into storage, launching the simulation,
 # and collecting MQTT status events — so the individual test functions stay
 # small and each assert one property.
@@ -15,20 +16,45 @@
 #   * in CI on the GitHub mirror.
 import json
 import os
+import posixpath
 import threading
 import time
 
 import pytest
 import requests
 
+
+def _env(*names, default):
+    """First non-empty env var among ``names`` (later names are deprecated aliases)."""
+    for name in names:
+        value = os.environ.get(name)
+        if value:
+            return value
+    return default
+
+
 BASE_URL = os.environ.get("NRP_BASE_URL", "http://localhost:9000")
 FS_USER = os.environ.get("NRP_FS_USER", "nrpuser")
 FS_PASSWORD = os.environ.get("NRP_FS_PASSWORD", "password")
 MQTT_HOST = os.environ.get("NRP_MQTT_HOST", "mqtt-broker-service")
-MQTT_PORT = int(os.environ.get("NRP_MQTT_PORT", "1883"))
-HUSKY_TEMPLATE = os.environ.get("HUSKY_TEMPLATE", "husky_braitenberg/simulation_config.json")
-HUSKY_CONFIG = os.environ.get("HUSKY_CONFIG", "simulation_config.json")
+MQTT_PORT = int(_env("NRP_MQTT_PORT", default="1883"))
 START_TIMEOUT = int(os.environ.get("START_TIMEOUT", "120"))
+
+# [EBR2-120] The experiment under test. NRP_TEMPLATE is the template config the
+# proxy clones (relative to the mounted templates dir), NRP_CONFIG the config file
+# the backend launches, NRP_EXPECTED_PREFIX the prefix of the storage id the clone
+# yields — the proxy names clones '<template dir>_<n>' (ExperimentCloner.
+# createUniqueExperimentId), hence the default. HUSKY_TEMPLATE / HUSKY_CONFIG are
+# the pre-EBR2-120 names, kept as aliases.
+TEMPLATE = _env("NRP_TEMPLATE", "HUSKY_TEMPLATE", default="husky_braitenberg/simulation_config.json")
+CONFIG = _env("NRP_CONFIG", "HUSKY_CONFIG", default="simulation_config.json")
+EXPECTED_PREFIX = _env("NRP_EXPECTED_PREFIX", default=posixpath.dirname(TEMPLATE))
+
+
+def pytest_configure(config):
+    if not EXPECTED_PREFIX:   # a flat NRP_TEMPLATE would make the prefix check vacuous
+        raise pytest.UsageError("NRP_TEMPLATE must be '<template dir>/<config>.json' "
+                                "(the proxy catalog's shape), or set NRP_EXPECTED_PREFIX")
 
 
 # --------------------------------------------------------------------------- #
@@ -42,7 +68,7 @@ class NRPClient:
         self.s = session
         self.auth = auth_headers
 
-    def clone(self, template=HUSKY_TEMPLATE):
+    def clone(self, template=TEMPLATE):
         r = self.s.post(f"{self.base_url}/proxy/storage/clone", headers=self.auth,
                         data=json.dumps({"expPath": template}), timeout=120)
         r.raise_for_status()
@@ -52,7 +78,27 @@ class NRPClient:
         return self.s.delete(f"{self.base_url}/proxy/storage/{exp_id}",
                              headers=self.auth, timeout=30)
 
-    def create_sim(self, exp_id, config=HUSKY_CONFIG):
+    def list_experiments(self):
+        """The storage experiments as the frontend's Experiments overview lists them."""
+        r = self.s.get(f"{self.base_url}/proxy/storage/experiments", headers=self.auth, timeout=60)
+        r.raise_for_status()
+        return r.json()
+
+    def experiment_title(self, exp_id):
+        """Title the overview shows for ``exp_id`` (configuration.SimulationName).
+
+        Only known after cloning: the proxy prefixes the template's SimulationName
+        with the clone timestamp (ExperimentCloner.flattenExperiment).
+        """
+        for entry in self.list_experiments():
+            if entry.get("id") == exp_id:
+                title = (entry.get("configuration") or {}).get("SimulationName")
+                if not title:
+                    pytest.fail(f"{exp_id} has no SimulationName; the Experiments overview cannot list it")
+                return title
+        pytest.fail(f"{exp_id} is not listed by /proxy/storage/experiments")
+
+    def create_sim(self, exp_id, config=CONFIG):
         r = self.s.post(f"{self.base_url}/nrp-services/simulation", headers=self.auth,
                         data=json.dumps({"experimentID": exp_id,
                                          "experimentConfiguration": config,
@@ -203,22 +249,29 @@ def mqtt():
 
 
 @pytest.fixture(scope="module")
-def husky_experiment(nrp):
-    """Clone the husky_braitenberg template into FS storage; delete on teardown."""
+def experiment(nrp):
+    """Clone TEMPLATE into FS storage; delete on teardown."""
     exp_id = nrp.clone()
-    assert exp_id.startswith("husky_braitenberg"), f"unexpected clone result: {exp_id[:120]}"
+    assert exp_id.startswith(EXPECTED_PREFIX), \
+        f"clone of {TEMPLATE} yielded {exp_id[:120]!r}, expected prefix {EXPECTED_PREFIX!r}"
     yield exp_id
     nrp.delete_experiment(exp_id)
 
 
 @pytest.fixture(scope="module")
-def started_simulation(nrp, husky_experiment, mqtt):
-    """Create + start a husky simulation via REST, poll until 'started'.
+def husky_experiment(experiment):
+    """Pre-EBR2-120 name of ``experiment``; kept so existing tests keep working."""
+    return experiment
+
+
+@pytest.fixture(scope="module")
+def started_simulation(nrp, experiment, mqtt):
+    """Create + start a simulation of the cloned experiment via REST, poll until 'started'.
 
     Module-scoped so the heavy nrp-core/Gazebo/NEST launch happens once; stopped
     on teardown so it does not collide with the UI suite's own launch.
     """
-    sim_id = nrp.create_sim(husky_experiment)
+    sim_id = nrp.create_sim(experiment)
     resp = nrp.set_state(sim_id, "started")
     assert resp.status_code == 200, f"PUT state=started -> {resp.status_code}: {resp.text[:200]}"
 
@@ -233,6 +286,6 @@ def started_simulation(nrp, husky_experiment, mqtt):
     assert state in ("started", "paused"), \
         f"simulation did not reach 'started' within {START_TIMEOUT}s (last state: {state})"
 
-    info = {"sim_id": sim_id, "state": state, "experiment": husky_experiment}
+    info = {"sim_id": sim_id, "state": state, "experiment": experiment}
     yield info
     nrp.set_state(sim_id, "stopped")
