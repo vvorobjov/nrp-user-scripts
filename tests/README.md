@@ -63,27 +63,36 @@ Experiment under test (EBR2-120):
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `NRP_TEMPLATE` | `husky_braitenberg/simulation_config.json` | Template config the proxy clones, relative to the mounted templates dir (`${HBP}/nrp-core/templates`). |
-| `NRP_CONFIG` | `simulation_config.json` | Config file inside the cloned experiment that the backend launches. |
+| `NRP_TEMPLATE` | `husky_braitenberg/simulation_config.json` | Template config the proxy clones, as `<dir>/<config>.json` relative to the mounted catalog (`${HBP}/nrp-core/templates`). |
+| `NRP_CONFIG` | `simulation_config.json` | Config file inside the cloned experiment that the backend launches. The proxy always writes the clone's config as `simulation_config.json`, whatever the template file was called, so this almost never needs setting. |
 | `NRP_EXPECTED_PREFIX` | directory of `NRP_TEMPLATE` (`husky_braitenberg`) | Prefix the clone's storage id must have. The proxy names clones `<template dir>_<n>`, so it rarely needs setting. |
 
 `HUSKY_TEMPLATE` / `HUSKY_CONFIG` are the pre-EBR2-120 names and still work as
-aliases (`NRP_*` wins when both are set). `run_acceptance.sh` forwards all of
-them into the suite container. Runner knobs for `run_acceptance.sh`:
-`ACCEPTANCE_IMAGE`, `NRP_HAPROXY_CONTAINER`, `RESULTS_DIR`.
+aliases (`NRP_*` wins when both are set) — for the pytest suites only;
+`husky_gate.sh` reads `HUSKY_TEMPLATE` but still expects a `husky_braitenberg_*`
+clone. `run_acceptance.sh` forwards all of the above (plus `NRP_FS_USER`,
+`NRP_FS_PASSWORD`, `NRP_MQTT_PORT`) into the suite container. Runner knobs for
+`run_acceptance.sh`: `ACCEPTANCE_IMAGE`, `NRP_HAPROXY_CONTAINER`, `RESULTS_DIR`.
 
 ### Running against another template
 
 ```bash
-NRP_TEMPLATE=nest_simple/simulation_config.json ./tests/run_acceptance.sh -m cli
+NRP_TEMPLATE=tf_exchange/simulation_config.json ./tests/run_acceptance.sh -m cli
 ```
 
 The suite clones the template, asserts the storage id starts with
-`nest_simple`, launches `simulation_config.json` and requires the simulation
-clock to advance — the UI suite additionally opens the experiment under the
-title the overview lists it with. Only **backend-launchable** experiments pass:
-the templates must be authored for the backend/UI launch path (as
-`husky_braitenberg` is), not merely copied from nrp-core `examples/`, which
-target the CLI/docker-compose path and go `started → failed` in the simulation
-server (the EBR2-117 finding that EBR2-120 tracks). A failure here therefore
-means the *experiment* is not backend-ready, not that the harness is broken.
+`tf_exchange`, launches `simulation_config.json` and requires the simulation
+clock to advance; the UI suite additionally opens the experiment under the
+title the overview lists it with. Any `<dir>/<config>.json` in the mounted
+catalog can be targeted (`tf_exchange/simulation_config_grpc.json` too). Two
+distinct failure signatures:
+
+- **Clone fails with an HTTP error at fixture setup** → the template is not in
+  `nrp-core/templates/`. Experiments under `nrp-core/examples/` (e.g.
+  `nest_simple`) are not mounted; promoting one into `templates/` is the
+  nrp-core side of EBR2-120.
+- **Clone succeeds but the simulation goes `started → failed`** → the
+  experiment is not backend-launchable. Only templates authored for the
+  backend/UI launch path (as `husky_braitenberg` is) pass; `examples/` configs
+  target the CLI/docker-compose path (the EBR2-117 finding EBR2-120 tracks).
+  This is a verdict on the experiment, not on the harness.
