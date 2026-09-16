@@ -49,9 +49,12 @@ START_TIMEOUT = int(os.environ.get("START_TIMEOUT", "120"))
 TEMPLATE = _env("NRP_TEMPLATE", "HUSKY_TEMPLATE", default="husky_braitenberg/simulation_config.json")
 CONFIG = _env("NRP_CONFIG", "HUSKY_CONFIG", default="simulation_config.json")
 EXPECTED_PREFIX = _env("NRP_EXPECTED_PREFIX", default=posixpath.dirname(TEMPLATE))
-if not EXPECTED_PREFIX:   # a flat NRP_TEMPLATE would make the prefix check vacuous
-    raise pytest.UsageError("NRP_TEMPLATE must be '<template dir>/<config>.json' "
-                            "(the proxy catalog's shape), or set NRP_EXPECTED_PREFIX")
+
+
+def pytest_configure(config):
+    if not EXPECTED_PREFIX:   # a flat NRP_TEMPLATE would make the prefix check vacuous
+        raise pytest.UsageError("NRP_TEMPLATE must be '<template dir>/<config>.json' "
+                                "(the proxy catalog's shape), or set NRP_EXPECTED_PREFIX")
 
 
 # --------------------------------------------------------------------------- #
