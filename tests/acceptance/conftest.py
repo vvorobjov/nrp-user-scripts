@@ -23,13 +23,6 @@ import time
 import pytest
 import requests
 
-BASE_URL = os.environ.get("NRP_BASE_URL", "http://localhost:9000")
-FS_USER = os.environ.get("NRP_FS_USER", "nrpuser")
-FS_PASSWORD = os.environ.get("NRP_FS_PASSWORD", "password")
-MQTT_HOST = os.environ.get("NRP_MQTT_HOST", "mqtt-broker-service")
-MQTT_PORT = int(os.environ.get("NRP_MQTT_PORT", "1883"))
-START_TIMEOUT = int(os.environ.get("START_TIMEOUT", "120"))
-
 
 def _env(*names, default):
     """First non-empty env var among ``names`` (later names are deprecated aliases)."""
@@ -39,6 +32,13 @@ def _env(*names, default):
             return value
     return default
 
+
+BASE_URL = os.environ.get("NRP_BASE_URL", "http://localhost:9000")
+FS_USER = os.environ.get("NRP_FS_USER", "nrpuser")
+FS_PASSWORD = os.environ.get("NRP_FS_PASSWORD", "password")
+MQTT_HOST = os.environ.get("NRP_MQTT_HOST", "mqtt-broker-service")
+MQTT_PORT = int(_env("NRP_MQTT_PORT", default="1883"))
+START_TIMEOUT = int(os.environ.get("START_TIMEOUT", "120"))
 
 # [EBR2-120] The experiment under test. NRP_TEMPLATE is the template config the
 # proxy clones (relative to the mounted templates dir), NRP_CONFIG the config file
