@@ -15,9 +15,13 @@
 #   ./tests/run_acceptance.sh -m cli          # only the REST suite
 #   ./tests/run_acceptance.sh -m ui           # only the UI suite
 #   ./tests/run_acceptance.sh -k time_advances # any pytest args pass through
+#   NRP_TEMPLATE=nest_simple/simulation_config.json ./tests/run_acceptance.sh -m cli
+#                                             # another template (EBR2-120)
 #
 # Env overrides: ACCEPTANCE_IMAGE, NRP_HAPROXY_CONTAINER, RESULTS_DIR,
-#                NRP_BASE_URL, NRP_MQTT_HOST, START_TIMEOUT.
+#                NRP_BASE_URL, NRP_MQTT_HOST, START_TIMEOUT,
+#                NRP_TEMPLATE, NRP_CONFIG, NRP_EXPECTED_PREFIX (and the deprecated
+#                HUSKY_TEMPLATE / HUSKY_CONFIG aliases) — defaults in conftest.py.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -43,6 +47,8 @@ exec docker run --rm \
   -e NRP_BASE_URL="${NRP_BASE_URL:-http://localhost:9000}" \
   -e NRP_MQTT_HOST="${NRP_MQTT_HOST:-mqtt-broker-service}" \
   -e START_TIMEOUT="${START_TIMEOUT:-120}" \
+  -e NRP_TEMPLATE -e NRP_CONFIG -e NRP_EXPECTED_PREFIX \
+  -e HUSKY_TEMPLATE -e HUSKY_CONFIG \
   "$IMAGE" \
   -v --junitxml=/suite/results/junit.xml \
   --tracing=retain-on-failure --output=/suite/results/artifacts \
