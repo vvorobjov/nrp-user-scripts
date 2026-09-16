@@ -49,6 +49,9 @@ def _env(*names, default):
 TEMPLATE = _env("NRP_TEMPLATE", "HUSKY_TEMPLATE", default="husky_braitenberg/simulation_config.json")
 CONFIG = _env("NRP_CONFIG", "HUSKY_CONFIG", default="simulation_config.json")
 EXPECTED_PREFIX = _env("NRP_EXPECTED_PREFIX", default=posixpath.dirname(TEMPLATE))
+if not EXPECTED_PREFIX:   # a flat NRP_TEMPLATE would make the prefix check vacuous
+    raise pytest.UsageError("NRP_TEMPLATE must be '<template dir>/<config>.json' "
+                            "(the proxy catalog's shape), or set NRP_EXPECTED_PREFIX")
 
 
 # --------------------------------------------------------------------------- #
@@ -86,8 +89,11 @@ class NRPClient:
         """
         for entry in self.list_experiments():
             if entry.get("id") == exp_id:
-                return entry["configuration"]["SimulationName"]
-        raise LookupError(f"{exp_id} is not listed by /proxy/storage/experiments")
+                title = (entry.get("configuration") or {}).get("SimulationName")
+                if not title:
+                    pytest.fail(f"{exp_id} has no SimulationName; the Experiments overview cannot list it")
+                return title
+        pytest.fail(f"{exp_id} is not listed by /proxy/storage/experiments")
 
     def create_sim(self, exp_id, config=CONFIG):
         r = self.s.post(f"{self.base_url}/nrp-services/simulation", headers=self.auth,
