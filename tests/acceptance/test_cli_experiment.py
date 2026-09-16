@@ -1,7 +1,8 @@
 # [EBR2-96] CLI/REST acceptance suite.
 #
 # Drives the live stack over the same REST surface the frontend uses, launches a
-# real husky_braitenberg simulation through nrp-backend (which forks nrp-core ->
+# real simulation of the template experiment (husky_braitenberg by default, see
+# NRP_TEMPLATE in conftest.py) through nrp-backend (which forks nrp-core ->
 # Gazebo + NEST), and checks the *result*: the simulation reaches 'started', its
 # simulation clock actually advances, MQTT status events flow, and no
 # runtime_error is published. This is the structured, deeply-asserting successor
@@ -9,6 +10,8 @@
 import time
 
 import pytest
+
+from conftest import EXPECTED_PREFIX
 
 pytestmark = pytest.mark.cli
 
@@ -22,9 +25,9 @@ def test_authenticate(auth_token):
     assert auth_token
 
 
-def test_clone_creates_experiment(husky_experiment):
-    """Cloning the template produces a husky_braitenberg_* storage experiment."""
-    assert husky_experiment.startswith("husky_braitenberg")
+def test_clone_creates_experiment(experiment):
+    """Cloning the template produces a <template dir>_* storage experiment."""
+    assert experiment.startswith(EXPECTED_PREFIX)
 
 
 def test_simulation_reaches_started(started_simulation):
