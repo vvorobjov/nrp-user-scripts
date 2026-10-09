@@ -2,7 +2,8 @@ name: Stack acceptance suite (UI + CLI)
 
 # [EBR2-96] Brings the published containerized stack up and runs the pytest
 # acceptance suites (CLI/REST + Playwright UI) against it, launching a real
-# husky_braitenberg simulation and asserting it actually steps.
+# husky_braitenberg simulation and asserting it actually steps, then the CLI
+# suite once more against the tf_exchange template (EBR2-120).
 #
 # CI runs on the GitHub mirror (Bitbucket holds PRs; development is synced to
 # GitHub, which fires this). The deep "simulation clock advances" assertions
@@ -63,6 +64,15 @@ jobs:
       - name: Run acceptance suites (UI + CLI)
         working-directory: nrp-user-scripts
         run: ./tests/run_acceptance.sh
+      # EBR2-120: a second backend-launchable template must clone, launch and
+      # advance its clock through the same path. Separate RESULTS_DIR so the
+      # husky junit.xml above is not overwritten.
+      - name: Run the CLI suite against the second template (tf_exchange)
+        working-directory: nrp-user-scripts
+        env:
+          NRP_TEMPLATE: tf_exchange/simulation_config.json
+          RESULTS_DIR: ${{ github.workspace }}/nrp-user-scripts/tests/acceptance-results/tf_exchange
+        run: ./tests/run_acceptance.sh -m cli
 
       - name: Stack logs on failure
         if: failure()
