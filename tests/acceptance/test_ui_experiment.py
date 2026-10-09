@@ -111,6 +111,12 @@ def test_launch_experiment_through_ui(page, ui_cleanup, experiment_title):
     page.wait_for_selector('button[title="Start"]:not([disabled])', timeout=90000)
     page.locator('button[title="Start"]').first.click()
 
+    # The status popup must announce the NEW state. It used to read the
+    # component state before React applied it and said "paused" (or
+    # "created") right after pressing play (EBR2-130). The toast autohides,
+    # so wait for it immediately after the click.
+    page.wait_for_selector("text=The experiment is running", timeout=60000)
+
     # The time boxes confirm the workbench is wired to the running simulation.
     page.wait_for_selector(".experiment-time-box", timeout=30000)
 
