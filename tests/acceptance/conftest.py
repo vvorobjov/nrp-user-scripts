@@ -278,12 +278,15 @@ def started_simulation(nrp, experiment, mqtt):
     state, deadline = None, time.time() + START_TIMEOUT
     while time.time() < deadline:
         state = nrp.get_state(sim_id)
-        if state in ("started", "paused"):
+        # 'completed' counts: a short template (tf_exchange has a 1 s
+        # SimulationTimeout) can run to its end between two polls, and it
+        # only gets there through 'started'.
+        if state in ("started", "paused", "completed"):
             break
         if state in ("failed", "halted"):
             pytest.fail(f"simulation entered terminal error state '{state}'")
         time.sleep(2)
-    assert state in ("started", "paused"), \
+    assert state in ("started", "paused", "completed"), \
         f"simulation did not reach 'started' within {START_TIMEOUT}s (last state: {state})"
 
     info = {"sim_id": sim_id, "state": state, "experiment": experiment}
