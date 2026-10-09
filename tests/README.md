@@ -46,7 +46,10 @@ JUnit XML and Playwright traces land in `tests/acceptance-results/`.
 
 `.github/workflows/acceptance.yml` (GitHub Actions on the mirror) brings the
 published stack up and runs both suites on every push to `development`/`master`
-and on PRs, uploading the JUnit + trace artifacts.
+and on PRs, uploading the JUnit + trace artifacts. A second step then runs the
+CLI suite with `NRP_TEMPLATE=tf_exchange/simulation_config.json` (results under
+`acceptance-results/tf_exchange/`), so CI proves two backend-launchable
+templates, not just husky (EBR2-120).
 
 > The deep "simulation clock advances" assertions require the **EBR2-97** fix
 > (start-vs-simserver-subscription race) to be present in the published
